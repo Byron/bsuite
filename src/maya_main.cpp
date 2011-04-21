@@ -5,6 +5,8 @@
 
 #include <Ptexture.h>
 
+PtexCache* gCache = 0;
+
 extern "C" {
 
 	//! Initialize the plugin in maya

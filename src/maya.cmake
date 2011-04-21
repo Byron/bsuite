@@ -1,6 +1,8 @@
 
 set(MAYA_SOURCE_FILES 
-	../maya_main.cpp)
+	../maya_main.cpp
+	../visnode.cpp
+	../util.cpp)
 
 # This function should be called from a subdirectory denoting the maya version
 # to make sure the include directories are only provided for a single location, and 

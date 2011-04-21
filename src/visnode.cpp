@@ -66,12 +66,11 @@ MStatus PtexVisNode::initialize()
 
 	// Input attributes
 	////////////////////
-	aPtexFileName = mfnTyp.create("ptexFileName", "f", MFnData::kString);
-	setup_input(mfnTyp);
+	aPtexFileName = mfnTyp.create("ptexFileName", "ptf", MFnData::kString);
 	mfnTyp.setConnectable(false);
 
 	MFnEnumAttribute mfnEnum;
-	mfnEnum.create("ptexFilterType", "t", 0);
+	aPtexFilterType = mfnEnum.create("ptexFilterType", "ptt", 0);
 	mfnEnum.addField("Point",      0);
 	mfnEnum.addField("Bilinear",   1);
 	mfnEnum.addField("Box",        2);
@@ -84,16 +83,16 @@ MStatus PtexVisNode::initialize()
 	mfnEnum.setKeyable(true);
 	mfnEnum.setConnectable(false);
 
-	aPtexFilterSize = mfnNum.create("ptexFilterSize", "s", MFnNumericData::kFloat, 1.0);
+	aPtexFilterSize = mfnNum.create("ptexFilterSize", "pts", MFnNumericData::kFloat, 1.0);
 	mfnNum.setKeyable(true);
 	
 	// Output attributes
 	/////////////////////
 	aNeedsCompute = mfnNum.create("needsComputation", "nc", MFnNumericData::kFloat, 0.0);
-	setup_output(aNeedsCompute);
+	setup_output(mfnNum);
 	
 	aMetaDataKeys = mfnTyp.create("metaData", "md", MFnData::kStringArray);
-	setup_output(aMetaDataKeys);
+	setup_output(mfnTyp);
 
 	// Add attributes
 	/////////////////
@@ -145,12 +144,12 @@ bool PtexVisNode::assure_filter(MDataBlock& data)
 	}
 	
 	Ptex::String error;
-	m_ptex_texture = gCache->get(filePath.asChar(), error);
-	if (!m_ptex_texture.get()) {
+	PtexTexturePtr ptex(gCache->get(filePath.asChar(), error));	// This pointer interface is ridiculous
+	if (!ptex.get()) {
 		m_error = error.c_str();
 		return false;
 	}
-	
+	m_ptex_texture.swap(ptex);
 	return true;
 }
 
@@ -175,7 +174,8 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 		const PtexFilter::FilterType fType = to_filter_type(data.inputValue(aPtexFilterType).asInt());
 		
 		PtexFilter::Options opts(fType, 0, fSize);
-		m_ptex_filter = PtexFilter::getFilter(m_ptex_texture.get(), opts);
+		PtexFilterPtr pfilter(PtexFilter::getFilter(m_ptex_texture.get(), opts));
+		m_ptex_filter.swap(pfilter);
 		
 		// Now we are ready for computation, and can leave everything else to the drawing method (for now)
 		

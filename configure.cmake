@@ -59,7 +59,7 @@ endif()
 ######################
 set(MAYA_VERSIONS 2012 2011 2010 2009 2008)
 set(PTEX_LIBRARIES Ptex z)
-set(MAYA_LIBRARIES Foundation OpenMaya OpenMayaAnim OpenMayaRender)
+set(MAYA_LIBRARIES Foundation OpenMaya OpenMayaUI OpenMayaAnim OpenMayaRender)
 set(CUSTOM_DEFINITIONS -DREQUIRE_IOSTREAM -D_BOOL)
 
 if(UNIX)

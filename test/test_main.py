@@ -1,7 +1,7 @@
 
 from util import *
 
-class TestMain(TestBase):
+class TestMain(TestMayaBase):
 	
 	def test_main(self):
 		pass
