@@ -9,3 +9,5 @@ CTest*
 Doxyfile
 Makefile
 cmake_*
+*.pyc
+Testing/

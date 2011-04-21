@@ -49,6 +49,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Pro
 endif()
 
 if(DOXYGEN)
+	set(DOXYFILE_SOURCE_DIRS src)
 	include(UseDoxygen.cmake)
 else(DOXYGEN)
 	message(WARNING "Doxygen was not found - documentation will not be built")
@@ -117,6 +118,6 @@ enable_testing()
 include(fun.cmake)
 
 add_subdirectory(src)
-#add_subdirectory(test)
+add_subdirectory(test)
 
 
