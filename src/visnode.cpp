@@ -11,8 +11,11 @@
 #include <maya/MString.h>
 #include <maya/MTypeId.h>
 #include <maya/MPlug.h>
+#include <maya/MStringArray.h>
+#include <maya/MFnMeshData.h>
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
+#include <maya/MFnStringArrayData.h>
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MFnTypedAttribute.h>
 #include <maya/MFnEnumAttribute.h>
@@ -21,20 +24,32 @@
 #include "util.h"
 #include "visnode.h"
 
+#include "assert.h"
+
 
 /////////////////////////////////////////////////////////////////////
 
 const MTypeId PtexVisNode::typeId(0x00108bdd);
-const MString PtexVisNode::typeName("PtexVisNode");
+const MString PtexVisNode::typeName("ptexVisNode");
 
 
 // Attributes
 MObject PtexVisNode::aPtexFileName;
 MObject PtexVisNode::aPtexFilterType;
 MObject PtexVisNode::aPtexFilterSize;
+MObject PtexVisNode::aInMesh;
 
+MObject PtexVisNode::aOutNumChannels;
+MObject PtexVisNode::aOutNumFaces;
+MObject PtexVisNode::aOutHasEdits;
+MObject PtexVisNode::aOutHasMipMaps;
+MObject PtexVisNode::aOutAlphaChannel;
 MObject PtexVisNode::aNeedsCompute;
-MObject PtexVisNode::aMetaDataKeys;
+MObject PtexVisNode::aOutMetaDataKeys;
+MObject PtexVisNode::aOutMeshType;
+MObject PtexVisNode::aOutDataType;
+MObject PtexVisNode::aOutUBorderMode;
+MObject PtexVisNode::aOutVBorderMode;
 
 
 PtexVisNode::PtexVisNode()
@@ -56,6 +71,13 @@ void* PtexVisNode::creator()
 	return new PtexVisNode();
 }
 
+void add_border_mode_fields(MFnEnumAttribute& mfnEnum)
+{
+	mfnEnum.addField("clamp", 0);
+	mfnEnum.addField("black", 0);
+	mfnEnum.addField("periodic", 0);
+}
+
 // DESCRIPTION:
 //
 MStatus PtexVisNode::initialize()
@@ -63,14 +85,20 @@ MStatus PtexVisNode::initialize()
 	MStatus status;
 	MFnNumericAttribute mfnNum;
 	MFnTypedAttribute mfnTyp;
+	MFnStringArrayData mfnStringArray;
 
 	// Input attributes
 	////////////////////
-	aPtexFileName = mfnTyp.create("ptexFileName", "ptf", MFnData::kString);
-	mfnTyp.setConnectable(false);
+	aPtexFileName = mfnTyp.create("ptexFilePath", "ptfp", MFnData::kString, &status);
+	CHECK_MSTATUS(status);
+	mfnTyp.setInternal(true);
+	
+	aInMesh = mfnTyp.create("inMesh", "i", MFnData::kMesh, &status);
+	mfnTyp.setDefault(MObject::kNullObj);
+	CHECK_MSTATUS(status);
 
 	MFnEnumAttribute mfnEnum;
-	aPtexFilterType = mfnEnum.create("ptexFilterType", "ptt", 0);
+	aPtexFilterType = mfnEnum.create("ptexFilterType", "ptft", 0);
 	mfnEnum.addField("Point",      0);
 	mfnEnum.addField("Bilinear",   1);
 	mfnEnum.addField("Box",        2);
@@ -79,11 +107,9 @@ MStatus PtexVisNode::initialize()
 	mfnEnum.addField("BSpline",    5);
 	mfnEnum.addField("CatmullRom", 6);
 	mfnEnum.addField("Mitchell",   7);
-	mfnEnum.setHidden(false);
 	mfnEnum.setKeyable(true);
-	mfnEnum.setConnectable(false);
 
-	aPtexFilterSize = mfnNum.create("ptexFilterSize", "pts", MFnNumericData::kFloat, 1.0);
+	aPtexFilterSize = mfnNum.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 1.0);
 	mfnNum.setKeyable(true);
 	
 	// Output attributes
@@ -91,20 +117,79 @@ MStatus PtexVisNode::initialize()
 	aNeedsCompute = mfnNum.create("needsComputation", "nc", MFnNumericData::kFloat, 0.0);
 	setup_output(mfnNum);
 	
-	aMetaDataKeys = mfnTyp.create("metaData", "md", MFnData::kStringArray);
+	aOutMetaDataKeys = mfnTyp.create("outMetaDataKeys", "omdk", MFnData::kStringArray, &status);
+	CHECK_MSTATUS(status);
+	mfnTyp.setDefault(mfnStringArray.create());
 	setup_output(mfnTyp);
+	
+	aOutNumChannels = mfnNum.create("outNumChannels", "onc", MFnNumericData::kInt);
+	setup_output(mfnNum);
+	
+	aOutNumFaces = mfnNum.create("outNumFaces", "onf", MFnNumericData::kInt);
+	setup_output(mfnNum);
+	
+	aOutAlphaChannel = mfnNum.create("outAlphaChannel", "oac", MFnNumericData::kInt);
+	setup_output(mfnNum);
+	
+	aOutHasEdits = mfnNum.create("outHasEdits", "ohe", MFnNumericData::kBoolean);
+	setup_output(mfnNum);
+	
+	aOutHasMipMaps = mfnNum.create("outHasMipMaps", "ohm", MFnNumericData::kBoolean);
+	setup_output(mfnNum);
+	
+	aOutMeshType = mfnEnum.create("outMeshType", "omt");
+	setup_output(mfnEnum);
+	mfnEnum.addField("triangle", 0);
+	mfnEnum.addField("quad", 1);
+	
+	aOutDataType = mfnEnum.create("outDataType", "odt");
+	setup_output(mfnEnum);
+	mfnEnum.addField("int8", 0);
+	mfnEnum.addField("int16", 1);
+	mfnEnum.addField("half", 2);
+	mfnEnum.addField("float", 3);
+	
+	aOutUBorderMode = mfnEnum.create("outUBorderMode", "oubm");
+	setup_output(mfnEnum);
+	add_border_mode_fields(mfnEnum);
+	aOutVBorderMode = mfnEnum.create("outVBorderMode", "ovbm");
+	setup_output(mfnEnum);
+	add_border_mode_fields(mfnEnum);
+	
 
 	// Add attributes
 	/////////////////
 	CHECK_MSTATUS(addAttribute(aPtexFileName));
 	CHECK_MSTATUS(addAttribute(aPtexFilterType));
 	CHECK_MSTATUS(addAttribute(aPtexFilterSize));
+	CHECK_MSTATUS(addAttribute(aInMesh));
 	
-	CHECK_MSTATUS(addAttribute(aMetaDataKeys));
+	CHECK_MSTATUS(addAttribute(aOutMetaDataKeys));
 	CHECK_MSTATUS(addAttribute(aNeedsCompute));
+	CHECK_MSTATUS(addAttribute(aOutNumChannels));
+	CHECK_MSTATUS(addAttribute(aOutNumFaces));
+	CHECK_MSTATUS(addAttribute(aOutAlphaChannel));
+	CHECK_MSTATUS(addAttribute(aOutHasEdits));
+	CHECK_MSTATUS(addAttribute(aOutHasMipMaps));
+	CHECK_MSTATUS(addAttribute(aOutMeshType));
+	CHECK_MSTATUS(addAttribute(aOutDataType));
+	CHECK_MSTATUS(addAttribute(aOutUBorderMode));
+	CHECK_MSTATUS(addAttribute(aOutVBorderMode));
+	
+	
 
 	// All input affect the output color
-	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aMetaDataKeys));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutMetaDataKeys));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutNumChannels));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutNumFaces));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutHasEdits));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutHasMipMaps));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutAlphaChannel));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutMeshType));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutDataType));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutUBorderMode));
+	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutVBorderMode));
+	CHECK_MSTATUS(attributeAffects(aInMesh,			aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFileName,   aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFilterSize, aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFilterType, aNeedsCompute));
@@ -132,7 +217,7 @@ PtexFilter::FilterType PtexVisNode::to_filter_type(int type)
 	}
 }
 
-bool PtexVisNode::assure_filter(MDataBlock& data)
+bool PtexVisNode::assure_texture(MDataBlock& data)
 {
 	if (m_ptex_texture.get()) {
 		return true;
@@ -153,6 +238,23 @@ bool PtexVisNode::assure_filter(MDataBlock& data)
 	return true;
 }
 
+void PtexVisNode::release_texture_and_filter()
+{
+	PtexTexturePtr ptex;
+	PtexFilterPtr pfilter;
+	m_ptex_texture.swap(ptex);
+	m_ptex_filter.swap(pfilter);
+}
+
+bool PtexVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx)
+{
+	if (plug == aPtexFileName) {
+		release_texture_and_filter();
+	}
+	
+	return false;
+}
+
 MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 {
 	// reset previous error, we only get called whenever something changes
@@ -164,7 +266,7 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 	// over and over again, lets limit this to just when something changes
 	data.setClean(plug);
 	if (plug == aNeedsCompute) {
-		if (!assure_filter(data)) {
+		if (!assure_texture(data)) {
 			return MS::kSuccess;
 		}
 		
@@ -180,10 +282,49 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 		// Now we are ready for computation, and can leave everything else to the drawing method (for now)
 		
 		return MS::kSuccess;
-	} else if (plug == aMetaDataKeys) {
-		if (!assure_filter(data)) {
+	} else if (plug == aOutMetaDataKeys || plug == aOutNumChannels || plug == aOutNumFaces ||
+	           plug == aOutAlphaChannel || plug == aOutHasEdits || plug == aOutHasMipMaps  ||
+	           plug == aOutMeshType || plug == aOutDataType || 
+	           plug == aOutUBorderMode || plug == aOutVBorderMode) {
+		if (!assure_texture(data)) {
 			return MS::kSuccess;
 		}
+		
+		// Update all file information
+		MFnStringArrayData arrayData(data.inputValue(aOutMetaDataKeys).data());
+		MStringArray keys = arrayData.array();
+		keys.clear();
+		
+		PtexTexture* tex = m_ptex_texture.get();
+		assert(tex);
+		
+		PtexMetaData* mdata = tex->getMetaData();
+		for (int i = 0; i < mdata->numKeys(); ++i) {
+			const char* keyName = 0;
+			Ptex::MetaDataType dt;
+			mdata->getKey(i, keyName, dt	);
+			keys.append(MString(keyName ? keyName : "unknown"));
+		}
+		
+		data.inputValue(aOutNumChannels).asInt() = tex->numChannels();
+		data.inputValue(aOutNumFaces).asInt() = tex->numFaces();
+		data.inputValue(aOutHasEdits).asBool() = tex->hasEdits();
+		data.inputValue(aOutHasMipMaps).asBool() = tex->hasMipMaps();
+		data.inputValue(aOutAlphaChannel).asInt() = tex->alphaChannel();
+		data.inputValue(aOutMeshType).asInt() = (int)tex->meshType();
+		data.inputValue(aOutDataType).asInt() = (int)tex->dataType();
+		data.inputValue(aOutUBorderMode).asInt() = (int)tex->uBorderMode();
+		data.inputValue(aOutVBorderMode).asInt() = (int)tex->vBorderMode();
+		
+		// set all clean
+		MObject* attrs[] = {&aOutMetaDataKeys, &aOutNumChannels, &aOutNumFaces, 
+		                    &aOutAlphaChannel, &aOutHasEdits, &aOutHasMipMaps,
+		                   &aOutMeshType, &aOutDataType, &aOutUBorderMode, &aOutVBorderMode};
+		MObject** end = attrs + (sizeof(attrs) / sizeof(attrs[0]));
+		for (MObject** i = attrs; i < end; ++i) {
+			data.setClean(**i);
+		}
+		
 		return MS::kSuccess;
 	} else {
 		return MS::kUnknownParameter;
@@ -192,10 +333,17 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 
 void PtexVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplayStyle style, M3dView::DisplayStatus)
 {
+	// make sure we are uptodate
+	MPlug(thisMObject(), aNeedsCompute).asInt();
+	
 	view.beginGL();
 	if (m_error.length()) {
 		view.drawText(m_error, MPoint());
 	}
+		
+	if (m_ptex_filter.get()) {
+		
+	}// end have filter
 	
 	view.endGL();
 }

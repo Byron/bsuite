@@ -14,6 +14,7 @@ class PtexVisNode : public MPxLocatorNode
 		virtual ~PtexVisNode();
 
 		virtual MStatus compute(const MPlug&, MDataBlock&);
+		virtual bool	setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx);
 		virtual void    postConstructor();
 		virtual void	draw(M3dView &view, const MDagPath &path, M3dView::DisplayStyle style, M3dView::DisplayStatus);
 
@@ -29,7 +30,10 @@ class PtexVisNode : public MPxLocatorNode
 		
 		//! Assure a filter is present.
 		//! \return false if this is not the case, usually because the filename is invalid
-		bool assure_filter(MDataBlock& data);
+		bool assure_texture(MDataBlock& data);
+		
+		//! release the current texture (if there is one). This releases the filter as well !
+		void release_texture_and_filter();
 		
 	protected:
 		// Input attributes
@@ -39,7 +43,16 @@ class PtexVisNode : public MPxLocatorNode
 		static MObject aInMesh;					//!< mesh to display the ptex information for
 		
 		// output attributes
-		static MObject aMetaDataKeys;			//!< string array of meta data keys
+		static MObject aOutNumChannels;			//!< provide the number of channels in the file
+		static MObject aOutNumFaces;			//!< amount of faces in the file
+		static MObject aOutAlphaChannel;		//!< index of the channel providing alpha information
+		static MObject aOutHasMipMaps;			//!< true if mipmaps are stored
+		static MObject aOutHasEdits;			//!< true if edits are available
+		static MObject aOutMetaDataKeys;		//!< string array of meta data keys
+		static MObject aOutDataType;			//!< data type used in the channels
+		static MObject aOutMeshType;			//!< mesh type used in file
+		static MObject aOutUBorderMode;			//!< u border mode
+		static MObject aOutVBorderMode;			//!< u border mode
 		static MObject aNeedsCompute;			//!< dummy output (for now) to check if we need to compute
 		
 
