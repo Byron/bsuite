@@ -13,7 +13,7 @@
 #include <maya/MPlug.h>
 #include <maya/MFileObject.h>
 #include <maya/MStringArray.h>
-#include <maya/MFnMeshData.h>
+#include <maya/MFnMesh.h>
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
 #include <maya/MFnStringArrayData.h>
@@ -84,18 +84,18 @@ void add_border_mode_fields(MFnEnumAttribute& mfnEnum)
 MStatus PtexVisNode::initialize()
 {
 	MStatus status;
-	MFnNumericAttribute mfnNum;
-	MFnTypedAttribute mfnTyp;
-	MFnStringArrayData mfnStringArray;
+	MFnNumericAttribute numFn;
+	MFnTypedAttribute typFn;
+	MFnStringArrayData stringArrayFn;
 
 	// Input attributes
 	////////////////////
-	aPtexFileName = mfnTyp.create("ptexFilePath", "ptfp", MFnData::kString, &status);
+	aPtexFileName = typFn.create("ptexFilePath", "ptfp", MFnData::kString, &status);
 	CHECK_MSTATUS(status);
-	mfnTyp.setInternal(true);
+	typFn.setInternal(true);
 	
-	aInMesh = mfnTyp.create("inMesh", "i", MFnData::kMesh, &status);
-	mfnTyp.setDefault(MObject::kNullObj);
+	aInMesh = typFn.create("inMesh", "i", MFnData::kMesh, &status);
+	typFn.setDefault(MObject::kNullObj);
 	CHECK_MSTATUS(status);
 
 	MFnEnumAttribute mfnEnum;
@@ -110,33 +110,33 @@ MStatus PtexVisNode::initialize()
 	mfnEnum.addField("Mitchell",   7);
 	mfnEnum.setKeyable(true);
 
-	aPtexFilterSize = mfnNum.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 1.0);
-	mfnNum.setKeyable(true);
+	aPtexFilterSize = numFn.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 1.0);
+	numFn.setKeyable(true);
 	
 	// Output attributes
 	/////////////////////
-	aNeedsCompute = mfnNum.create("needsComputation", "nc", MFnNumericData::kFloat, 0.0);
-	setup_output(mfnNum);
+	aNeedsCompute = numFn.create("needsComputation", "nc", MFnNumericData::kInt);
+	setup_output(numFn);
 	
-	aOutMetaDataKeys = mfnTyp.create("outMetaDataKeys", "omdk", MFnData::kStringArray, &status);
+	aOutMetaDataKeys = typFn.create("outMetaDataKeys", "omdk", MFnData::kStringArray, &status);
 	CHECK_MSTATUS(status);
-	mfnTyp.setDefault(mfnStringArray.create());
-	setup_output(mfnTyp);
+	typFn.setDefault(stringArrayFn.create());
+	setup_output(typFn);
 	
-	aOutNumChannels = mfnNum.create("outNumChannels", "onc", MFnNumericData::kInt);
-	setup_output(mfnNum);
+	aOutNumChannels = numFn.create("outNumChannels", "onc", MFnNumericData::kInt);
+	setup_output(numFn);
 	
-	aOutNumFaces = mfnNum.create("outNumFaces", "onf", MFnNumericData::kInt);
-	setup_output(mfnNum);
+	aOutNumFaces = numFn.create("outNumFaces", "onf", MFnNumericData::kInt);
+	setup_output(numFn);
 	
-	aOutAlphaChannel = mfnNum.create("outAlphaChannel", "oac", MFnNumericData::kInt);
-	setup_output(mfnNum);
+	aOutAlphaChannel = numFn.create("outAlphaChannel", "oac", MFnNumericData::kInt);
+	setup_output(numFn);
 	
-	aOutHasEdits = mfnNum.create("outHasEdits", "ohe", MFnNumericData::kBoolean);
-	setup_output(mfnNum);
+	aOutHasEdits = numFn.create("outHasEdits", "ohe", MFnNumericData::kBoolean);
+	setup_output(numFn);
 	
-	aOutHasMipMaps = mfnNum.create("outHasMipMaps", "ohm", MFnNumericData::kBoolean);
-	setup_output(mfnNum);
+	aOutHasMipMaps = numFn.create("outHasMipMaps", "ohm", MFnNumericData::kBoolean);
+	setup_output(numFn);
 	
 	aOutMeshType = mfnEnum.create("outMeshType", "omt");
 	setup_output(mfnEnum);
@@ -254,13 +254,48 @@ void PtexVisNode::release_texture_and_filter()
 	m_ptex_filter.swap(pfilter);
 }
 
+void PtexVisNode::release_cache()
+{
+	m_sample_col.clear();
+	m_sample_pos.clear();
+}
+
 bool PtexVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx)
 {
 	if (plug == aPtexFileName) {
 		release_texture_and_filter();
+		release_cache();
 	}
 	
 	return false;
+}
+
+bool PtexVisNode::update_sample_buffer(MDataBlock& data)
+{
+	PtexTexture* tex = m_ptex_texture.get();
+	PtexFilter* filter = m_ptex_filter.get();
+	
+	if (!tex | !filter) {
+		m_error = "Cannot sample ptex without a valid texture and filter";
+		return false;
+	}
+	
+	MStatus stat;
+	MFnMesh meshFn(data.inputValue(aInMesh).data(), &stat);
+	if (stat.error()) {
+		m_error = "no mesh provided";
+		return false;
+	}
+	
+	// For now, lets support one-on-one mappings without sub-face support
+	if (meshFn.numPolygons() != tex->numFaces()) {
+		m_error = "Face count of texture does not match polygon count of connected mesh. Currently these must match one on one";
+		return false;
+	}
+	
+	
+	
+	return true;
 }
 
 MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
@@ -274,6 +309,10 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 	// over and over again, lets limit this to just when something changes
 	data.setClean(plug);
 	if (plug == aNeedsCompute) {
+		MDataHandle ncHandle = data.outputValue(aNeedsCompute);
+		// we are successfull, even if there is no valid texture
+		// We only use error codes if the sampling fails
+		ncHandle.setInt(1);
 		if (!assure_texture(data)) {
 			return MS::kSuccess;
 		}
@@ -287,7 +326,8 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 		PtexFilterPtr pfilter(PtexFilter::getFilter(m_ptex_texture.get(), opts));
 		m_ptex_filter.swap(pfilter);
 		
-		// Now we are ready for computation, and can leave everything else to the drawing method (for now)
+		// We cache the samples for faster drawing, and won't support live-drawing for now
+		ncHandle.asInt() = update_sample_buffer(data);
 		
 		return MS::kSuccess;
 	} else if (plug == aOutMetaDataKeys || plug == aOutNumChannels || plug == aOutNumFaces ||
@@ -299,7 +339,7 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 		}
 		
 		// Update all file information
-		MFnStringArrayData arrayData(data.inputValue(aOutMetaDataKeys).data());
+		MFnStringArrayData arrayData(data.outputValue(aOutMetaDataKeys).data());
 		MStringArray keys = arrayData.array();
 		keys.clear();
 		
@@ -314,15 +354,15 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 			keys.append(MString(keyName ? keyName : "unknown"));
 		}
 		
-		data.inputValue(aOutNumChannels).asInt() = tex->numChannels();
-		data.inputValue(aOutNumFaces).asInt() = tex->numFaces();
-		data.inputValue(aOutHasEdits).asBool() = tex->hasEdits();
-		data.inputValue(aOutHasMipMaps).asBool() = tex->hasMipMaps();
-		data.inputValue(aOutAlphaChannel).asInt() = tex->alphaChannel();
-		data.inputValue(aOutMeshType).asInt() = (int)tex->meshType();
-		data.inputValue(aOutDataType).asInt() = (int)tex->dataType();
-		data.inputValue(aOutUBorderMode).asInt() = (int)tex->uBorderMode();
-		data.inputValue(aOutVBorderMode).asInt() = (int)tex->vBorderMode();
+		data.outputValue(aOutNumChannels).asInt() = tex->numChannels();
+		data.outputValue(aOutNumFaces).asInt() = tex->numFaces();
+		data.outputValue(aOutHasEdits).asBool() = tex->hasEdits();
+		data.outputValue(aOutHasMipMaps).asBool() = tex->hasMipMaps();
+		data.outputValue(aOutAlphaChannel).asInt() = tex->alphaChannel();
+		data.outputValue(aOutMeshType).asInt() = (int)tex->meshType();
+		data.outputValue(aOutDataType).asInt() = (int)tex->dataType();
+		data.outputValue(aOutUBorderMode).asInt() = (int)tex->uBorderMode();
+		data.outputValue(aOutVBorderMode).asInt() = (int)tex->vBorderMode();
 		
 		// set all clean
 		MObject* attrs[] = {&aOutMetaDataKeys, &aOutNumChannels, &aOutNumFaces, 

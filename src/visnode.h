@@ -2,10 +2,22 @@
 #define PTEX_VISUALIZATION_NODE
 
 #include <Ptexture.h>
+
 #include <maya/MPxLocatorNode.h>
+#include <vector>
+
+
+struct Float3
+{
+	float x;
+	float y;
+	float z;
+};
 
 typedef PtexPtr<PtexFilter> PtexFilterPtr;
 typedef PtexPtr<PtexTexture> PtexTexturePtr;
+
+typedef std::vector<Float3>	Float3Vector;
 
 class PtexVisNode : public MPxLocatorNode
 {
@@ -35,6 +47,16 @@ class PtexVisNode : public MPxLocatorNode
 		//! release the current texture (if there is one). This releases the filter as well !
 		void release_texture_and_filter();
 		
+		//! release data taken up by our sample cache
+		void release_cache();
+		
+		//! update our sample cache with changes. As a result, we will fill our 
+		//! sample cache with local space positions and colors, ready to be 
+		//! pushed through opengl.
+		//! \return true on success
+		//! \note changes error code on failure
+		bool update_sample_buffer(MDataBlock& data);
+		
 	protected:
 		// Input attributes
 		static MObject aPtexFileName;			//!< path to ptex file to use
@@ -61,6 +83,9 @@ class PtexVisNode : public MPxLocatorNode
 		PtexFilterPtr	m_ptex_filter;			//!< filter ptr to be used for ptex evaluation
 		PtexTexturePtr	m_ptex_texture;			//!< texture pointer
 		MString			m_error;				//!< error string
+		
+		Float3Vector	m_sample_pos;			//!< sample positions
+		Float3Vector	m_sample_col;			//!< sample colors
 };
 
 #endif
