@@ -11,6 +11,7 @@
 #include <maya/MString.h>
 #include <maya/MTypeId.h>
 #include <maya/MPlug.h>
+#include <maya/MFileObject.h>
 #include <maya/MStringArray.h>
 #include <maya/MFnMeshData.h>
 #include <maya/MDataBlock.h>
@@ -228,8 +229,15 @@ bool PtexVisNode::assure_texture(MDataBlock& data)
 		return false;
 	}
 	
+	// ptex crashes ungracefully if the file doesn't exist ... great
+	MFileObject file;
+	file.setRawFullName(filePath);
+	if (!file.exists()) {
+		return false;
+	}
+	
 	Ptex::String error;
-	PtexTexturePtr ptex(gCache->get(filePath.asChar(), error));	// This pointer interface is ridiculous
+	PtexTexturePtr ptex(gCache->get(file.resolvedFullName().asChar(), error));	// This pointer interface is ridiculous
 	if (!ptex.get()) {
 		m_error = error.c_str();
 		return false;

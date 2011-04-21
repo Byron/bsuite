@@ -9,7 +9,7 @@ set(TEST_MAYA_VERSION 2010 CACHE STRING
 
 if(EXISTS ${TEST_MRV_PATH})
 	add_test(NAME maintest 
-		COMMAND python ${TEST_MRV_PATH} ${TEST_MAYA_VERSION} batch_startup.py $<TARGET_FILE:Maya${TEST_MAYA_VERSION}>)
+		COMMAND python ${TEST_MRV_PATH} ${TEST_MAYA_VERSION} --mrv-mayapy batch_startup.py $<TARGET_FILE:Maya${TEST_MAYA_VERSION}>)
 else()
 	message(WARNING "Tests deactivated as tmrv path is not provided, check your configuration")
 endif()

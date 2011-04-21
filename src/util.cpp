@@ -4,7 +4,7 @@
 void setup_output(MFnAttribute& attr)
 {
 	attr.setStorable(false);
-	attr.setWritable(true);
+	attr.setWritable(false);
 }
 
 

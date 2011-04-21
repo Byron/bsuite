@@ -43,3 +43,10 @@ class TestMain(TestPtexVisNodeBase):
 		# change scene
 		n, m = self.setupScene('nonquad')
 		n.needsComputation.asInt()
+		
+		# empty string is fine
+		n.ptfp.setString("")
+		n.needsComputation.asInt()
+		# non-exinsting path as well
+		n.ptfp.setString("helloworld")
+		n.needsComputation.asInt()
