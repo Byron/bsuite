@@ -1,5 +1,10 @@
+*.pro.user
+*.so
+*.mll
+*.dylib
 CMakeCache.txt
 CMakeFiles/
+doc/
 CTest*
 Doxyfile
 Makefile

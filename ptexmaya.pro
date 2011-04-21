@@ -8,7 +8,8 @@ TARGET = Maya
 TEMPLATE = app
 INCLUDEPATH += ../PtexLib \
 				../ZLib \
-				$$(MAYA_LOCATION)/include
+				$$(MAYA_LOCATION)/include \
+				$$(PTEX_INCLUDE_DIR)
 
 SOURCES += \
     PtexUVNode.cpp \
@@ -16,7 +17,8 @@ SOURCES += \
     PtexColorNode.cpp \
     PluginMain.cpp \
     CmpMeshModifierNode.cpp \
-    CmpMeshModifierCmd.cpp
+    CmpMeshModifierCmd.cpp \
+    src/maya_main.cpp
 
 OTHER_FILES += \
     AEptexTemplate.mel

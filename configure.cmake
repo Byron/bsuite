@@ -57,8 +57,9 @@ endif()
 # MAYA CONFIGURATION
 ######################
 set(MAYA_VERSIONS 2012 2011 2010 2009 2008)
+set(PTEX_LIBRARIES Ptex z)
 set(MAYA_LIBRARIES Foundation OpenMaya OpenMayaAnim OpenMayaRender)
-set(CUSTOM_DEFINITIONS "REQUIRE_IOSTREAM;_BOOL")
+set(CUSTOM_DEFINITIONS -DREQUIRE_IOSTREAM -D_BOOL)
 
 if(UNIX)
 	set (MAYA_INSTALL_BASE_DEFAULT /usr/autodesk)
@@ -66,7 +67,7 @@ elseif(APPLE)
 	set (MAYA_INSTALL_BASE_DEFAULT /Applications/Autodesk)
 else(UNIX)
 	set(MAYA_INSTALL_BASE_DEFAULT "c:/Program Files")
-	set(CUSTOM_DEFINITIONS ${CUSTOM_DEFINITIONS}"_AFXDLL;_MBCS NT_PLUGIN")
+	lists(APPEND CUSTOM_DEFINITIONS -D_AFXDLL -D_MBCS -DNT_PLUGIN)
 	
 	set(LOCAL_WARNING_FLAGS /W3)
 	set(LOCAL_RTTI_FLAGS /GR)
@@ -115,7 +116,7 @@ enable_testing()
 
 include(fun.cmake)
 
-#add_subdirectory('src')
-#add_subdirectory('test')
+add_subdirectory(src)
+#add_subdirectory(test)
 
 
