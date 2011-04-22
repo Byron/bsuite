@@ -20,10 +20,19 @@ class TestMain(TestPtexVisNodeBase):
 		assert n.outUBorderMode.asInt() == 0
 		assert n.outVBorderMode.asInt() == 0
 		
-		
-		
 		# trigger computation
-		n.needsComputation.asInt()
+		# This can still work as its a one-on-one mapping
+		assert n.needsComputation.asInt() == True
+		
+		# trigger resampling
+		n.sampleMultiplier.setFloat(0.0)	# 0 should be fine as well, maybe restrict it
+		assert n.needsComputation.asInt() == True
+		n.sampleMultiplier.setFloat(1.5)
+		assert n.needsComputation.asInt() == True
+		for dm in range(3):
+			n.displayMode.setFloat(dm)
+			assert n.needsComputation.asInt() == True
+		#END set display mode
 		
 		
 		# channels change if texture changes
@@ -40,13 +49,17 @@ class TestMain(TestPtexVisNodeBase):
 		assert n.outUBorderMode.asInt() == 0
 		assert n.outVBorderMode.asInt() == 0
 		
+		# not a one-on-one mapping
+		assert n.needsComputation.asInt() == False
+		
 		# change scene
 		n, m = self.setupScene('nonquad')
 		n.needsComputation.asInt()
 		
 		# empty string is fine
 		n.ptfp.setString("")
-		n.needsComputation.asInt()
+		assert n.needsComputation.asInt() == True
+		
 		# non-exinsting path as well
 		n.ptfp.setString("helloworld")
-		n.needsComputation.asInt()
+		assert n.needsComputation.asInt() == True

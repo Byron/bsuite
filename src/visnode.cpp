@@ -13,7 +13,7 @@
 #include <maya/MPlug.h>
 #include <maya/MFileObject.h>
 #include <maya/MStringArray.h>
-#include <maya/MFnMeshData.h>
+#include <maya/MFnMesh.h>
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
 #include <maya/MFnStringArrayData.h>
@@ -21,11 +21,17 @@
 #include <maya/MFnTypedAttribute.h>
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MFloatVector.h>
+#include <maya/MFloatPointArray.h>
+#include <maya/MTimer.h>
+#include <maya/MHardwareRenderer.h>
+#include <maya/MGLFunctionTable.h>
 
 #include "util.h"
 #include "visnode.h"
 
 #include "assert.h"
+
+#include <cmath>
 
 
 /////////////////////////////////////////////////////////////////////
@@ -38,6 +44,8 @@ const MString PtexVisNode::typeName("ptexVisNode");
 MObject PtexVisNode::aPtexFileName;
 MObject PtexVisNode::aPtexFilterType;
 MObject PtexVisNode::aPtexFilterSize;
+MObject PtexVisNode::aDisplayMode;
+MObject PtexVisNode::aSampleMultiplier;
 MObject PtexVisNode::aInMesh;
 
 MObject PtexVisNode::aOutNumChannels;
@@ -51,10 +59,12 @@ MObject PtexVisNode::aOutMeshType;
 MObject PtexVisNode::aOutDataType;
 MObject PtexVisNode::aOutUBorderMode;
 MObject PtexVisNode::aOutVBorderMode;
+MObject PtexVisNode::aGlPointSize;
 
 
 PtexVisNode::PtexVisNode()
 	: m_ptex_num_channels(0)
+    , m_gl_point_size(1.0)
 {}
 
 PtexVisNode::~PtexVisNode()
@@ -84,18 +94,18 @@ void add_border_mode_fields(MFnEnumAttribute& mfnEnum)
 MStatus PtexVisNode::initialize()
 {
 	MStatus status;
-	MFnNumericAttribute mfnNum;
-	MFnTypedAttribute mfnTyp;
-	MFnStringArrayData mfnStringArray;
+	MFnNumericAttribute numFn;
+	MFnTypedAttribute typFn;
+	MFnStringArrayData stringArrayFn;
 
 	// Input attributes
 	////////////////////
-	aPtexFileName = mfnTyp.create("ptexFilePath", "ptfp", MFnData::kString, &status);
+	aPtexFileName = typFn.create("ptexFilePath", "ptfp", MFnData::kString, &status);
 	CHECK_MSTATUS(status);
-	mfnTyp.setInternal(true);
+	typFn.setInternal(true);
 	
-	aInMesh = mfnTyp.create("inMesh", "i", MFnData::kMesh, &status);
-	mfnTyp.setDefault(MObject::kNullObj);
+	aInMesh = typFn.create("inMesh", "i", MFnData::kMesh, &status);
+	typFn.setDefault(MObject::kNullObj);
 	CHECK_MSTATUS(status);
 
 	MFnEnumAttribute mfnEnum;
@@ -110,33 +120,51 @@ MStatus PtexVisNode::initialize()
 	mfnEnum.addField("Mitchell",   7);
 	mfnEnum.setKeyable(true);
 
-	aPtexFilterSize = mfnNum.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 1.0);
-	mfnNum.setKeyable(true);
+	aDisplayMode = mfnEnum.create("displayMode", "dm");
+	mfnEnum.addField("texel", (int)Texel);
+	mfnEnum.addField("faceRelative", (int)FaceRelative);
+	mfnEnum.addField("faceAbsolute", (int)FaceAbsolute);
+	mfnEnum.setDefault((short)FaceAbsolute);
+	mfnEnum.setKeyable(true);
+	
+	aPtexFilterSize = numFn.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 0.001);
+	numFn.setMin(0.0);
+	numFn.setMax(1.0);
+	numFn.setKeyable(true);
+	
+	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kFloat, 1.0);
+	numFn.setMin(0.0);
+	numFn.setKeyable(true);
+	numFn.setInternal(true);
+	
+	aSampleMultiplier = numFn.create("sampleMultiplier", "smlt", MFnNumericData::kFloat, 1.0);
+	numFn.setMin(0.0);
+	numFn.setKeyable(true);
 	
 	// Output attributes
 	/////////////////////
-	aNeedsCompute = mfnNum.create("needsComputation", "nc", MFnNumericData::kFloat, 0.0);
-	setup_output(mfnNum);
+	aNeedsCompute = numFn.create("needsComputation", "nc", MFnNumericData::kInt);
+	setup_output(numFn);
 	
-	aOutMetaDataKeys = mfnTyp.create("outMetaDataKeys", "omdk", MFnData::kStringArray, &status);
+	aOutMetaDataKeys = typFn.create("outMetaDataKeys", "omdk", MFnData::kStringArray, &status);
 	CHECK_MSTATUS(status);
-	mfnTyp.setDefault(mfnStringArray.create());
-	setup_output(mfnTyp);
+	typFn.setDefault(stringArrayFn.create());
+	setup_output(typFn);
 	
-	aOutNumChannels = mfnNum.create("outNumChannels", "onc", MFnNumericData::kInt);
-	setup_output(mfnNum);
+	aOutNumChannels = numFn.create("outNumChannels", "onc", MFnNumericData::kInt);
+	setup_output(numFn);
 	
-	aOutNumFaces = mfnNum.create("outNumFaces", "onf", MFnNumericData::kInt);
-	setup_output(mfnNum);
+	aOutNumFaces = numFn.create("outNumFaces", "onf", MFnNumericData::kInt);
+	setup_output(numFn);
 	
-	aOutAlphaChannel = mfnNum.create("outAlphaChannel", "oac", MFnNumericData::kInt);
-	setup_output(mfnNum);
+	aOutAlphaChannel = numFn.create("outAlphaChannel", "oac", MFnNumericData::kInt);
+	setup_output(numFn);
 	
-	aOutHasEdits = mfnNum.create("outHasEdits", "ohe", MFnNumericData::kBoolean);
-	setup_output(mfnNum);
+	aOutHasEdits = numFn.create("outHasEdits", "ohe", MFnNumericData::kBoolean);
+	setup_output(numFn);
 	
-	aOutHasMipMaps = mfnNum.create("outHasMipMaps", "ohm", MFnNumericData::kBoolean);
-	setup_output(mfnNum);
+	aOutHasMipMaps = numFn.create("outHasMipMaps", "ohm", MFnNumericData::kBoolean);
+	setup_output(numFn);
 	
 	aOutMeshType = mfnEnum.create("outMeshType", "omt");
 	setup_output(mfnEnum);
@@ -163,6 +191,9 @@ MStatus PtexVisNode::initialize()
 	CHECK_MSTATUS(addAttribute(aPtexFileName));
 	CHECK_MSTATUS(addAttribute(aPtexFilterType));
 	CHECK_MSTATUS(addAttribute(aPtexFilterSize));
+	CHECK_MSTATUS(addAttribute(aGlPointSize));
+	CHECK_MSTATUS(addAttribute(aDisplayMode));
+	CHECK_MSTATUS(addAttribute(aSampleMultiplier));
 	CHECK_MSTATUS(addAttribute(aInMesh));
 	
 	CHECK_MSTATUS(addAttribute(aOutMetaDataKeys));
@@ -191,6 +222,8 @@ MStatus PtexVisNode::initialize()
 	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutUBorderMode));
 	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutVBorderMode));
 	CHECK_MSTATUS(attributeAffects(aInMesh,			aNeedsCompute));
+	CHECK_MSTATUS(attributeAffects(aDisplayMode,	aNeedsCompute));
+	CHECK_MSTATUS(attributeAffects(aSampleMultiplier,	aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFileName,   aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFilterSize, aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFilterType, aNeedsCompute));
@@ -254,13 +287,234 @@ void PtexVisNode::release_texture_and_filter()
 	m_ptex_filter.swap(pfilter);
 }
 
+void PtexVisNode::release_cache()
+{
+	m_sample_col.clear();
+	m_sample_pos.clear();
+}
+
 bool PtexVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx)
 {
 	if (plug == aPtexFileName) {
 		release_texture_and_filter();
+		release_cache();
+	} else if (plug == aGlPointSize) {
+		m_gl_point_size = dataHandle.asFloat();
 	}
 	
 	return false;
+}
+
+//! \return dot product of two vectors
+template <typename T>
+float dot(const T& l, const T& r) {
+	return l.x*r.x + l.y*r.y + l.z*r.z;
+}
+
+//! \return length of the vector
+template <typename T>
+float len(const T& v) {
+	return std::sqrt(dot(v));
+}
+
+//! \return uv values for the given point on a triangle
+template <typename T>
+void uv_from_pos(const T& a, const T& b, const T& c, const T& p, float& out_u, float& out_v)
+{
+	T v0 = b - a;
+	T v1 = c - a;
+	T v2 = p - a;
+	
+	const float dot00 = dot(v0, v0);
+	const float dot01 = dot(v0, v1);
+	const float dot02 = dot(v0, v2);
+	
+	const float dot11 = dot(v1, v1);
+	const float dot12 = dot(v1, v2);
+	
+	const float invDenom = 1.0f / (dot00 * dot11 - dot01 * dot01);
+	
+	out_u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+	out_v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+}
+
+bool PtexVisNode::update_sample_buffer(MDataBlock& data)
+{
+	PtexTexture* tex = m_ptex_texture.get();
+	PtexFilter* filter = m_ptex_filter.get();
+	
+	if (!tex | !filter) {
+		m_error = "Cannot sample ptex without a valid texture and filter";
+		return false;
+	}
+	
+	if (tex->numChannels() < 3 || tex->numChannels() > 4) {
+		m_error = "Can only handle 3 or 4 channels currently";
+		return false;
+	}
+	
+	if (tex->meshType() != Ptex::mt_triangle)  {
+		m_error = "Cannot visualize non-triangle meshes for now";
+		return false;
+	}
+	
+	MStatus stat;
+	MFnMesh meshFn(data.inputValue(aInMesh).data(), &stat);
+	if (stat.error()) {
+		m_error = "no mesh provided";
+		return false;
+	}
+	
+	// For now, lets support one-on-one mappings without sub-face support
+	if (meshFn.numPolygons() != tex->numFaces()) {
+		m_error = "Face count of texture does not match polygon count of connected mesh. Currently these must match one on one";
+		return false;
+	}
+	
+	if (tex->numFaces() == 0) {
+		m_error = "Empty texture encountered";
+		return false;
+	}
+	
+	
+	
+	// OBTAIN SAMPLES
+	/////////////////
+	// lets just read the samples for now
+	const int numFaces = tex->numFaces();
+	const int numChannels = tex->numChannels();
+	const DisplayMode displayMode = (DisplayMode)data.inputValue(aDisplayMode).asInt();
+	const float mult = data.inputValue(aSampleMultiplier).asFloat();
+	
+	MTimer timer;
+	timer.beginTimer();
+	
+	// count memory we require for preallocation
+	size_t numTexels = 0;
+	for (int i = 0; i < numFaces; ++i) {
+		numTexels += (size_t)(tex->getFaceInfo(i).res.size() * mult);
+	}// for each face
+	
+	release_cache();
+	m_sample_pos.reserve(numTexels);
+	m_sample_col.reserve(numTexels);
+	
+	Float4 pix;							// one pixel
+	switch(displayMode)
+	{
+	case Texel:
+	{
+		const float step = 0.01f;
+		Float3		pos;			// position
+		for (int i = 0; i < numFaces; ++i) {
+			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
+			const int ures = fi.res.u();
+			const int vres = fi.res.v();
+			
+			for (int u = 0; u < ures; ++u) {
+				for (int v = 0; v < vres; ++v) {
+					tex->getPixel(i, u, v, &pix.x, 0, numChannels);
+					m_sample_col.push_back(pix);
+					m_sample_pos.push_back(pos);
+					pos.y += step;
+				}// for each v texel
+				pos.x += step;
+				pos.y = 0.0f;
+			}// for each u texel
+		}// for each face
+		break;
+	}// case texel
+	case FaceRelative:	// fall through
+	case FaceAbsolute:
+	{
+#if MAYA_API_VERSION > 200810
+		#define TFLOAT3 Float3
+		const Float3* vtx = reinterpret_cast<const Float3*>(meshFn.getRawPoints(&stat));
+#else
+		MFloatPointArray vtx;
+		meshFn.getPoints(vtx);
+		#define TFLOAT3 MFloatPoint
+#endif
+		const float fsize = data.inputValue(aPtexFileName).asFloat();
+		int tverts[3];						// stores 3 triangle vertex ids
+		for (int i = 0; i < numFaces; ++i) {
+			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
+			const int ures = (int)(fi.res.u() * mult);
+			const int vres = (int)(fi.res.v() * mult);
+			const float ufres = (float)ures;
+			const float vfres = (float)vres;
+			
+			meshFn.getPolygonTriangleVertices(i, 0, tverts);
+			const TFLOAT3& a = vtx[tverts[0]];
+			const TFLOAT3& b = vtx[tverts[1]];
+			const TFLOAT3& c = vtx[tverts[2]];
+			
+			switch(displayMode)
+			{
+			case FaceRelative:
+			{
+				// Walk along the uvs and produce a point accordingly
+				for (int u = 0; u < ures; ++u) {
+					const float uf = u / ufres;
+					const TFLOAT3 uvec = (b-a) * uf;
+					for (int v = 0; v < vres; ++v) {
+						const float vf = (1.0f - uf) * (v / vfres);
+						filter->eval(&pix.x, 0, numChannels, i, uf, vf, fsize, fsize, fsize, fsize);
+						m_sample_col.push_back(pix);
+						m_sample_pos.push_back(a + uvec + (c-a)*vf);
+					}// for each vsample
+				}// for each usample
+				break;
+			}
+			case FaceAbsolute:
+			{
+				// Walk along the first edge to generate the sampling raster
+				// that was used to create the texture. Our samples hit the sample center
+				// if no sampling multiplier is used
+				const TFLOAT3 suv = (b - a) / ufres;	// vector spanning one sample in u
+				const TFLOAT3 suvhalf = suv / 2.0f;
+				const TFLOAT3 svv = (c - a) / vfres;	// vector spanning one sample in v
+				const TFLOAT3 svvhalf = svv / 2.0f;
+				
+				int ur = ures;				// editable vresolution
+				float uf, vf;				// uvs matching our sample positions
+				
+				// even samples
+				TFLOAT3 p;
+				for (int v = 0; v < vres; ++v, --ur) {
+					TFLOAT3 ta = a + (svv * v);		// texel vertex a
+					for (int u = 0; u < ur; ++u, ta += suv) {
+						const TFLOAT3 tb = ta + suv;
+						const TFLOAT3 tc = ta + svv;
+						for (short is_odd = 0; is_odd < 2; is_odd += 1 + (u+1==ur)) {
+							if (is_odd) {
+								p = (tb + tc + (ta + (suv + svv))) / 3.0f;
+							} else {
+								p = (ta + tb + tc) / 3.0f;
+							}
+							uv_from_pos(a, b, c, p, uf, vf);
+							filter->eval(&pix.x, 0, numChannels, i, uf, vf, fsize, fsize, fsize, fsize);
+							m_sample_col.push_back(pix);
+							m_sample_pos.push_back(p);
+						}// for each even/odd texel
+					}// for each vsample
+				}// for each usample
+				break;
+			}
+			default: break;
+			}// end sampling mode switch
+		}// for each face
+		
+#undef TFLOAT3
+		break;
+	}
+	}// switch displayMode
+	
+	timer.endTimer();
+	
+	// debug printing
+	cerr << "Obtained " << m_sample_pos.size() << " samples in " << timer.elapsedTime() << " s" << "(" << m_sample_pos.size() / timer.elapsedTime() << " samples/s)" << endl;
+	return true;
 }
 
 MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
@@ -274,6 +528,10 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 	// over and over again, lets limit this to just when something changes
 	data.setClean(plug);
 	if (plug == aNeedsCompute) {
+		MDataHandle ncHandle = data.outputValue(aNeedsCompute);
+		// we are successfull, even if there is no valid texture
+		// We only use error codes if the sampling fails
+		ncHandle.setInt(1);
 		if (!assure_texture(data)) {
 			return MS::kSuccess;
 		}
@@ -287,7 +545,8 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 		PtexFilterPtr pfilter(PtexFilter::getFilter(m_ptex_texture.get(), opts));
 		m_ptex_filter.swap(pfilter);
 		
-		// Now we are ready for computation, and can leave everything else to the drawing method (for now)
+		// We cache the samples for faster drawing, and won't support live-drawing for now
+		ncHandle.asInt() = update_sample_buffer(data);
 		
 		return MS::kSuccess;
 	} else if (plug == aOutMetaDataKeys || plug == aOutNumChannels || plug == aOutNumFaces ||
@@ -299,7 +558,7 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 		}
 		
 		// Update all file information
-		MFnStringArrayData arrayData(data.inputValue(aOutMetaDataKeys).data());
+		MFnStringArrayData arrayData(data.outputValue(aOutMetaDataKeys).data());
 		MStringArray keys = arrayData.array();
 		keys.clear();
 		
@@ -314,15 +573,15 @@ MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 			keys.append(MString(keyName ? keyName : "unknown"));
 		}
 		
-		data.inputValue(aOutNumChannels).asInt() = tex->numChannels();
-		data.inputValue(aOutNumFaces).asInt() = tex->numFaces();
-		data.inputValue(aOutHasEdits).asBool() = tex->hasEdits();
-		data.inputValue(aOutHasMipMaps).asBool() = tex->hasMipMaps();
-		data.inputValue(aOutAlphaChannel).asInt() = tex->alphaChannel();
-		data.inputValue(aOutMeshType).asInt() = (int)tex->meshType();
-		data.inputValue(aOutDataType).asInt() = (int)tex->dataType();
-		data.inputValue(aOutUBorderMode).asInt() = (int)tex->uBorderMode();
-		data.inputValue(aOutVBorderMode).asInt() = (int)tex->vBorderMode();
+		data.outputValue(aOutNumChannels).asInt() = tex->numChannels();
+		data.outputValue(aOutNumFaces).asInt() = tex->numFaces();
+		data.outputValue(aOutHasEdits).asBool() = tex->hasEdits();
+		data.outputValue(aOutHasMipMaps).asBool() = tex->hasMipMaps();
+		data.outputValue(aOutAlphaChannel).asInt() = tex->alphaChannel();
+		data.outputValue(aOutMeshType).asInt() = (int)tex->meshType();
+		data.outputValue(aOutDataType).asInt() = (int)tex->dataType();
+		data.outputValue(aOutUBorderMode).asInt() = (int)tex->uBorderMode();
+		data.outputValue(aOutVBorderMode).asInt() = (int)tex->vBorderMode();
 		
 		// set all clean
 		MObject* attrs[] = {&aOutMetaDataKeys, &aOutNumChannels, &aOutNumFaces, 
@@ -343,15 +602,43 @@ void PtexVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplayStyl
 {
 	// make sure we are uptodate
 	MPlug(thisMObject(), aNeedsCompute).asInt();
-	
 	view.beginGL();
 	if (m_error.length()) {
-		view.drawText(m_error, MPoint());
+		view.drawText(MString("Error: ") + m_error, MPoint());
 	}
 		
-	if (m_ptex_filter.get()) {
-		
-	}// end have filter
+	if (!m_sample_pos.size()) {
+		goto finish_drawing;
+	}
 	
+	{ // start drawing
+	MHardwareRenderer* renderer = MHardwareRenderer::theRenderer();
+	if (!renderer) {
+		m_error = "No hardware renderer";
+		goto finish_drawing;
+	}
+	
+	MGLFunctionTable* glf = renderer->glFunctionTable();
+	if (!glf) {
+		m_error = "No function table";
+		goto finish_drawing;
+	}
+	
+	glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
+	glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
+	{
+		glf->glEnableClientState(MGL_VERTEX_ARRAY);
+		glf->glVertexPointer(3, MGL_FLOAT, 0, m_sample_pos.data());
+		glf->glEnableClientState(MGL_COLOR_ARRAY);
+		glf->glColorPointer(3, MGL_FLOAT, 0, m_sample_col.data());
+		
+		glf->glPointSize(m_gl_point_size);
+		glf->glDrawArrays(MGL_POINTS, 0, m_sample_pos.size());
+	}
+	glf->glPopAttrib();
+	glf->glPopClientAttrib();
+	}
+	
+finish_drawing:
 	view.endGL();
 }

@@ -2,13 +2,72 @@
 #define PTEX_VISUALIZATION_NODE
 
 #include <Ptexture.h>
+
 #include <maya/MPxLocatorNode.h>
+#include <maya/MGLdefinitions.h>
+#include <maya/MFloatPoint.h>
+#include <vector>
+
+
+struct Float3
+{
+	float x;
+	float y;
+	float z;
+	
+	Float3(float x=0.f, float y=0.f, float z=0.f)
+	    : x(x)
+	    , y(y)
+	    , z(z)
+	{}
+	
+	Float3(const MFloatPoint& r)
+	    : x(r.x)
+	    , y(r.y)
+	    , z(r.z)
+	{}
+	
+	inline Float3 operator - (const Float3& r) const {
+		return Float3(x - r.x, y - r.y, z - r.z);
+	}
+	inline Float3 operator + (const Float3& r) const {
+		return Float3(x + r.x, y + r.y, z + r.z);
+	}
+	inline Float3& operator += (const Float3& r) {
+		x += r.x; 
+		y += r.y; 
+		z += r.z;
+		return *this;
+	}
+	inline Float3 operator * (float v) const {
+		return Float3(x * v, y * v, z * v);
+	}
+	inline Float3 operator / (float v) const {
+		return Float3(x / v, y / v, z / v);
+	}
+};
+
+struct Float4 : public Float3
+{
+	float w;
+};
 
 typedef PtexPtr<PtexFilter> PtexFilterPtr;
 typedef PtexPtr<PtexTexture> PtexTexturePtr;
 
+typedef std::vector<Float3>	Float3Vector;
+
 class PtexVisNode : public MPxLocatorNode
 {
+	public:
+	
+	enum DisplayMode
+	{
+		Texel = 0,					//!< Direct display
+		FaceRelative = 1,			//!< display in face space, along uvs
+		FaceAbsolute = 2,			//!< display in face space, along longest edge
+	};
+	
 	public:
 		PtexVisNode();
 		virtual ~PtexVisNode();
@@ -35,12 +94,25 @@ class PtexVisNode : public MPxLocatorNode
 		//! release the current texture (if there is one). This releases the filter as well !
 		void release_texture_and_filter();
 		
+		//! release data taken up by our sample cache
+		void release_cache();
+		
+		//! update our sample cache with changes. As a result, we will fill our 
+		//! sample cache with local space positions and colors, ready to be 
+		//! pushed through opengl.
+		//! \return true on success
+		//! \note changes error code on failure
+		bool update_sample_buffer(MDataBlock& data);
+		
 	protected:
 		// Input attributes
 		static MObject aPtexFileName;			//!< path to ptex file to use
 		static MObject aPtexFilterType;			//!< type of filter for evaluation
 		static MObject aPtexFilterSize;			//!< desired uv filter size
 		static MObject aInMesh;					//!< mesh to display the ptex information for
+		static MObject aGlPointSize;			//!< size of a point when drawing
+		static MObject aDisplayMode;			//!< defines the way we display samples
+		static MObject aSampleMultiplier;		//!< Multiply amount of samples taken
 		
 		// output attributes
 		static MObject aOutNumChannels;			//!< provide the number of channels in the file
@@ -61,6 +133,10 @@ class PtexVisNode : public MPxLocatorNode
 		PtexFilterPtr	m_ptex_filter;			//!< filter ptr to be used for ptex evaluation
 		PtexTexturePtr	m_ptex_texture;			//!< texture pointer
 		MString			m_error;				//!< error string
+		
+		Float3Vector	m_sample_pos;			//!< sample positions
+		Float3Vector	m_sample_col;			//!< sample colors
+		MGLfloat		m_gl_point_size;		//!< size of a point when drawing (cache)	
 };
 
 #endif
