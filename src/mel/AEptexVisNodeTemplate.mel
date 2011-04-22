@@ -1,19 +1,12 @@
 
 global proc AEptexVisNodeBrowser(string $fileAttribute)
 {
-	//if file exist, then use it as start directory of file browser
-	string $path = `getAttr $fileAttribute`;
-    if(`filetest -f $path`) {
-        string $path = dirname( $path );
-        workspace -dir $path;
-    } else {
-        string $workspace = `workspace -q -fn`;
-        setWorkingDirectory $workspace "image" "sourceImages";
-    }
-	
+	// We use the most primitve file browser just to be maya 2008 compatible ... 
 	string $ptxFilter = "*.ptx";
 	string $result = `fileDialog -directoryMask $ptxFilter -mode 0`;
-	setAttr $fileAttribute -type "string" $result;
+	if ($result != "") {
+		setAttr $fileAttribute -type "string" $result;
+	}
 }
 
 global proc AEptexVisNodeNameReplace(string $fileAttribute)
