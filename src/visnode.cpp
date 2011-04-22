@@ -21,6 +21,7 @@
 #include <maya/MFnTypedAttribute.h>
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MFloatVector.h>
+#include <maya/MFloatPointArray.h>
 
 #include <maya/MHardwareRenderer.h>
 #include <maya/MGLFunctionTable.h>
@@ -315,6 +316,11 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 		return false;
 	}
 	
+	if (tex->numFaces() == 0) {
+		m_error = "Empty texture encountered";
+		return false;
+	}
+	
 	
 	// lets just read the samples for now
 	const int numFaces = tex->numFaces();
@@ -331,17 +337,36 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	m_sample_col.reserve(numTexels);
 	
 	const float step = 0.01f;
+	int tverts[3];						// stores 3 triangle vertex ids
 	Float4 p;								// one pixel
-	Float3 pos = {0.f, 0.f, 0.f};			// position
-	// const Float3* vtx = reinterpret_cast<const Float3*>(meshFn.getRawPoints());
+	Float3 pos;			// position
+#if MAYA_API_VERSION > 200810
+	#define TFLOAT3 Float3
+	const Float3* vtx = reinterpret_cast<const Float3*>(meshFn.getRawPoints(&stat));
+#else
+	MFloatPointArray vtx;
+	meshFn.getPoints(vtx);
+	#define TFLOAT3 MFloatPoint
+#endif
 	
 	for (int i = 0; i < numFaces; ++i) {
 		const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
-		for (int u = 0; u < fi.res.u(); u++) {
-			for (int v = 0; v < fi.res.v(); ++v) {
+		const int ures = fi.res.u();
+		const int vres = fi.res.v();
+		const float uresf = (float)ures;
+		const float vresf = (float)vres;
+		
+		meshFn.getPolygonTriangleVertices(i, 0, tverts);
+		const TFLOAT3& v1 = vtx[tverts[0]];
+		const TFLOAT3& v2 = vtx[tverts[1]];
+		const TFLOAT3& v3 = vtx[tverts[2]];
+		
+		for (int u = 0; u < ures; u++) {
+			const TFLOAT3 uvec = (v2-v1)*(u / uresf);
+			for (int v = 0; v < vres; ++v) {
 				tex->getPixel(i, u, v, &p.x, 0, numChannels);
 				m_sample_col.push_back(p);
-				m_sample_pos.push_back(pos);
+				m_sample_pos.push_back(v1 + uvec + (v3-v1) * (v / vresf));
 				pos.y += step;
 			}// for each v texel
 			pos.x += step;
@@ -349,6 +374,7 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 		}// for each u texel
 	}// for each face
 	
+#undef TFLOAT3
 	return true;
 }
 

@@ -5,6 +5,7 @@
 
 #include <maya/MPxLocatorNode.h>
 #include <maya/MGLdefinitions.h>
+#include <maya/MFloatPoint.h>
 #include <vector>
 
 
@@ -14,8 +15,26 @@ struct Float3
 	float y;
 	float z;
 	
-	Float3 operator - (const Float3& r) {
-		return (Float3){ x - r.x, y - r.y, z - r.z };
+	Float3(float x=0.f, float y=0.f, float z=0.f)
+	    : x(x)
+	    , y(y)
+	    , z(z)
+	{}
+	
+	Float3(const MFloatPoint& r)
+	    : x(r.x)
+	    , y(r.y)
+	    , z(r.z)
+	{}
+	
+	inline Float3 operator - (const Float3& r) const {
+		return Float3(x - r.x, y - r.y, z - r.z);
+	}
+	inline Float3 operator + (const Float3& r) const {
+		return Float3(x + r.x, y + r.y, z + r.z);
+	}
+	inline Float3 operator * (float v) const {
+		return Float3(x * v, y * v, z * v);
 	}
 };
 
