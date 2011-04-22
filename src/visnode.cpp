@@ -476,12 +476,18 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 				float uf, vf;				// uvs matching our sample positions
 				
 				// even samples
+				TFLOAT3 p;
 				for (int v = 0; v < vres; ++v, --ur) {
 					TFLOAT3 ta = a + (svv * v);		// texel vertex a
 					for (int u = 0; u < ur; ++u, ta += suv) {
+						const TFLOAT3 tb = ta + suv;
+						const TFLOAT3 tc = ta + svv;
 						for (short is_odd = 0; is_odd < 2; is_odd += 1 + (u+1==ur)) {
-							TFLOAT3 p = (ta + (ta+suv) + (ta+svv)) / 3.0f;
-							p += (svvhalf + suvhalf) * (float)is_odd;
+							if (is_odd) {
+								p = (tb + tc + (ta + (suv + svv))) / 3.0f;
+							} else {
+								p = (ta + tb + tc) / 3.0f;
+							}
 							uv_from_pos(a, b, c, p, uf, vf);
 							filter->eval(&pix.x, 0, numChannels, i, uf, vf, fsize, fsize, fsize, fsize);
 							m_sample_col.push_back(pix);
