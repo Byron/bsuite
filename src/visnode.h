@@ -33,8 +33,17 @@ struct Float3
 	inline Float3 operator + (const Float3& r) const {
 		return Float3(x + r.x, y + r.y, z + r.z);
 	}
+	inline Float3& operator += (const Float3& r) {
+		x += r.x; 
+		y += r.y; 
+		z += r.z;
+		return *this;
+	}
 	inline Float3 operator * (float v) const {
 		return Float3(x * v, y * v, z * v);
+	}
+	inline Float3 operator / (float v) const {
+		return Float3(x / v, y / v, z / v);
 	}
 };
 

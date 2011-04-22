@@ -31,6 +31,8 @@
 
 #include "assert.h"
 
+#include <cmath>
+
 
 /////////////////////////////////////////////////////////////////////
 
@@ -122,6 +124,7 @@ MStatus PtexVisNode::initialize()
 	mfnEnum.addField("texel", (int)Texel);
 	mfnEnum.addField("faceRelative", (int)FaceRelative);
 	mfnEnum.addField("faceAbsolute", (int)FaceAbsolute);
+	mfnEnum.setDefault((short)FaceAbsolute);
 	mfnEnum.setKeyable(true);
 	
 	aPtexFilterSize = numFn.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 0.001);
@@ -298,6 +301,39 @@ bool PtexVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle
 	return false;
 }
 
+//! \return dot product of two vectors
+template <typename T>
+float dot(const T& l, const T& r) {
+	return l.x*r.x + l.y*r.y + l.z*r.z;
+}
+
+//! \return length of the vector
+template <typename T>
+float len(const T& v) {
+	return std::sqrt(dot(v));
+}
+
+//! \return uv values for the given point on a triangle
+template <typename T>
+void uv_from_pos(const T& a, const T& b, const T& c, const T& p, float& out_u, float& out_v)
+{
+	T v0 = b - a;
+	T v1 = c - a;
+	T v2 = p - a;
+	
+	const float dot00 = dot(v0, v0);
+	const float dot01 = dot(v0, v1);
+	const float dot02 = dot(v0, v2);
+	
+	const float dot11 = dot(v1, v1);
+	const float dot12 = dot(v1, v2);
+	
+	const float invDenom = 1.0f / (dot00 * dot11 - dot01 * dot01);
+	
+	out_u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+	out_v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+}
+
 bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 {
 	PtexTexture* tex = m_ptex_texture.get();
@@ -359,7 +395,7 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	m_sample_pos.reserve(numTexels);
 	m_sample_col.reserve(numTexels);
 	
-	Float4 p;							// one pixel
+	Float4 pix;							// one pixel
 	switch(displayMode)
 	{
 	case Texel:
@@ -373,8 +409,8 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 			
 			for (int u = 0; u < ures; ++u) {
 				for (int v = 0; v < vres; ++v) {
-					tex->getPixel(i, u, v, &p.x, 0, numChannels);
-					m_sample_col.push_back(p);
+					tex->getPixel(i, u, v, &pix.x, 0, numChannels);
+					m_sample_col.push_back(pix);
 					m_sample_pos.push_back(pos);
 					pos.y += step;
 				}// for each v texel
@@ -384,7 +420,8 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 		}// for each face
 		break;
 	}// case texel
-	case FaceRelative:
+	case FaceRelative:	// fall through
+	case FaceAbsolute:
 	{
 #if MAYA_API_VERSION > 200810
 		#define TFLOAT3 Float3
@@ -404,20 +441,58 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 			const float vfres = (float)vres;
 			
 			meshFn.getPolygonTriangleVertices(i, 0, tverts);
-			const TFLOAT3& v1 = vtx[tverts[0]];
-			const TFLOAT3& v2 = vtx[tverts[1]];
-			const TFLOAT3& v3 = vtx[tverts[2]];
+			const TFLOAT3& a = vtx[tverts[0]];
+			const TFLOAT3& b = vtx[tverts[1]];
+			const TFLOAT3& c = vtx[tverts[2]];
 			
-			for (int u = 0; u < ures; ++u) {
-				const float uf = u / ufres;
-				const TFLOAT3 uvec = (v2-v1) * uf;
-				for (int v = 0; v < vres; ++v) {
-					const float vf = (1.0f - uf) * (v / vfres);
-					filter->eval(&p.x, 0, numChannels, i, uf, vf, fsize, fsize, fsize, fsize);
-					m_sample_col.push_back(p);
-					m_sample_pos.push_back(v1 + uvec + (v3-v1)*vf);
-				}// for each vsample
-			}// for each usample
+			switch(displayMode)
+			{
+			case FaceRelative:
+			{
+				// Walk along the uvs and produce a point accordingly
+				for (int u = 0; u < ures; ++u) {
+					const float uf = u / ufres;
+					const TFLOAT3 uvec = (b-a) * uf;
+					for (int v = 0; v < vres; ++v) {
+						const float vf = (1.0f - uf) * (v / vfres);
+						filter->eval(&pix.x, 0, numChannels, i, uf, vf, fsize, fsize, fsize, fsize);
+						m_sample_col.push_back(pix);
+						m_sample_pos.push_back(a + uvec + (c-a)*vf);
+					}// for each vsample
+				}// for each usample
+				break;
+			}
+			case FaceAbsolute:
+			{
+				// Walk along the first edge to generate the sampling raster
+				// that was used to create the texture. Our samples hit the sample center
+				// if no sampling multiplier is used
+				const TFLOAT3 suv = (b - a) / ufres;	// vector spanning one sample in u
+				const TFLOAT3 suvhalf = suv / 2.0f;
+				const TFLOAT3 svv = (c - a) / vfres;	// vector spanning one sample in v
+				const TFLOAT3 svvhalf = svv / 2.0f;
+				
+				int ur = ures;				// editable vresolution
+				float uf, vf;				// uvs matching our sample positions
+				
+				// even samples
+				for (int v = 0; v < vres; ++v, --ur) {
+					TFLOAT3 ta = a + (svv * v);		// texel vertex a
+					for (int u = 0; u < ur; ++u, ta += suv) {
+						for (short is_odd = 0; is_odd < 2; is_odd += 1 + (u+1==ur)) {
+							TFLOAT3 p = (ta + (ta+suv) + (ta+svv)) / 3.0f;
+							p += (svvhalf + suvhalf) * (float)is_odd;
+							uv_from_pos(a, b, c, p, uf, vf);
+							filter->eval(&pix.x, 0, numChannels, i, uf, vf, fsize, fsize, fsize, fsize);
+							m_sample_col.push_back(pix);
+							m_sample_pos.push_back(p);
+						}// for each even/odd texel
+					}// for each vsample
+				}// for each usample
+				break;
+			}
+			default: break;
+			}// end sampling mode switch
 		}// for each face
 		
 #undef TFLOAT3
