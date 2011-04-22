@@ -85,8 +85,8 @@ void* PtexVisNode::creator()
 void add_border_mode_fields(MFnEnumAttribute& mfnEnum)
 {
 	mfnEnum.addField("clamp", 0);
-	mfnEnum.addField("black", 0);
-	mfnEnum.addField("periodic", 0);
+	mfnEnum.addField("black", 1);
+	mfnEnum.addField("periodic", 2);
 }
 
 // DESCRIPTION:

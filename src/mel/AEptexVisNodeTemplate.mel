@@ -1,0 +1,77 @@
+
+global proc AEptexVisNodeBrowser(string $fileAttribute)
+{
+	//if file exist, then use it as start directory of file browser
+	string $path = `getAttr $fileAttribute`;
+    if(`filetest -f $path`) {
+        string $path = dirname( $path );
+        workspace -dir $path;
+    } else {
+        string $workspace = `workspace -q -fn`;
+        setWorkingDirectory $workspace "image" "sourceImages";
+    }
+	
+	string $ptxFilter = "*.ptx";
+	string $result = `fileDialog -directoryMask $ptxFilter -mode 0`;
+	setAttr $fileAttribute -type "string" $result;
+}
+
+global proc AEptexVisNodeNameReplace(string $fileAttribute)
+{
+	connectControl -fileName ptexVisNodetextureNameField $fileAttribute;
+	button -e -c ("AEptexVisNodeBrowser \""+$fileAttribute+"\"") browser;
+}
+
+global proc AEptexNameNew(string $fileAttribute)
+{
+	setUITemplate -pst attributeEditorTemplate;
+	rowLayout -nc 3 textureNameLayout;
+	{
+		text -label "Ptex File";
+		textField ptexVisNodetextureNameField;
+		symbolButton -image "navButtonBrowse.xpm" browser;
+	}
+	setParent ..;
+	setUITemplate -ppt;
+	
+	AEptexVisNodeNameReplace($fileAttribute);
+}
+
+global proc AEptexVisNodeTemplate(string $nodeName)
+{
+	editorTemplate -beginScrollLayout;
+
+	editorTemplate -beginLayout "Ptex Texture Attributes" -collapse 0;
+	{
+		editorTemplate -callCustom  "AEptexNameNew" 
+									"AEptexVisNodeNameReplace" 
+									"ptexFilePath";
+						
+		editorTemplate -addControl "ptexFilterType";
+		editorTemplate -addControl "ptexFilterSize";
+		editorTemplate -addControl "displayMode";
+		editorTemplate -addControl "glPointSize";
+		editorTemplate -addControl "sampleMultiplier";
+	}
+	editorTemplate -endLayout;
+	
+	editorTemplate -beginLayout "Ptex Texture Information" -collapse 0;
+	{
+		editorTemplate -l "Meta Data Keys" -addControl "outMetaDataKeys";
+		editorTemplate -l "Channels" -addControl "outNumChannels";
+		editorTemplate -l "Alpha Channel" -addControl "outAlphaChannel";
+		editorTemplate -l "Faces" -addControl "outNumFaces";
+		editorTemplate -l "Has Edits" -addControl "outHasEdits";
+		editorTemplate -l "Has MipMaps" -addControl "outHasMipMaps";
+		editorTemplate -l "Mesh Type" -addControl "outMeshType";
+		editorTemplate -l "Data Type" -addControl "outDataType";
+		editorTemplate -l "U Border Mode" -addControl "outUBorderMode";
+		editorTemplate -l "V Border Mode" -addControl "outVBorderMode";
+		
+	}
+	editorTemplate -endLayout;
+	
+	editorTemplate -addExtraControls;
+	editorTemplate -endScrollLayout;
+}
+
