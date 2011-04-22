@@ -19,10 +19,12 @@ class TestMain(TestPtexVisNodeBase):
 		assert n.outMeshType.asInt() == 0
 		assert n.outUBorderMode.asInt() == 0
 		assert n.outVBorderMode.asInt() == 0
+		assert n.outNumSamples.asInt() == 0	# not computed yet
 		
 		# trigger computation
 		# This can still work as its a one-on-one mapping
 		assert n.needsComputation.asInt() == True
+		assert n.outNumSamples.asInt() == 144
 		
 		# trigger resampling
 		n.sampleMultiplier.setFloat(0.0)	# 0 should be fine as well, maybe restrict it
@@ -51,6 +53,7 @@ class TestMain(TestPtexVisNodeBase):
 		
 		# not a one-on-one mapping
 		assert n.needsComputation.asInt() == False
+		assert n.outNumSamples.asInt() == 0
 		
 		# change scene
 		n, m = self.setupScene('nonquad')

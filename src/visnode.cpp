@@ -22,7 +22,6 @@
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MFloatVector.h>
 #include <maya/MFloatPointArray.h>
-#include <maya/MTimer.h>
 #include <maya/MHardwareRenderer.h>
 #include <maya/MGLFunctionTable.h>
 
@@ -59,6 +58,7 @@ MObject PtexVisNode::aOutMeshType;
 MObject PtexVisNode::aOutDataType;
 MObject PtexVisNode::aOutUBorderMode;
 MObject PtexVisNode::aOutVBorderMode;
+MObject PtexVisNode::aOutNumSamples;
 MObject PtexVisNode::aGlPointSize;
 
 
@@ -166,6 +166,9 @@ MStatus PtexVisNode::initialize()
 	aOutHasMipMaps = numFn.create("outHasMipMaps", "ohm", MFnNumericData::kBoolean);
 	setup_output(numFn);
 	
+	aOutNumSamples = numFn.create("outNumSamples", "ons", MFnNumericData::kInt);
+	setup_output(numFn);
+	
 	aOutMeshType = mfnEnum.create("outMeshType", "omt");
 	setup_output(mfnEnum);
 	mfnEnum.addField("triangle", 0);
@@ -207,6 +210,7 @@ MStatus PtexVisNode::initialize()
 	CHECK_MSTATUS(addAttribute(aOutDataType));
 	CHECK_MSTATUS(addAttribute(aOutUBorderMode));
 	CHECK_MSTATUS(addAttribute(aOutVBorderMode));
+	CHECK_MSTATUS(addAttribute(aOutNumSamples));
 	
 	
 
@@ -291,6 +295,8 @@ void PtexVisNode::release_cache()
 {
 	m_sample_col.clear();
 	m_sample_pos.clear();
+	
+	MPlug(thisMObject(), aOutNumSamples).setInt(0);
 }
 
 bool PtexVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx)
@@ -385,9 +391,6 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	const int numChannels = tex->numChannels();
 	const DisplayMode displayMode = (DisplayMode)data.inputValue(aDisplayMode).asInt();
 	const float mult = data.inputValue(aSampleMultiplier).asFloat();
-	
-	MTimer timer;
-	timer.beginTimer();
 	
 	// count memory we require for preallocation
 	size_t numTexels = 0;
@@ -510,10 +513,10 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	}
 	}// switch displayMode
 	
-	timer.endTimer();
 	
-	// debug printing
-	cerr << "Obtained " << m_sample_pos.size() << " samples in " << timer.elapsedTime() << " s" << "(" << m_sample_pos.size() / timer.elapsedTime() << " samples/s)" << endl;
+	// Update sample count, just for user information
+	data.outputValue(aOutNumSamples).setInt(m_sample_pos.size());
+	
 	return true;
 }
 

@@ -9,6 +9,7 @@
 #include <vector>
 
 
+//! Structure with 3 floats and most general vector methods
 struct Float3
 {
 	float x;
@@ -47,6 +48,7 @@ struct Float3
 	}
 };
 
+//! Simple 4 float structure
 struct Float4 : public Float3
 {
 	float w;
@@ -54,9 +56,10 @@ struct Float4 : public Float3
 
 typedef PtexPtr<PtexFilter> PtexFilterPtr;
 typedef PtexPtr<PtexTexture> PtexTexturePtr;
-
 typedef std::vector<Float3>	Float3Vector;
 
+
+//! Node helping to obtain information about ptextures. It can visualize them in the viewport as well
 class PtexVisNode : public MPxLocatorNode
 {
 	public:
@@ -125,6 +128,7 @@ class PtexVisNode : public MPxLocatorNode
 		static MObject aOutMeshType;			//!< mesh type used in file
 		static MObject aOutUBorderMode;			//!< u border mode
 		static MObject aOutVBorderMode;			//!< u border mode
+		static MObject aOutNumSamples;			//!< number of samples we have taken
 		static MObject aNeedsCompute;			//!< dummy output (for now) to check if we need to compute
 		
 

@@ -42,22 +42,34 @@ global proc AEptexVisNodeTemplate(string $nodeName)
 						
 		editorTemplate -addControl "ptexFilterType";
 		editorTemplate -addControl "ptexFilterSize";
-		editorTemplate -addControl "displayMode";
+		editorTemplate -ann "texel: Show textures faces in one line; faceRelative: samples along u and v; faceAbsolute: samples along actual positions"
+						-addControl "displayMode";
 		editorTemplate -addControl "glPointSize";
-		editorTemplate -addControl "sampleMultiplier";
+		editorTemplate -ann "Multiply the amounts of samples taken. Duplicating the value produces 4 times more samples"
+					-addControl "sampleMultiplier";
 	}
 	editorTemplate -endLayout;
 	
 	editorTemplate -beginLayout "Ptex Texture Information" -collapse 0;
 	{
-		editorTemplate -l "Meta Data Keys" -addControl "outMetaDataKeys";
-		editorTemplate -l "Channels" -addControl "outNumChannels";
-		editorTemplate -l "Alpha Channel" -addControl "outAlphaChannel";
-		editorTemplate -l "Faces" -addControl "outNumFaces";
-		editorTemplate -l "Has Edits" -addControl "outHasEdits";
-		editorTemplate -l "Has MipMaps" -addControl "outHasMipMaps";
-		editorTemplate -l "Mesh Type" -addControl "outMeshType";
-		editorTemplate -l "Data Type" -addControl "outDataType";
+		editorTemplate -ann "StringArray of available metadata keys - only visible via script"
+					-l "Meta Data Keys" -addControl "outMetaDataKeys";
+		editorTemplate -ann "Amount of channels, e.g. 3 for channels like RGB"
+					-l "Channels" -addControl "outNumChannels" ;
+		editorTemplate -ann "The ID of the alpha channel or -1 if there is none"
+					-l "Alpha Channel" -addControl "outAlphaChannel" ;
+		editorTemplate -ann "The amount of mapped faces"
+					-l "Faces" -addControl "outNumFaces" ;
+		editorTemplate -ann "Amount of texture samples displayed in the viewport" 
+					-l "Samples" -addControl "outNumSamples" ;
+		editorTemplate -ann "True if edits are (still) available in the ptex file"
+					-l "Has Edits" -addControl "outHasEdits" ;
+		editorTemplate -ann "True if mipmaps are available" 
+					-l "Has MipMaps" -addControl "outHasMipMaps" ;
+		editorTemplate -ann "MeshFormat the samples are stored in"
+					-l "Mesh Type" -addControl "outMeshType" ;
+		editorTemplate -ann "The data type of all channels"
+					-l "Data Type" -addControl "outDataType" ;
 		editorTemplate -l "U Border Mode" -addControl "outUBorderMode";
 		editorTemplate -l "V Border Mode" -addControl "outVBorderMode";
 		
