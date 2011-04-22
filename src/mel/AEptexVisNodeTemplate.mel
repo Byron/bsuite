@@ -42,7 +42,7 @@ global proc AEptexVisNodeTemplate(string $nodeName)
 						
 		editorTemplate -addControl "ptexFilterType";
 		editorTemplate -addControl "ptexFilterSize";
-		editorTemplate -ann "texel: Show textures faces in one line; faceRelative: samples along u and v; faceAbsolute: samples along actual positions"
+		editorTemplate -ann "texelTile: Show textures faces in one line; faceRelative: samples along u and v; faceAbsolute: samples along actual positions"
 						-addControl "displayMode";
 		editorTemplate -addControl "glPointSize";
 		editorTemplate -ann "Multiply the amounts of samples taken. Duplicating the value produces 4 times more samples"

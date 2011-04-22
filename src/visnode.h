@@ -71,7 +71,7 @@ class PtexVisNode : public MPxLocatorNode
 	
 	enum DisplayMode
 	{
-		Texel = 0,					//!< Direct display
+		TexelTile = 0,				//!< Direct display of texel tiles
 		FaceRelative = 1,			//!< display in face space, along uvs
 		FaceAbsolute = 2,			//!< display in face space, along longest edge
 	};

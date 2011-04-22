@@ -1,4 +1,4 @@
-.. image:: http://old.byronimo.de/download/ptexmaya.png
+.. image:: http://old.byronimo.de/download/ptexmaya_ui.png
     :width: 900 px
 
 PtexMaya is a conglomerate of tools to handle ptex textures within maya. For now it is only used as research project and to obtain an understanding on how ptex works.

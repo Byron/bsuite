@@ -121,7 +121,7 @@ MStatus PtexVisNode::initialize()
 	mfnEnum.setKeyable(true);
 
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
-	mfnEnum.addField("texel", (int)Texel);
+	mfnEnum.addField("texelTile", (int)TexelTile);
 	mfnEnum.addField("faceRelative", (int)FaceRelative);
 	mfnEnum.addField("faceAbsolute", (int)FaceAbsolute);
 	mfnEnum.setDefault((short)FaceAbsolute);
@@ -397,7 +397,7 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	Float4 pix;							// one pixel
 	switch(displayMode)
 	{
-	case Texel:
+	case TexelTile:
 	{
 		const float step = 0.01f;
 		Float3		pos;			// position
