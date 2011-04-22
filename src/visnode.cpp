@@ -22,6 +22,9 @@
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MFloatVector.h>
 
+#include <maya/MHardwareRenderer.h>
+#include <maya/MGLFunctionTable.h>
+
 #include "util.h"
 #include "visnode.h"
 
@@ -51,10 +54,12 @@ MObject PtexVisNode::aOutMeshType;
 MObject PtexVisNode::aOutDataType;
 MObject PtexVisNode::aOutUBorderMode;
 MObject PtexVisNode::aOutVBorderMode;
+MObject PtexVisNode::aGlPointSize;
 
 
 PtexVisNode::PtexVisNode()
 	: m_ptex_num_channels(0)
+    , m_gl_point_size(1.0)
 {}
 
 PtexVisNode::~PtexVisNode()
@@ -113,6 +118,10 @@ MStatus PtexVisNode::initialize()
 	aPtexFilterSize = numFn.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 1.0);
 	numFn.setKeyable(true);
 	
+	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kFloat, 1.0);
+	numFn.setKeyable(true);
+	numFn.setInternal(true);
+	
 	// Output attributes
 	/////////////////////
 	aNeedsCompute = numFn.create("needsComputation", "nc", MFnNumericData::kInt);
@@ -163,6 +172,7 @@ MStatus PtexVisNode::initialize()
 	CHECK_MSTATUS(addAttribute(aPtexFileName));
 	CHECK_MSTATUS(addAttribute(aPtexFilterType));
 	CHECK_MSTATUS(addAttribute(aPtexFilterSize));
+	CHECK_MSTATUS(addAttribute(aGlPointSize));
 	CHECK_MSTATUS(addAttribute(aInMesh));
 	
 	CHECK_MSTATUS(addAttribute(aOutMetaDataKeys));
@@ -265,6 +275,8 @@ bool PtexVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle
 	if (plug == aPtexFileName) {
 		release_texture_and_filter();
 		release_cache();
+	} else if (plug == aGlPointSize) {
+		m_gl_point_size = dataHandle.asFloat();
 	}
 	
 	return false;
@@ -277,6 +289,16 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	
 	if (!tex | !filter) {
 		m_error = "Cannot sample ptex without a valid texture and filter";
+		return false;
+	}
+	
+	if (tex->numChannels() < 3 || tex->numChannels() > 4) {
+		m_error = "Can only handle 3 or 4 channels currently";
+		return false;
+	}
+	
+	if (tex->meshType() != Ptex::mt_triangle)  {
+		m_error = "Cannot visualize non-triangle meshes for now";
 		return false;
 	}
 	
@@ -294,6 +316,38 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	}
 	
 	
+	// lets just read the samples for now
+	const int numFaces = tex->numFaces();
+	const int numChannels = tex->numChannels();
+	
+	// count memory we require for preallocation
+	size_t numTexels = 0;
+	for (int i = 0; i < numFaces; ++i) {
+		numTexels += tex->getFaceInfo(i).res.size();
+	}// for each face
+	
+	release_cache();
+	m_sample_pos.reserve(numTexels);
+	m_sample_col.reserve(numTexels);
+	
+	const float step = 0.01f;
+	Float4 p;								// one pixel
+	Float3 pos = {0.f, 0.f, 0.f};			// position
+	// const Float3* vtx = reinterpret_cast<const Float3*>(meshFn.getRawPoints());
+	
+	for (int i = 0; i < numFaces; ++i) {
+		const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
+		for (int u = 0; u < fi.res.u(); u++) {
+			for (int v = 0; v < fi.res.v(); ++v) {
+				tex->getPixel(i, u, v, &p.x, 0, numChannels);
+				m_sample_col.push_back(p);
+				m_sample_pos.push_back(pos);
+				pos.y += step;
+			}// for each v texel
+			pos.x += step;
+			pos.y = 0.0f;
+		}// for each u texel
+	}// for each face
 	
 	return true;
 }
@@ -383,15 +437,43 @@ void PtexVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplayStyl
 {
 	// make sure we are uptodate
 	MPlug(thisMObject(), aNeedsCompute).asInt();
-	
 	view.beginGL();
 	if (m_error.length()) {
-		view.drawText(m_error, MPoint());
+		view.drawText(MString("Error: ") + m_error, MPoint());
 	}
 		
-	if (m_ptex_filter.get()) {
-		
-	}// end have filter
+	if (!m_sample_pos.size()) {
+		goto finish_drawing;
+	}
 	
+	{ // start drawing
+	MHardwareRenderer* renderer = MHardwareRenderer::theRenderer();
+	if (!renderer) {
+		m_error = "No hardware renderer";
+		goto finish_drawing;
+	}
+	
+	MGLFunctionTable* glf = renderer->glFunctionTable();
+	if (!glf) {
+		m_error = "No function table";
+		goto finish_drawing;
+	}
+	
+	glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
+	glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
+	{
+		glf->glEnableClientState(MGL_VERTEX_ARRAY);
+		glf->glVertexPointer(3, MGL_FLOAT, 0, m_sample_pos.data());
+		glf->glEnableClientState(MGL_COLOR_ARRAY);
+		glf->glColorPointer(3, MGL_FLOAT, 0, m_sample_col.data());
+		
+		glf->glPointSize(m_gl_point_size);
+		glf->glDrawArrays(MGL_POINTS, 0, m_sample_pos.size());
+	}
+	glf->glPopAttrib();
+	glf->glPopClientAttrib();
+	}
+	
+finish_drawing:
 	view.endGL();
 }

@@ -4,6 +4,7 @@
 #include <Ptexture.h>
 
 #include <maya/MPxLocatorNode.h>
+#include <maya/MGLdefinitions.h>
 #include <vector>
 
 
@@ -12,6 +13,15 @@ struct Float3
 	float x;
 	float y;
 	float z;
+	
+	Float3 operator - (const Float3& r) {
+		return (Float3){ x - r.x, y - r.y, z - r.z };
+	}
+};
+
+struct Float4 : public Float3
+{
+	float w;
 };
 
 typedef PtexPtr<PtexFilter> PtexFilterPtr;
@@ -63,6 +73,7 @@ class PtexVisNode : public MPxLocatorNode
 		static MObject aPtexFilterType;			//!< type of filter for evaluation
 		static MObject aPtexFilterSize;			//!< desired uv filter size
 		static MObject aInMesh;					//!< mesh to display the ptex information for
+		static MObject aGlPointSize;			//!< size of a point when drawing
 		
 		// output attributes
 		static MObject aOutNumChannels;			//!< provide the number of channels in the file
@@ -86,6 +97,7 @@ class PtexVisNode : public MPxLocatorNode
 		
 		Float3Vector	m_sample_pos;			//!< sample positions
 		Float3Vector	m_sample_col;			//!< sample colors
+		MGLfloat		m_gl_point_size;		//!< size of a point when drawing (cache)	
 };
 
 #endif
