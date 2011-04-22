@@ -51,6 +51,14 @@ typedef std::vector<Float3>	Float3Vector;
 class PtexVisNode : public MPxLocatorNode
 {
 	public:
+	
+	enum DisplayMode
+	{
+		Texel = 0,			//!< Direct display
+		Face = 1,			//!< display in face space
+	};
+	
+	public:
 		PtexVisNode();
 		virtual ~PtexVisNode();
 
@@ -93,6 +101,7 @@ class PtexVisNode : public MPxLocatorNode
 		static MObject aPtexFilterSize;			//!< desired uv filter size
 		static MObject aInMesh;					//!< mesh to display the ptex information for
 		static MObject aGlPointSize;			//!< size of a point when drawing
+		static MObject aDisplayMode;			//!< defines the way we display samples
 		
 		// output attributes
 		static MObject aOutNumChannels;			//!< provide the number of channels in the file

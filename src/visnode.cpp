@@ -42,6 +42,7 @@ const MString PtexVisNode::typeName("ptexVisNode");
 MObject PtexVisNode::aPtexFileName;
 MObject PtexVisNode::aPtexFilterType;
 MObject PtexVisNode::aPtexFilterSize;
+MObject PtexVisNode::aDisplayMode;
 MObject PtexVisNode::aInMesh;
 
 MObject PtexVisNode::aOutNumChannels;
@@ -116,7 +117,12 @@ MStatus PtexVisNode::initialize()
 	mfnEnum.addField("Mitchell",   7);
 	mfnEnum.setKeyable(true);
 
-	aPtexFilterSize = numFn.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 1.0);
+	aDisplayMode = mfnEnum.create("displayMode", "dm");
+	mfnEnum.addField("texel", (int)Texel);
+	mfnEnum.addField("face", (int)Face);
+	mfnEnum.setKeyable(true);
+	
+	aPtexFilterSize = numFn.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 0.001);
 	numFn.setKeyable(true);
 	
 	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kFloat, 1.0);
@@ -174,6 +180,7 @@ MStatus PtexVisNode::initialize()
 	CHECK_MSTATUS(addAttribute(aPtexFilterType));
 	CHECK_MSTATUS(addAttribute(aPtexFilterSize));
 	CHECK_MSTATUS(addAttribute(aGlPointSize));
+	CHECK_MSTATUS(addAttribute(aDisplayMode));
 	CHECK_MSTATUS(addAttribute(aInMesh));
 	
 	CHECK_MSTATUS(addAttribute(aOutMetaDataKeys));
@@ -202,6 +209,7 @@ MStatus PtexVisNode::initialize()
 	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutUBorderMode));
 	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutVBorderMode));
 	CHECK_MSTATUS(attributeAffects(aInMesh,			aNeedsCompute));
+	CHECK_MSTATUS(attributeAffects(aDisplayMode,	aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFileName,   aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFilterSize, aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFilterType, aNeedsCompute));
@@ -322,9 +330,13 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	}
 	
 	
+	
+	// OBTAIN SAMPLES
+	/////////////////
 	// lets just read the samples for now
 	const int numFaces = tex->numFaces();
 	const int numChannels = tex->numChannels();
+	const DisplayMode displayMode = (DisplayMode)data.inputValue(aDisplayMode).asInt();
 	
 	// count memory we require for preallocation
 	size_t numTexels = 0;
@@ -336,45 +348,71 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	m_sample_pos.reserve(numTexels);
 	m_sample_col.reserve(numTexels);
 	
-	const float step = 0.01f;
-	int tverts[3];						// stores 3 triangle vertex ids
-	Float4 p;								// one pixel
-	Float3 pos;			// position
+	Float4 p;							// one pixel
+	switch(displayMode)
+	{
+	case Texel:
+	{
+		const float step = 0.01f;
+		Float3		pos;			// position
+		for (int i = 0; i < numFaces; ++i) {
+			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
+			const int ures = fi.res.u();
+			const int vres = fi.res.v();
+			
+			for (int u = 0; u < ures; ++u) {
+				for (int v = 0; v < vres; ++v) {
+					tex->getPixel(i, u, v, &p.x, 0, numChannels);
+					m_sample_col.push_back(p);
+					m_sample_pos.push_back(pos);
+					pos.y += step;
+				}// for each v texel
+				pos.x += step;
+				pos.y = 0.0f;
+			}// for each u texel
+		}// for each face
+		break;
+	}// case texel
+	case Face:
+	{
 #if MAYA_API_VERSION > 200810
-	#define TFLOAT3 Float3
-	const Float3* vtx = reinterpret_cast<const Float3*>(meshFn.getRawPoints(&stat));
+		#define TFLOAT3 Float3
+		const Float3* vtx = reinterpret_cast<const Float3*>(meshFn.getRawPoints(&stat));
 #else
-	MFloatPointArray vtx;
-	meshFn.getPoints(vtx);
-	#define TFLOAT3 MFloatPoint
+		MFloatPointArray vtx;
+		meshFn.getPoints(vtx);
+		#define TFLOAT3 MFloatPoint
 #endif
-	
-	for (int i = 0; i < numFaces; ++i) {
-		const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
-		const int ures = fi.res.u();
-		const int vres = fi.res.v();
-		const float uresf = (float)ures;
-		const float vresf = (float)vres;
+		const float fsize = data.inputValue(aPtexFileName).asFloat();
+		int tverts[3];						// stores 3 triangle vertex ids
+		for (int i = 0; i < numFaces; ++i) {
+			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
+			const int ures = fi.res.u();
+			const int vres = fi.res.v();
+			const float ufres = (float)ures;
+			const float vfres = (float)vres;
+			
+			meshFn.getPolygonTriangleVertices(i, 0, tverts);
+			const TFLOAT3& v1 = vtx[tverts[0]];
+			const TFLOAT3& v2 = vtx[tverts[1]];
+			const TFLOAT3& v3 = vtx[tverts[2]];
+			
+			for (int u = 0; u < ures; ++u) {
+				const float uf = u / ufres;
+				const TFLOAT3 uvec = (v2-v1) * uf;
+				for (int v = 0; v < vres; ++v) {
+					const float vf = (1.0f - uf) * (v / vfres);
+					filter->eval(&p.x, 0, numChannels, i, uf, vf, fsize, fsize, fsize, fsize);
+					m_sample_col.push_back(p);
+					m_sample_pos.push_back(v1 + uvec + (v3-v1)*vf);
+				}// for each vsample
+			}// for each usample
+		}// for each face
 		
-		meshFn.getPolygonTriangleVertices(i, 0, tverts);
-		const TFLOAT3& v1 = vtx[tverts[0]];
-		const TFLOAT3& v2 = vtx[tverts[1]];
-		const TFLOAT3& v3 = vtx[tverts[2]];
-		
-		for (int u = 0; u < ures; u++) {
-			const TFLOAT3 uvec = (v2-v1)*(u / uresf);
-			for (int v = 0; v < vres; ++v) {
-				tex->getPixel(i, u, v, &p.x, 0, numChannels);
-				m_sample_col.push_back(p);
-				m_sample_pos.push_back(v1 + uvec + (v3-v1) * (v / vresf));
-				pos.y += step;
-			}// for each v texel
-			pos.x += step;
-			pos.y = 0.0f;
-		}// for each u texel
-	}// for each face
-	
 #undef TFLOAT3
+		break;
+	}
+	}// switch displayMode
 	return true;
 }
 
