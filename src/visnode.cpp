@@ -128,13 +128,17 @@ MStatus PtexVisNode::initialize()
 	mfnEnum.setKeyable(true);
 	
 	aPtexFilterSize = numFn.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 0.001);
+	numFn.setMin(0.0);
+	numFn.setMax(1.0);
 	numFn.setKeyable(true);
 	
 	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kFloat, 1.0);
+	numFn.setMin(0.0);
 	numFn.setKeyable(true);
 	numFn.setInternal(true);
 	
 	aSampleMultiplier = numFn.create("sampleMultiplier", "smlt", MFnNumericData::kFloat, 1.0);
+	numFn.setMin(0.0);
 	numFn.setKeyable(true);
 	
 	// Output attributes
