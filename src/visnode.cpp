@@ -22,7 +22,7 @@
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MFloatVector.h>
 #include <maya/MFloatPointArray.h>
-
+#include <maya/MTimer.h>
 #include <maya/MHardwareRenderer.h>
 #include <maya/MGLFunctionTable.h>
 
@@ -43,6 +43,7 @@ MObject PtexVisNode::aPtexFileName;
 MObject PtexVisNode::aPtexFilterType;
 MObject PtexVisNode::aPtexFilterSize;
 MObject PtexVisNode::aDisplayMode;
+MObject PtexVisNode::aSampleMultiplier;
 MObject PtexVisNode::aInMesh;
 
 MObject PtexVisNode::aOutNumChannels;
@@ -119,7 +120,8 @@ MStatus PtexVisNode::initialize()
 
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
 	mfnEnum.addField("texel", (int)Texel);
-	mfnEnum.addField("face", (int)Face);
+	mfnEnum.addField("faceRelative", (int)FaceRelative);
+	mfnEnum.addField("faceAbsolute", (int)FaceAbsolute);
 	mfnEnum.setKeyable(true);
 	
 	aPtexFilterSize = numFn.create("ptexFilterSize", "ptfs", MFnNumericData::kFloat, 0.001);
@@ -128,6 +130,9 @@ MStatus PtexVisNode::initialize()
 	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kFloat, 1.0);
 	numFn.setKeyable(true);
 	numFn.setInternal(true);
+	
+	aSampleMultiplier = numFn.create("sampleMultiplier", "smlt", MFnNumericData::kFloat, 1.0);
+	numFn.setKeyable(true);
 	
 	// Output attributes
 	/////////////////////
@@ -181,6 +186,7 @@ MStatus PtexVisNode::initialize()
 	CHECK_MSTATUS(addAttribute(aPtexFilterSize));
 	CHECK_MSTATUS(addAttribute(aGlPointSize));
 	CHECK_MSTATUS(addAttribute(aDisplayMode));
+	CHECK_MSTATUS(addAttribute(aSampleMultiplier));
 	CHECK_MSTATUS(addAttribute(aInMesh));
 	
 	CHECK_MSTATUS(addAttribute(aOutMetaDataKeys));
@@ -210,6 +216,7 @@ MStatus PtexVisNode::initialize()
 	CHECK_MSTATUS(attributeAffects(aPtexFileName,	aOutVBorderMode));
 	CHECK_MSTATUS(attributeAffects(aInMesh,			aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aDisplayMode,	aNeedsCompute));
+	CHECK_MSTATUS(attributeAffects(aSampleMultiplier,	aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFileName,   aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFilterSize, aNeedsCompute));
 	CHECK_MSTATUS(attributeAffects(aPtexFilterType, aNeedsCompute));
@@ -337,11 +344,15 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	const int numFaces = tex->numFaces();
 	const int numChannels = tex->numChannels();
 	const DisplayMode displayMode = (DisplayMode)data.inputValue(aDisplayMode).asInt();
+	const float mult = data.inputValue(aSampleMultiplier).asFloat();
+	
+	MTimer timer;
+	timer.beginTimer();
 	
 	// count memory we require for preallocation
 	size_t numTexels = 0;
 	for (int i = 0; i < numFaces; ++i) {
-		numTexels += tex->getFaceInfo(i).res.size();
+		numTexels += (size_t)(tex->getFaceInfo(i).res.size() * mult);
 	}// for each face
 	
 	release_cache();
@@ -373,7 +384,7 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 		}// for each face
 		break;
 	}// case texel
-	case Face:
+	case FaceRelative:
 	{
 #if MAYA_API_VERSION > 200810
 		#define TFLOAT3 Float3
@@ -387,8 +398,8 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 		int tverts[3];						// stores 3 triangle vertex ids
 		for (int i = 0; i < numFaces; ++i) {
 			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
-			const int ures = fi.res.u();
-			const int vres = fi.res.v();
+			const int ures = (int)(fi.res.u() * mult);
+			const int vres = (int)(fi.res.v() * mult);
 			const float ufres = (float)ures;
 			const float vfres = (float)vres;
 			
@@ -413,6 +424,11 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 		break;
 	}
 	}// switch displayMode
+	
+	timer.endTimer();
+	
+	// debug printing
+	cerr << "Obtained " << m_sample_pos.size() << " samples in " << timer.elapsedTime() << " s" << "(" << m_sample_pos.size() / timer.elapsedTime() << " samples/s)" << endl;
 	return true;
 }
 

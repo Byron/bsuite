@@ -54,8 +54,9 @@ class PtexVisNode : public MPxLocatorNode
 	
 	enum DisplayMode
 	{
-		Texel = 0,			//!< Direct display
-		Face = 1,			//!< display in face space
+		Texel = 0,					//!< Direct display
+		FaceRelative = 1,			//!< display in face space, along uvs
+		FaceAbsolute = 2,			//!< display in face space, along longest edge
 	};
 	
 	public:
@@ -102,6 +103,7 @@ class PtexVisNode : public MPxLocatorNode
 		static MObject aInMesh;					//!< mesh to display the ptex information for
 		static MObject aGlPointSize;			//!< size of a point when drawing
 		static MObject aDisplayMode;			//!< defines the way we display samples
+		static MObject aSampleMultiplier;		//!< Multiply amount of samples taken
 		
 		// output attributes
 		static MObject aOutNumChannels;			//!< provide the number of channels in the file
