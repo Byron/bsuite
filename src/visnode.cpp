@@ -263,6 +263,7 @@ bool PtexVisNode::assure_texture(MDataBlock& data)
 	
 	const MString& filePath = data.inputValue(aPtexFileName).asString();
 	if (filePath.length() == 0) {
+		reset_output_info(data);
 		return false;
 	}
 	
@@ -270,6 +271,7 @@ bool PtexVisNode::assure_texture(MDataBlock& data)
 	MFileObject file;
 	file.setRawFullName(filePath);
 	if (!file.exists()) {
+		reset_output_info(data);
 		return false;
 	}
 	
@@ -277,10 +279,25 @@ bool PtexVisNode::assure_texture(MDataBlock& data)
 	PtexTexturePtr ptex(gCache->get(file.resolvedFullName().asChar(), error));	// This pointer interface is ridiculous
 	if (!ptex.get()) {
 		m_error = error.c_str();
+		reset_output_info(data);
 		return false;
 	}
 	m_ptex_texture.swap(ptex);
 	return true;
+}
+
+void PtexVisNode::reset_output_info(MDataBlock &data)
+{
+	// reset only the most important attributes
+	data.outputValue(aOutAlphaChannel).setInt(0);
+	data.outputValue(aOutHasEdits).setBool(false);
+	data.outputValue(aOutHasMipMaps).setBool(false);
+	data.outputValue(aOutNumChannels).setInt(0);
+	data.outputValue(aOutNumFaces).setInt(0);
+	
+	MFnStringArrayData saFn;
+	MObject empty = saFn.create();
+	data.outputValue(aOutMetaDataKeys).setMObject(empty);
 }
 
 void PtexVisNode::release_texture_and_filter()
@@ -354,35 +371,10 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 		return false;
 	}
 	
-	if (tex->numChannels() < 3 || tex->numChannels() > 4) {
-		m_error = "Can only handle 3 or 4 channels currently";
+	if (tex->numChannels() > 4) {
+		m_error = "Can only handle up to 4 channels currently";
 		return false;
 	}
-	
-	if (tex->meshType() != Ptex::mt_triangle)  {
-		m_error = "Cannot visualize non-triangle meshes for now";
-		return false;
-	}
-	
-	MStatus stat;
-	MFnMesh meshFn(data.inputValue(aInMesh).data(), &stat);
-	if (stat.error()) {
-		m_error = "no mesh provided";
-		return false;
-	}
-	
-	// For now, lets support one-on-one mappings without sub-face support
-	if (meshFn.numPolygons() != tex->numFaces()) {
-		m_error = "Face count of texture does not match polygon count of connected mesh. Currently these must match one on one";
-		return false;
-	}
-	
-	if (tex->numFaces() == 0) {
-		m_error = "Empty texture encountered";
-		return false;
-	}
-	
-	
 	
 	// OBTAIN SAMPLES
 	/////////////////
@@ -430,6 +422,29 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	case FaceRelative:	// fall through
 	case FaceAbsolute:
 	{
+		if (tex->meshType() != Ptex::mt_triangle)  {
+			m_error = "Cannot visualize non-triangle meshes for now";
+			return false;
+		}
+		
+		MStatus stat;
+		MFnMesh meshFn(data.inputValue(aInMesh).data(), &stat);
+		if (stat.error()) {
+			m_error = "no mesh provided";
+			return false;
+		}
+		
+		// For now, lets support one-on-one mappings without sub-face support
+		if (meshFn.numPolygons() != tex->numFaces()) {
+			m_error = "Face count of texture does not match polygon count of connected mesh. Currently these must match one on one";
+			return false;
+		}
+		
+		if (tex->numFaces() == 0) {
+			m_error = "Empty texture encountered";
+			return false;
+		}
+		
 #if MAYA_API_VERSION > 200810
 		#define TFLOAT3 Float3
 		const Float3* vtx = reinterpret_cast<const Float3*>(meshFn.getRawPoints(&stat));
@@ -513,6 +528,10 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 	}
 	}// switch displayMode
 	
+	// reset previous error - at this point we have samples
+	if (m_error.length() && m_sample_col.size()) {
+		m_error = MString();
+	}
 	
 	// Update sample count, just for user information
 	data.outputValue(aOutNumSamples).setInt(m_sample_pos.size());
@@ -522,11 +541,6 @@ bool PtexVisNode::update_sample_buffer(MDataBlock& data)
 
 MStatus PtexVisNode::compute(const MPlug& plug, MDataBlock& data)
 {
-	// reset previous error, we only get called whenever something changes
-	if (m_error.length()) {
-		m_error = MString();
-	}
-	
 	// in all cases, just set us clean - if we are not setup, we would be called
 	// over and over again, lets limit this to just when something changes
 	data.setClean(plug);

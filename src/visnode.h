@@ -52,6 +52,11 @@ struct Float3
 struct Float4 : public Float3
 {
 	float w;
+	
+	Float4(float x=0.f, float y=0.f, float z=0.f, float w=0.f)
+	    : Float3(x,y,z)
+	    , w(w)
+	{}
 };
 
 typedef PtexPtr<PtexFilter> PtexFilterPtr;
@@ -96,6 +101,9 @@ class PtexVisNode : public MPxLocatorNode
 		
 		//! release the current texture (if there is one). This releases the filter as well !
 		void release_texture_and_filter();
+		
+		//! reset output information (e.g. once we have no valid texture)
+		void reset_output_info(MDataBlock& data);
 		
 		//! release data taken up by our sample cache
 		void release_cache();

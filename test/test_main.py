@@ -66,3 +66,11 @@ class TestMain(TestPtexVisNodeBase):
 		# non-exinsting path as well
 		n.ptfp.setString("helloworld")
 		assert n.needsComputation.asInt() == True
+		
+		# if there is no valid texture, we don't have texture information
+		assert n.outNumChannels.asInt() == 0
+		assert n.outNumFaces.asInt() == 0
+		assert n.outHasEdits.asBool() == 0
+		assert n.outHasMipMaps.asBool() == 0
+		assert n.outAlphaChannel.asInt() == 0
+		assert len(n.outMetaDataKeys.masData().array()) == 0
