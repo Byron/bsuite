@@ -57,6 +57,7 @@ endfunction()
 #					LIBRARY_DIRS dir1 [... dirN]
 #					LINK_LIBRARIES lib1 [...libN]
 #					DEFINES def1 [...defN]
+#					WITHOUT_EXCEPTIONS
 #					WITH_TEST
 #				)
 #
@@ -83,6 +84,8 @@ endfunction()
 #	List of library names that should be linked into your output file
 # DEFINES
 #	Defines that should be set for your project
+# WITHOUT_EXCEPTIONS
+#	If set, exceptions will be disabled.
 # WITH_TEST
 #	If set, a python based test will be run which loads your compiled plugin.
 #	In your mrv/nose test implementation, you will have to verify that your plugin
@@ -90,7 +93,7 @@ endfunction()
 # ======================================
 function(add_maya_project)
 	cmake_parse_arguments(PROJECT 
-						"WITH_TEST"
+						"WITH_TEST;WITHOUT_EXCEPTIONS"
 						"NAME"
 						"MAYA_VERSIONS;SOURCE_FILES;SOURCE_DIRS;INCLUDE_DIRS;LIBRARY_DIRS;LINK_LIBRARIES;DEFINES"
 						${ARGN})
@@ -205,6 +208,10 @@ function(add_maya_project)
 		#set_property(TARGET ${PROJECT_ID}
 		#			APPEND PROPERTY INCLUDE_DIRECTORIES ${MAYA_INCLUDE_DIR})
 		append_to_target_property(${PROJECT_ID} COMPILE_FLAGS "${INCL_DIR_FLAG}${MAYA_INCLUDE_DIR}" YES)
+		if(PROJECT_WITHOUT_EXCEPTIONS AND UNIX)
+			# TODO: windows version ... 
+			append_to_target_property(${PROJECT_ID} COMPILE_FLAGS -fno-exceptions YES)
+		endif()
 		
 		target_link_libraries(${PROJECT_ID} 
 										${DEFAULT_MAYA_LIBRARIES} 

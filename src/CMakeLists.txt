@@ -1,4 +1,4 @@
 
-foreach(PLUGIN ptex)
+foreach(PLUGIN ptex lidar)
 	add_subdirectory(${PLUGIN})
 endforeach()

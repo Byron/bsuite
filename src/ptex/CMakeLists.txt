@@ -38,5 +38,6 @@ if(WAS_SUCCESSFUL)
 					LIBRARY_DIRS
 						${PTEX_LIBRARY_DIR}
 					WITH_TEST
+					WITHOUT_EXCEPTIONS
 					)
 endif()
