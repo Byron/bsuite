@@ -221,7 +221,10 @@ function(add_maya_project)
 		if(PROJECT_WITH_TEST)
 			# Assure configuration
 			if(EXISTS ${TEST_TMRV_PATH})
-				add_test(NAME ${PROJECT_ID}_Test 
+				add_test(NAME
+							${PROJECT_ID}_Test
+						WORKING_DIRECTORY
+							${CMAKE_SOURCE_DIR}/test
 						COMMAND 
 							python ${TEST_TMRV_PATH} ${MAYA_VERSION} 
 									--mrv-mayapy batch_startup.py 
