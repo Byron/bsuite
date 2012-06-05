@@ -32,10 +32,14 @@ endfunction()
 # PROPERTY the target level property name
 # VALUES is a semicolon separated list of values to set
 # ======================================
-function(append_to_target_property TARGET PROPERTY VALUES)
+function(append_to_target_property TARGET PROPERTY VALUES SPACE_SEPARATED)
 	get_target_property(CURR_VALUES ${TARGET} ${PROPERTY})
 	if (CURR_VALUES)
-		list(APPEND CURR_VALUES ${VALUES})
+		if(SPACE_SEPARATED)
+			set(CURR_VALUES "${CURR_VALUES} ${VALUES}")
+		else()
+			list(APPEND CURR_VALUES ${VALUES})
+		endif()
 	else()
 		set(CURR_VALUES ${VALUES})
 	endif()
@@ -53,6 +57,7 @@ endfunction()
 #					LIBRARY_DIRS dir1 [... dirN]
 #					LINK_LIBRARIES lib1 [...libN]
 #					DEFINES def1 [...defN]
+#					WITH_TEST
 #				)
 #
 # This function allows to configure an average project and automatically add
@@ -78,10 +83,14 @@ endfunction()
 #	List of library names that should be linked into your output file
 # DEFINES
 #	Defines that should be set for your project
+# WITH_TEST
+#	If set, a python based test will be run which loads your compiled plugin.
+#	In your mrv/nose test implementation, you will have to verify that your plugin
+#	is loaded.
 # ======================================
 function(add_maya_project)
 	cmake_parse_arguments(PROJECT 
-						""
+						"WITH_TEST"
 						"NAME"
 						"MAYA_VERSIONS;SOURCE_FILES;SOURCE_DIRS;INCLUDE_DIRS;LIBRARY_DIRS;LINK_LIBRARIES;DEFINES"
 						${ARGN})
@@ -131,8 +140,10 @@ function(add_maya_project)
 	
 	if(WIN32)
 		set(LINK_DIR_FLAG "\L")
+		set(INCL_DIR_FLAG "\I")
 	else()
 		set(LINK_DIR_FLAG "-L")
+		set(INCL_DIR_FLAG "-I")
 	endif()
 	
 	# DIRECTORY LEVEL CONFIGURATION
@@ -150,19 +161,25 @@ function(add_maya_project)
 		
 		if(NOT EXISTS ${_MAYA_LOCATION})
 			message(SEND_ERROR "maya was not found at ${_MAYA_LOCATION} - please assure your MAYA_VERSIONS are set correctly, as well as your MAYA_INSTALL_BASE_SUFFIX, which could be -x64 on 64 bit systems")
+			return()
 		endif()
 		
 		# MAYA INCLUDE DIR 
 		set(MAYA_INCLUDE_DIR ${_MAYA_LOCATION}${INCLUDE_INSERT}/include)
 		if(NOT EXISTS ${MAYA_INCLUDE_DIR})
 			message(SEND_ERROR "Maya include directory at ${MAYA_INCLUDE_DIR} did not exist")
+			return()
 		endif()
 		
 		# LIBRARY INCLUDE DIR
 		set(MAYA_LIB_DIR ${_MAYA_LOCATION}${LIB_INSERT}/lib)
 		if(NOT EXISTS ${MAYA_LIB_DIR})
 			message(SEND_ERROR "Maya library directory at ${MAYA_LIB_DIR} did not exist")
+			return()
 		endif()
+		
+		
+		message(STATUS "Building project ${PROJECT_NAME} for maya ${MAYA_VERSION}")
 		
 		# CREATE TARGET
 		###############
@@ -172,30 +189,48 @@ function(add_maya_project)
 		
 		# TARGET LEVEL CONFIGURATION
 		#############################
-		append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}${MAYA_LIB_DIR}")
+		append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}${MAYA_LIB_DIR}" YES)
 		if (${CMAKE_BUILD_TYPE} MATCHES Release AND UNIX AND NOT APPLE)
-			append_to_target_property(${PROJECT_ID} LINK_FLAGS "-Wl,--strip-all,-O2")
+			append_to_target_property(${PROJECT_ID} LINK_FLAGS "-Wl,--strip-all,-O2" YES)
 		endif()
-		append_to_target_property(${PROJECT_ID} INCLUDE_DIRECTORIES ${MAYA_INCLUDE_DIR})
+		# its ignored by implementation ! Its hard to set per-project includes
+		#pend_to_target_property(${PROJECT_ID} INCLUDE_DIRECTORIES ${MAYA_INCLUDE_DIR})
+		#set_property(TARGET ${PROJECT_ID}
+		#			APPEND PROPERTY INCLUDE_DIRECTORIES ${MAYA_INCLUDE_DIR})
+		append_to_target_property(${PROJECT_ID} COMPILE_FLAGS "${INCL_DIR_FLAG}${MAYA_INCLUDE_DIR}" YES)
 		
 		target_link_libraries(${PROJECT_ID} 
 										${DEFAULT_MAYA_LIBRARIES} 
 										${PROJECT_LINK_LIBRARIES})
 		
 		if(PROJECT_DEFINES)
-			append_to_target_property(${PROJECT_ID} COMPILE_DEFINITIONS "${PROJECT_DEFINES}")
+			append_to_target_property(${PROJECT_ID} COMPILE_DEFINITIONS "${PROJECT_DEFINES}" NO)
 		endif()
 		
-		set_target_properties(${PROJECT_ID} PROPERTIES 
+		set_target_properties(${PROJECT_ID} PROPERTIES
 												OUTPUT_NAME 
 														${PROJECT_NAME}
-												PREFIX 
+												PREFIX
 														""				# make sure we don't get the 'lib' prefix on linux
-												SUFFIX 
+												SUFFIX
 														${PROJECT_SUFFIX}
 												LIBRARY_OUTPUT_DIRECTORY
 													${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${MAYA_VERSION}
 												CLEAN_DIRECT_OUTPUT 1)
+												
+		if(PROJECT_WITH_TEST)
+			# Assure configuration
+			if(EXISTS ${TEST_TMRV_PATH})
+				add_test(NAME ${PROJECT_ID}_Test 
+						COMMAND 
+							python ${TEST_TMRV_PATH} ${MAYA_VERSION} 
+									--mrv-mayapy batch_startup.py 
+									$<TARGET_FILE:${PROJECT_ID}>)
+				message(STATUS "Adding test for ${PROJECT_NAME} for maya ${MAYA_VERSION}")
+			else()
+				message(WARNING "Tests for ${PROJECT_ID} deactivated as tmrv path is not provided, check your configuration")
+			endif() # project with tmrv path
+		endif() # project with test
 	endforeach()# FOR EACH MAYA VERSION
 endfunction()
 

@@ -38,7 +38,7 @@ class TestMayaBase(unittest.TestCase):
 		"""Open the given scene forcibly"""
 		return mrv.maya.Scene.open(path, force=True)
 	
-	
+
 class TestPtexVisNodeBase(TestMayaBase):
 	"""provides utilities to setup a ptexture file"""
 	
@@ -56,7 +56,10 @@ class TestPtexVisNodeBase(TestMayaBase):
 		m = nt.Node("meshShape")
 		assert(isinstance(m, nt.Mesh))
 		
-		n = nt.PtexVisNode()
+		try:
+			n = nt.PtexVisNode()
+		except RuntimeError:
+			raise nose.SkipTest("Plugin was not loaded - this is not our run")
 		m.outMesh.mconnectTo(n.inMesh)
 		n.ptfp.setString(str(cls.ptexturePath(ptexture_name)))
 		return n, m

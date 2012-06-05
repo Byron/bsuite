@@ -8,6 +8,5 @@ include(configure.cmake)
 include(fun.cmake)
 
 add_subdirectory(src)
-add_subdirectory(test)
 
 

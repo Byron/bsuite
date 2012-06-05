@@ -11,9 +11,9 @@ set(${PROJECT_NAME}_VERSION_MAJOR 1)
 set(${PROJECT_NAME}_VERSION_MINOR 0)
 
 # general path configuration
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE})
 
 # add the profiling configuration. Its essentially the release config, but
 # compiles with profiling instructions, enabling gprof
@@ -45,7 +45,8 @@ if(UNIX)
 		CMAKE_SHARED_LINKER_FLAGS_PROFILE)
 		
 	# make sure we see everything! Don't export anything by default
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fno-exceptions -fPIC  -Wall -pedantic-errors -Wno-long-long -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-comment -Wcast-qual -Werror")
+	# for now, without -pedantic, as it prevents compilation of maya thanks to 'extra ;'  - don't know how to disable this
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fno-exceptions -fPIC  -Wall -Wno-long-long -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-comment -Wcast-qual")
 endif() #unix
 
 if(${CMAKE_BUILD_TYPE} MATCHES Debug OR ${CMAKE_BUILD_TYPE} MATCHES Profile)
@@ -103,3 +104,9 @@ endif()
 # TESTING
 ##########
 enable_testing()
+
+set(TEST_TMRV_PATH "" CACHE FILEPATH
+	"Path to the tmrv executable, providing facilities to test maya plugins using the mrv development framework")
+
+set(TEST_MAYA_VERSION 2010 CACHE STRING
+	"Maya version to use for testing")
