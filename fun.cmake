@@ -134,8 +134,11 @@ function(add_maya_project)
 	
 	# OSX HANDLING
 	if(APPLE)
-		set(LIB_INSERT "/Maya.app/Contents/MacOS")
-		set(INCLUDE_INSERT "/devkit")
+		set(LIB_INSERT "Maya.app/Contents/MacOS")
+		set(INCLUDE_SUFFIX "devkit/include")
+	else()
+		set(LIB_INSERT "lib")
+		set(INCLUDE_SUFFIX "include")
 	endif()
 	
 	if(WIN32)
@@ -152,6 +155,11 @@ function(add_maya_project)
 	include_directories(${PROJECT_INCLUDE_DIRS})
 	link_directories(${PROJECT_LIBRARY_DIRS})
 	
+	# assure we have agl
+	if(APPLE)
+		include_directories(${OSX_AGL_INCLUDE_DIR})
+	endif()
+	
 	
 	# FOR EACH MAYA VERSION TO GENERATE
 	####################################
@@ -165,14 +173,14 @@ function(add_maya_project)
 		endif()
 		
 		# MAYA INCLUDE DIR 
-		set(MAYA_INCLUDE_DIR ${_MAYA_LOCATION}${INCLUDE_INSERT}/include)
+		set(MAYA_INCLUDE_DIR ${_MAYA_LOCATION}/${INCLUDE_SUFFIX})
 		if(NOT EXISTS ${MAYA_INCLUDE_DIR})
 			message(SEND_ERROR "Maya include directory at ${MAYA_INCLUDE_DIR} did not exist")
 			return()
 		endif()
 		
 		# LIBRARY INCLUDE DIR
-		set(MAYA_LIB_DIR ${_MAYA_LOCATION}${LIB_INSERT}/lib)
+		set(MAYA_LIB_DIR ${_MAYA_LOCATION}/${LIB_INSERT})
 		if(NOT EXISTS ${MAYA_LIB_DIR})
 			message(SEND_ERROR "Maya library directory at ${MAYA_LIB_DIR} did not exist")
 			return()

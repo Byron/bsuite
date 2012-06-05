@@ -22,8 +22,14 @@
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MFloatVector.h>
 #include <maya/MFloatPointArray.h>
-#include <maya/MHardwareRenderer.h>
+
+
+// Fix unholy c++ incompatibility - typedefs to void are not allowed in gcc greater 4.1.2
+#include <maya/MGLdefinitions.h>
+#define MGLvoid void
 #include <maya/MGLFunctionTable.h>
+#undef MGLvoid
+#include <maya/MHardwareRenderer.h>
 
 #include "util.h"
 #include "visnode.h"
