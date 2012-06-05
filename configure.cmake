@@ -1,6 +1,6 @@
 # CMAKE CONFIGURATION
 #####################
-project(PtexMaya CXX)
+project(MayaPlugins CXX)
 
 set(${PROJECT_NAME}_VERSION_MAJOR 1)
 set(${PROJECT_NAME}_VERSION_MINOR 0)
@@ -12,41 +12,45 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
 # add the profiling configuration. Its essentially the release config, but
 # compiles with profiling instructions, enabling gprof
-if(CMAKE_CONFIGURATION_TYPES)
-	list(APPEND CMAKE_CONFIGURATION_TYPES Profile)
-	list(REMOVE_DUPLICATES CMAKE_CONFIGURATION_TYPES)
-	set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
-		"Add the configurations that we need"
-		FORCE)
+if(UNIX)
+	if(CMAKE_CONFIGURATION_TYPES)
+		list(APPEND CMAKE_CONFIGURATION_TYPES Profile)
+		list(REMOVE_DUPLICATES CMAKE_CONFIGURATION_TYPES)
+		set(CMAKE_CONFIGURATION_TYPES "${CMAKE_CONFIGURATION_TYPES}" CACHE STRING
+			"Add the configurations that we need"
+			FORCE)
+	endif()
+endif() # unix
+
+
+# COMPILER FLAGS
+##################
+if(UNIX)
+	set( CMAKE_CXX_FLAGS_PROFILE "-O3 -DNDEBUG -pg" CACHE STRING
+		"Flags used by the C++ compiler during PROFILE builds.")
+	set( CMAKE_EXE_LINKER_FLAGS_PROFILE
+		"-pg" CACHE STRING
+		"Flags used for linking binaries during PROFILE builds.")
+	set( CMAKE_SHARED_LINKER_FLAGS_PROFILE
+		"-pg" CACHE STRING
+		"Flags used by the shared libraries linker during PROFILE builds.")
+	mark_as_advanced(
+		CMAKE_CXX_FLAGS_PROFILE
+		CMAKE_EXE_LINKER_FLAGS_PROFILE
+		CMAKE_SHARED_LINKER_FLAGS_PROFILE)
+		
+	# make sure we see everything! Don't export anything by default
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fno-exceptions -fPIC  -Wall -pedantic-errors -Wno-long-long -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-comment -Wcast-qual -Werror")
+endif() #unix
+
+if(${CMAKE_BUILD_TYPE} MATCHES Debug OR ${CMAKE_BUILD_TYPE} MATCHES Profile)
+	add_definitions(-DDEBUG)
 endif()
 
-set( CMAKE_CXX_FLAGS_PROFILE "-O3 -DNDEBUG -pg" CACHE STRING
-    "Flags used by the C++ compiler during PROFILE builds.")
-set( CMAKE_EXE_LINKER_FLAGS_PROFILE
-    "-pg" CACHE STRING
-    "Flags used for linking binaries during PROFILE builds.")
-set( CMAKE_SHARED_LINKER_FLAGS_PROFILE
-    "-pg" CACHE STRING
-    "Flags used by the shared libraries linker during PROFILE builds.")
-mark_as_advanced(
-    CMAKE_CXX_FLAGS_PROFILE
-    CMAKE_EXE_LINKER_FLAGS_PROFILE
-    CMAKE_SHARED_LINKER_FLAGS_PROFILE)
-
-# CMAKE setUP AND CONFIGURATION
+# CMAKE SETUP AND CONFIGURATION
 ###############################
 # setup modules
 include(FindDoxygen DOXYGEN_SKIP_DOT)
-
-# setup compiler
-if(UNIX)
-	# show all warnings
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}\ -Wall")
-endif()
-
-if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug" OR "${CMAKE_BUILD_TYPE}" STREQUAL "Profile")
-	add_definitions(-DDEBUG)
-endif()
 
 if(DOXYGEN)
 	set(DOXYFILE_SOURCE_DIRS src)
@@ -55,11 +59,11 @@ else(DOXYGEN)
 	message(WARNING "Doxygen was not found - documentation will not be built")
 endif()
 
+
 # MAYA CONFIGURATION
 ######################
-set(MAYA_VERSIONS 2012 2011 2010 2009 2008)
-set(PTEX_LIBRARIES Ptex z)
-set(MAYA_LIBRARIES Foundation OpenMaya OpenMayaUI OpenMayaAnim OpenMayaRender)
+set(DEFAULT_MAYA_VERSIONS 2012 2011 2010 2009 2008)
+set(DEFAULT_MAYA_LIBRARIES Foundation OpenMaya OpenMayaUI OpenMayaAnim OpenMayaRender)
 set(CUSTOM_DEFINITIONS -DREQUIRE_IOSTREAM -D_BOOL)
 
 if(UNIX)
@@ -82,43 +86,15 @@ set(MAYA_INSTALL_BASE_PATH ${MAYA_INSTALL_BASE_DEFAULT} CACHE PATH
 
 set(MAYA_INSTALL_BASE_SUFFIX "" CACHE STRING
     "Suffix to append to maya installation directories, like -x64 on 64 bit systems on linux")
+
+set(MAYA_BUILD_VERSIONS "${DEFAULT_MAYA_VERSIONS}" CACHE STRING
+    "a semicolon separated list of all maya versions you would like to have build, like 2008;2009 ")
     
-set(PTEX_INCLUDE_DIR "" CACHE PATH
-	"Directory containing the ptex headers")
-
-set(PTEX_LIBRARY_DIR "" CACHE PATH
-	"Directory containing the ptex headers")
-
-# VERIFY PREREQUESITES
-######################
-if(NOT EXISTS ${PTEX_INCLUDE_DIR})
-	message(SEND_ERROR "PTex header directory must be set, check your configuration")
-endif()
-
-if(NOT EXISTS ${PTEX_LIBRARY_DIR})
-	message(SEND_ERROR "PTex library directory must be set, check your configuration")
-endif()
-
 if(NOT EXISTS ${MAYA_INSTALL_BASE_PATH})
-	message(SEND_ERROR "Maya install location is not set, check your configuration")
+	message(SEND_ERROR "Maya install location is not set or does not exist at '${MAYA_INSTALL_BASE_PATH}, check your configuration")
 endif()
 
-# CONFIGURE Compiler/linker
-###########################
-include_directories(${PTEX_INCLUDE_DIR} src test SYSTEM)
-link_directories(${PTEX_LIBRARY_DIR})
 
-# CONFIGURE LIBRARIES
-#####################
-
-
-# TEST SETUP
-############
+# TESTING
+##########
 enable_testing()
-
-include(fun.cmake)
-
-add_subdirectory(src)
-add_subdirectory(test)
-
-

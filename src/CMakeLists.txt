@@ -1,4 +1,4 @@
 
-foreach(VERSION IN LISTS MAYA_VERSIONS)
-	add_subdirectory(${VERSION})
+foreach(PLUGIN IN ptex)
+	add_subdirectory(${PLUGIN})
 endforeach()
