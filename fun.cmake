@@ -188,7 +188,6 @@ function(add_maya_project)
 		
 		
 		message(STATUS "Building project ${PROJECT_NAME} for maya ${MAYA_VERSION}")
-		message(STATUS ${PROJECT_SUFFIX})
 		# CREATE TARGET
 		###############
 		add_library(${PROJECT_ID}
@@ -239,7 +238,7 @@ function(add_maya_project)
 									$<TARGET_FILE:${PROJECT_ID}>)
 				message(STATUS "Adding test for ${PROJECT_NAME} for maya ${MAYA_VERSION}")
 			else()
-				message(WARNING "Tests for ${PROJECT_ID} deactivated as tmrv path is not provided, check your configuration")
+				message(STATUS "Tests for ${PROJECT_ID} deactivated as tmrv path is not provided, check your configuration")
 			endif() # project with tmrv path
 		endif() # project with test
 	endforeach()# FOR EACH MAYA VERSION

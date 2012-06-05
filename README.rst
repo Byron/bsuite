@@ -1,13 +1,23 @@
-.. image:: http://old.byronimo.de/download/ptexmaya_ui.png
+#############
+About B-Suite
+#############
+The B-Suite (pronounced *Be Sweet*) is a conglomerate of maya plugins that I wrote because I really wanted to try something.
+The respective plugins where written with quality in mind. Additionally you will find auto-tests, code-docs and end-user docs. 
+
+########
+PTexVis
+########
+
+.. image:: http://old.byronimo.de/download/PTexVis_ui.png
     :width: 900 px
 
-PtexMaya is a conglomerate of tools to handle ptex textures within maya. For now it is only used as research project and to obtain an understanding on how ptex works.
+PTexVis is a locator which can display ptex textures are point clouds on top of the corresponding mesh. For now it is only used as research project and to obtain an understanding on how ptex works.
 
-PtexMaya works for Maya 2008 to Maya 2012.
+PTexVis works for Maya 2008 to Maya 2013, on Linux and OSX.
 
-########
+========
 Features
-########
+========
 * **Ptexture Viewport Visualization (ptxVisNode)**
 
  * Display ptextures directly in the viewport using opengl points
@@ -22,31 +32,45 @@ Features
 ########
 Building
 ########
-PtexMaya uses cmake to setup its build environment. 
-For a successful build, you need the headers for Ptex (https://github.com/wdas/ptex) as well as a compiled static or dynamic library. Additionally you require a maya installation (version 2008 to 2012).
+The B-Suite build system uses cmake to setup its build environment. 
+For a successful build you need the headers for Ptex (https://github.com/wdas/ptex) as well as a compiled static or dynamic library. Additionally you require a maya installation (version 2008 to 2012).
+
+For your convenience, ptex is included as git-submodule which can be retrieved rather easily.
+After cloning the repository, make sure you run::
+    
+    # get a clone of ptex
+    cd bsuite
+    git submodule init
+    git submodule update
+    
+    # create the ptex library
+    make -C 3rdParty/ptex
 
 First, you generate your build configuration, then you perform the actual build::
     
-    cd ptexmaya
-    cmake .
-    # this fails as you have to setup the paths to ptex at least
+    mkdir -p build/release
+    cd build/release
+    cmake ../..
+    
+    # this fails as you have to setup some paths - see the error message
+    # for more info and run the cmake gui to perform the configuration.
     cmake-gui .
-    # setup the PTEX variables, otherwise the configuration will fail
+    # setup the PTEX variables, otherwise the configuration will fail for PTexVis.
     # Hit generate in the UI or execute cmake . 
     
-    # Linux|OSX: build the plugin for all maya versions
+    # Linux|OSX: build the plugin for all configured maya versions
     make
     
     # Windows: Open visual studio and build from there
     
-Adjust the plugin and script path for maya to find your newly compiled plugin::
+Adjust the maya plugin and script path for maya to find your newly compiled plugin(s)::
     
     export MAYA_SCRIPT_PATH=src/mel
-    export MAYA_PLUG_IN_PATH=src/2012/lib
+    export MAYA_PLUG_IN_PATH=bin/release/2012
 
 Launch maya and load the plugin::
     
-    loadPlugin("libptexmaya")
+    loadPlugin("ptexvis")
     
     # create a node and connect a mesh (which matches the the ptex file)
     # See http://ptex.us for examples
@@ -56,8 +80,16 @@ Launch maya and load the plugin::
     # In the attribute editor, select a ptx texture to display.
     # You will see error messages in the viewport if something doesn't work.
 
-.. note:: Tested only on linux currently, but should be usable on Windows and OSX as well.
+.. note:: Tested only on Linux and OSX currently, but should be usable on Windows as well.
 
+#######
+Testing
+#######
+
+In short:
+
+ * Make sure cmake knows where your tmrv executable is. Its part of the `mrv development framework<https://github.com/mrv-developers/mrv>`
+ * run **ctest** to invoke the test-suite.
 
 ########
 License

@@ -1,6 +1,7 @@
 
 if(NOT CMAKE_BUILD_TYPE)
-	message(FATAL_ERROR "CMAKE_BUILD_TYPE must be set, on the commandline, set it using -DCMAKE_BUILD_TYPE=Debug|Release")
+	set(CMAKE_BUILD_TYPE Release)
+	message(STATUS "CMAKE_BUILD_TYPE was set to do a Release build. For debug builds, specify -DCMAKE_BUILD_TYPE=Debug on the commandline")
 endif()
 
 # CMAKE CONFIGURATION
@@ -11,9 +12,10 @@ set(${PROJECT_NAME}_VERSION_MAJOR 1)
 set(${PROJECT_NAME}_VERSION_MINOR 0)
 
 # general path configuration
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE})
+string(TOLOWER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_LOWER)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LOWER})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LOWER})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE_LOWER})
 
 # add the profiling configuration. Its essentially the release config, but
 # compiles with profiling instructions, enabling gprof
