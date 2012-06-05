@@ -78,11 +78,14 @@ endif()
 set(CUSTOM_DEFINITIONS -DREQUIRE_IOSTREAM -D_BOOL)
 
 if(UNIX)
-	set (MAYA_INSTALL_BASE_DEFAULT /usr/autodesk)
-	list(APPEND CUSTOM_DEFINITIONS -DLINUX)
-elseif(APPLE)
-	set (MAYA_INSTALL_BASE_DEFAULT /Applications/Autodesk)
-else(UNIX)
+	if(APPLE)
+		set (MAYA_INSTALL_BASE_DEFAULT /Applications/Autodesk)
+		list(APPEND CUSTOM_DEFINITIONS -DOSMac_)
+	else()
+		set (MAYA_INSTALL_BASE_DEFAULT /usr/autodesk)
+		list(APPEND CUSTOM_DEFINITIONS -DLINUX)
+	endif()
+else()
 	set(MAYA_INSTALL_BASE_DEFAULT "c:/Program Files")
 	list(APPEND CUSTOM_DEFINITIONS -D_AFXDLL -D_MBCS -DNT_PLUGIN)
 	
@@ -103,6 +106,15 @@ set(MAYA_BUILD_VERSIONS "${DEFAULT_MAYA_VERSIONS}" CACHE STRING
     
 if(NOT EXISTS ${MAYA_INSTALL_BASE_PATH})
 	message(SEND_ERROR "Maya install location is not set or does not exist at '${MAYA_INSTALL_BASE_PATH}, check your configuration")
+endif()
+
+if(APPLE)
+	set(OSX_AGL_INCLUDE_DIR "/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/AGL.framework/Versions/A/Headers" CACHE STRING
+		"Directory containing the headers of the agl framework of osx")
+	
+	if(NOT EXISTS ${OSX_AGL_INCLUDE_DIR})
+		message(SEND_ERROR "AGL include directory not found at ${OSX_AGL_INCLUDE_DIR} - please configure it in your cmake cache and try again")
+	endif()
 endif()
 
 

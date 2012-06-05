@@ -1,9 +1,9 @@
 
 function(init_ptex RESULT)
-	set(PTEX_INCLUDE_DIR "" CACHE PATH
+	set(PTEX_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/3rdParty/ptex/install/include" CACHE PATH
 		"Directory containing the ptex headers")
 	
-	set(PTEX_LIBRARY_DIR "" CACHE PATH
+	set(PTEX_LIBRARY_DIR "${CMAKE_SOURCE_DIR}/3rdParty/ptex/install/lib" CACHE PATH
 		"Directory containing the ptex headers")
 	
 	# VERIFY PREREQUESITES
