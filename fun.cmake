@@ -126,7 +126,7 @@ function(add_maya_project)
 	# HANDLE SUFFIX
 	if(WIN32)
 		set(PROJECT_SUFFIX .mll)
-	elif(APPLE)
+	elseif(APPLE)
 		set(PROJECT_SUFFIX .bundle)
 	else()
 		set(PROJECT_SUFFIX .so)
@@ -188,7 +188,7 @@ function(add_maya_project)
 		
 		
 		message(STATUS "Building project ${PROJECT_NAME} for maya ${MAYA_VERSION}")
-		
+		message(STATUS ${PROJECT_SUFFIX})
 		# CREATE TARGET
 		###############
 		add_library(${PROJECT_ID}
