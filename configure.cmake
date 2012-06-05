@@ -70,6 +70,11 @@ endif()
 ######################
 set(DEFAULT_MAYA_VERSIONS 2012 2011 2010 2009 2008)
 set(DEFAULT_MAYA_LIBRARIES Foundation OpenMaya OpenMayaUI OpenMayaAnim OpenMayaRender)
+
+if(UNIX AND NOT APPLE AND ${CMAKE_CXX_SIZEOF_DATA_PTR} EQUAL 8)
+	set(DEFAULT_MAYA_INSTALL_SUFFIX -x64)
+endif()
+
 set(CUSTOM_DEFINITIONS -DREQUIRE_IOSTREAM -D_BOOL)
 
 if(UNIX)
@@ -90,7 +95,7 @@ add_definitions(${CUSTOM_DEFINITIONS})
 set(MAYA_INSTALL_BASE_PATH ${MAYA_INSTALL_BASE_DEFAULT} CACHE PATH
     "Path containing all your maya installations, like /usr/autodesk or /Applications/Autodesk/")
 
-set(MAYA_INSTALL_BASE_SUFFIX "" CACHE STRING
+set(MAYA_INSTALL_BASE_SUFFIX "${DEFAULT_MAYA_INSTALL_SUFFIX}" CACHE STRING
     "Suffix to append to maya installation directories, like -x64 on 64 bit systems on linux")
 
 set(MAYA_BUILD_VERSIONS "${DEFAULT_MAYA_VERSIONS}" CACHE STRING
