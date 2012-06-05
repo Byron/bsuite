@@ -1,2 +1,2 @@
 
-add_maya_build(2009)
+add_maya_project(2009)
