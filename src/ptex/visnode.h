@@ -1,67 +1,16 @@
 #ifndef PTEX_VISUALIZATION_NODE
 #define PTEX_VISUALIZATION_NODE
 
-#include <Ptexture.h>
+#include "Ptexture.h"
+#include "math_util.h"
 
 #include <maya/MPxLocatorNode.h>
 #include <maya/MGLdefinitions.h>
-#include <maya/MFloatPoint.h>
-#include <vector>
 
-
-//! Structure with 3 floats and most general vector methods
-struct Float3
-{
-	float x;
-	float y;
-	float z;
-	
-	Float3(float x=0.f, float y=0.f, float z=0.f)
-	    : x(x)
-	    , y(y)
-	    , z(z)
-	{}
-	
-	Float3(const MFloatPoint& r)
-	    : x(r.x)
-	    , y(r.y)
-	    , z(r.z)
-	{}
-	
-	inline Float3 operator - (const Float3& r) const {
-		return Float3(x - r.x, y - r.y, z - r.z);
-	}
-	inline Float3 operator + (const Float3& r) const {
-		return Float3(x + r.x, y + r.y, z + r.z);
-	}
-	inline Float3& operator += (const Float3& r) {
-		x += r.x; 
-		y += r.y; 
-		z += r.z;
-		return *this;
-	}
-	inline Float3 operator * (float v) const {
-		return Float3(x * v, y * v, z * v);
-	}
-	inline Float3 operator / (float v) const {
-		return Float3(x / v, y / v, z / v);
-	}
-};
-
-//! Simple 4 float structure
-struct Float4 : public Float3
-{
-	float w;
-	
-	Float4(float x=0.f, float y=0.f, float z=0.f, float w=0.f)
-	    : Float3(x,y,z)
-	    , w(w)
-	{}
-};
 
 typedef PtexPtr<PtexFilter> PtexFilterPtr;
 typedef PtexPtr<PtexTexture> PtexTexturePtr;
-typedef std::vector<Float3>	Float3Vector;
+
 
 
 //! Node helping to obtain information about ptextures. It can visualize them in the viewport as well
@@ -73,7 +22,7 @@ class PtexVisNode : public MPxLocatorNode
 	{
 		TexelTile = 0,				//!< Direct display of texel tiles
 		FaceRelative = 1,			//!< display in face space, along uvs
-		FaceAbsolute = 2,			//!< display in face space, along longest edge
+		FaceAbsolute = 2			//!< display in face space, along longest edge
 	};
 	
 	public:

@@ -1,0 +1,3 @@
+[submodule "3rdParty/ptex"]
+	path = 3rdParty/ptex
+	url = git://github.com/wdas/ptex.git

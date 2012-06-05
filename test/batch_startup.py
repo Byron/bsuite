@@ -3,10 +3,11 @@ import os
 
 # we do nothing more than setting up information about the location of the 
 # plugin we should test
-if len(sys.argv) != 2:
-	raise AssertionError("Need first argument to be location to plugin we should test, got %s" % ", ".join(sys.argv))
+plug_file = sys.argv[-1]
+if not os.path.isfile(plug_file):
+	raise AssertionError("Need first argument to be location to existing plugin, got %s" % plug_file)
 
-os.environ['TEST_PLUGIN_PATH'] = sys.argv[1]
+os.environ['TEST_PLUGIN_PATH'] = sys.argv[-1]
 sys.argv = sys.argv[:1]
 
 import mrv.test.cmd.startup as startup; 

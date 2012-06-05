@@ -1,2 +1,4 @@
 
-include(maya.cmake)
+foreach(PLUGIN ptex)
+	add_subdirectory(${PLUGIN})
+endforeach()
