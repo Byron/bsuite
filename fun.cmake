@@ -222,7 +222,7 @@ function(add_maya_project)
 			# Assure configuration
 			if(EXISTS ${TEST_TMRV_PATH})
 				add_test(NAME
-							${PROJECT_ID}_Test
+							${PROJECT_ID}
 						WORKING_DIRECTORY
 							${CMAKE_SOURCE_DIR}/test
 						COMMAND 
