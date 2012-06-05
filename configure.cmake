@@ -1,3 +1,8 @@
+
+if(NOT CMAKE_BUILD_TYPE)
+	message(FATAL_ERROR "CMAKE_BUILD_TYPE must be set, on the commandline, set it using -DCMAKE_BUILD_TYPE=Debug|Release")
+endif()
+
 # CMAKE CONFIGURATION
 #####################
 project(MayaPlugins CXX)

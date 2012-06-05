@@ -7,7 +7,7 @@ include(CMakeParseArguments)
 # Set RESULT_VARIABLE to a list of file paths relative to the given list of DIRECTORIES
 # which should be a relative path. All paths are based on the current source directory.
 # ======================================
-function(find_sourcefiles_recursive RESULT_VARIABLE DIRECTORIES EXCLUDE_PATHS)
+function(find_sourcefiles_recursive RESULT_VARIABLE DIRECTORIES)
 	foreach(SUBDIR ${DIRECTORIES})
 		get_filename_component(ABSOLUTE_SUBDIR ${SUBDIR} ABSOLUTE)
 		if(NOT EXISTS ${ABSOLUTE_SUBDIR})
@@ -15,11 +15,11 @@ function(find_sourcefiles_recursive RESULT_VARIABLE DIRECTORIES EXCLUDE_PATHS)
 		endif()
 		
 		set(FILEGLOBS)
-		foreach(FILESPEC IN LISTS FL_CMAKE_SOURCE_EXTENSIONS)
+		foreach(FILESPEC *.cpp *.cxx *.c *.h *.hpp)
 			list(APPEND FILEGLOBS ${SUBDIR}/${FILESPEC})
 		endforeach()
-		
 		file(GLOB_RECURSE SOURCE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${FILEGLOBS})
+		list(APPEND ALL_SOURCE_FILES ${SOURCE_FILES})
 	endforeach()
 	set(${RESULT_VARIABLE} ${ALL_SOURCE_FILES} PARENT_SCOPE)
 endfunction()
@@ -101,13 +101,13 @@ function(add_maya_project)
 	# set source files
 	if(NOT PROJECT_SOURCE_FILES)
 		if(NOT PROJECT_SOURCE_DIRS)
-			set(PROJECT_SOURCE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+			set(PROJECT_SOURCE_DIRS .)
 		endif()
 		find_sourcefiles_recursive(PROJECT_SOURCE_FILES "${PROJECT_SOURCE_DIRS}")
 	endif()
 	
 	if(NOT PROJECT_INCLUDE_DIRS)
-		set(PROJECT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+		set(PROJECT_INCLUDE_DIRS .)
 	endif()
 	
 	if(NOT PROJECT_SOURCE_FILES)
@@ -130,9 +130,9 @@ function(add_maya_project)
 	endif()
 	
 	if(WIN32)
-		set(LINK_DIR_FLAG "\L"
+		set(LINK_DIR_FLAG "\L")
 	else()
-		set(LINK_DIR_FLAG "-L"
+		set(LINK_DIR_FLAG "-L")
 	endif()
 	
 	# DIRECTORY LEVEL CONFIGURATION
@@ -160,7 +160,7 @@ function(add_maya_project)
 		
 		# LIBRARY INCLUDE DIR
 		set(MAYA_LIB_DIR ${_MAYA_LOCATION}${LIB_INSERT}/lib)
-		if(NOT EXISTS ${MAYA_LIB_DIR)
+		if(NOT EXISTS ${MAYA_LIB_DIR})
 			message(SEND_ERROR "Maya library directory at ${MAYA_LIB_DIR} did not exist")
 		endif()
 		
