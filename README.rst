@@ -8,7 +8,7 @@ The respective plugins where written with quality in mind. Additionally you will
 PTexVis
 ########
 
-.. image:: http://old.byronimo.de/download/PTexVis_ui.png
+.. image:: http://old.byronimo.de/download/ptexmaya_ui.png
     :width: 900 px
 
 PTexVis is a locator which can display ptex textures are point clouds on top of the corresponding mesh. For now it is only used as research project and to obtain an understanding on how ptex works.
