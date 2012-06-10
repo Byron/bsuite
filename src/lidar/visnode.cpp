@@ -39,7 +39,9 @@
 // whyever this gets defined ... may have something to do with the ogl headers 
 #undef Success
 
-#include "assert.h"
+#include <assert.h>
+#undef max
+#include <limits>
 
 
 
@@ -52,6 +54,8 @@ const MString LidarVisNode::typeName("lidarVisNode");
 // input attributes
 MObject LidarVisNode::aLidarFileName;
 MObject LidarVisNode::aGlPointSize;
+MObject LidarVisNode::aIntensityScale;
+MObject LidarVisNode::aTranslateToOrigin;
 MObject LidarVisNode::aUseMMap;
 MObject LidarVisNode::aUsePointCache;
 MObject LidarVisNode::aDisplayMode;
@@ -74,10 +78,20 @@ MObject LidarVisNode::aOutPointBBoxMax;
 MObject LidarVisNode::aNeedsCompute;
 
 
+// Column-Major right away
+const float _initializer[4][4] = {
+	{1.0f, 0.0f, 0.0f, 0.0f},
+	{0.0f, 0.0f, -1.0f, 0.0f},
+	{0.0f, 1.0f, 0.0f, 0.0f},
+	{0.0f, 0.0f, 0.0f, 1.0f}
+};
+
+const MMatrix LidarVisNode::convert_z_up_to_y_up_column_major(_initializer);
 
 
 LidarVisNode::LidarVisNode()
-    : m_gl_point_size(1.0)
+    : m_gl_point_size(1.0f)
+	, m_intensity_scale(1.0f)
 {}
 
 LidarVisNode::~LidarVisNode()
@@ -112,11 +126,14 @@ MStatus LidarVisNode::initialize()
 	
 	aUseMMap = numFn.create("useMMap", "umm", MFnNumericData::kBoolean, 0, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
+	
+	aTranslateToOrigin = numFn.create("translateToOrigin", "tto", MFnNumericData::kBoolean, 0, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	numFn.setAffectsWorldSpace(true);
 	numFn.setInternal(true);
 	
 	aUsePointCache = numFn.create("useDisplayCache", "udc", MFnNumericData::kBoolean, 0, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
-	numFn.setInternal(true);
 	
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
 	mfnEnum.addField("Intensity", (int)DMIntensity);
@@ -124,6 +141,11 @@ MStatus LidarVisNode::initialize()
 	
 	mfnEnum.setDefault((short)DMIntensity);
 	mfnEnum.setKeyable(true);
+	
+	aIntensityScale = numFn.create("intensityScale", "iscale", MFnNumericData::kFloat, 1.0);
+	numFn.setMin(1.0);
+	numFn.setKeyable(true);
+	numFn.setInternal(true);
 	
 	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kFloat, 1.0);
 	numFn.setMin(0.0);
@@ -187,6 +209,8 @@ MStatus LidarVisNode::initialize()
 	/////////////////
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aLidarFileName));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aGlPointSize));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aIntensityScale));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aTranslateToOrigin))
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseMMap));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUsePointCache));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aDisplayMode));
@@ -224,7 +248,7 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUsePointCache,	aNeedsCompute));
-
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aTranslateToOrigin,	aNeedsCompute));
 	return MS::kSuccess;
 }
 
@@ -277,19 +301,43 @@ bool LidarVisNode::renew_las_reader(const MString &filepath)
 void LidarVisNode::reset_caches()
 {
 	m_bbox = MBoundingBox();
+	m_compensation_column_major.setToIdentity();
+}
+
+void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
+{
+	m_compensation_column_major.setToIdentity();
+	if (translateToOrigin && m_las_stream.get()) {
+		const LAS_Types::Header13& hdr = m_las_stream->header();
+		// enter data column -major
+		m_compensation_column_major.matrix[3][0] = -hdr.min_x;
+		m_compensation_column_major.matrix[3][1] = -hdr.min_y;
+		m_compensation_column_major.matrix[3][2] = -hdr.min_z;
+	}
+	m_compensation_column_major *= convert_z_up_to_y_up_column_major;
+	
+	const LAS_Types::Header13& hdr = m_las_stream->header();
+	m_bbox = MBoundingBox(
+							MPoint(hdr.min_x, hdr.min_y, hdr.min_z) * m_compensation_column_major,
+							MPoint(hdr.max_x, hdr.max_y, hdr.max_z) * m_compensation_column_major
+						);
 }
 
 bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx)
 {
 	if (plug == aLidarFileName) {
-		renew_las_reader(dataHandle.asString());
-		reset_caches();
+		if (renew_las_reader(dataHandle.asString())) {
+			update_compensation_matrix_and_bbox(MPlug(thisMObject(), aTranslateToOrigin).asBool());
+		} else {
+			reset_caches();
+		}
 	} 
-	else if (plug == aUseMMap || plug == aUsePointCache) {
-		reset_caches();
-	}
 	else if (plug == aGlPointSize) {
 		m_gl_point_size = dataHandle.asFloat();
+	} else if (plug == aIntensityScale) {
+		m_intensity_scale = dataHandle.asFloat();
+	} else if (plug == aTranslateToOrigin) {
+		update_compensation_matrix_and_bbox(dataHandle.asBool());
 	}
 	
 	return false;
@@ -307,9 +355,13 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 		// indicate error right awway
 		ncHandle.setInt(1);
 		if (m_las_stream.get() == 0) {
+			reset_caches();
 			return MS::kSuccess;
 		}
 		
+		// Update caches which would be relevant for drawing !
+		assert(m_las_stream->status() == LAS_IStream::Success);
+		update_compensation_matrix_and_bbox(data.outputValue(aTranslateToOrigin).asBool());
 		
 		// indicate everything is fine
 		m_error.clear();
@@ -317,38 +369,38 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 		return MS::kSuccess;
 	} else {
 		// Assume its an output plug
-		reset_output_attributes(data);
-		if (m_las_stream.get() && m_las_stream->status() == LAS_IStream::Success) {
-			const LAS_Types::Header13& hdr = m_las_stream->header();
-			
-			data.outputValue(aOutSystemIdentifier).setString(hdr.system_identifier);
-			data.outputValue(aOutGeneratingSoftware).setString(hdr.generating_software);
-			{
-				MString date;
-				date += hdr.creation_day_of_year;
-				date += "/";
-				date += hdr.creation_year;
-				data.outputValue(aOutCreationDate).setString(date);
-			}
-			{
-				MString version;
-				version += hdr.version_major;
-				version += ".";
-				version += hdr.version_minor;
-				data.outputValue(aOutVersionString).setString(version);
-			}
-			data.outputValue(aOutNumVariableRecords).setInt(hdr.num_variable_length_records);
-			data.outputValue(aOutPointDataFormat).setInt(hdr.point_data_format_id);
-			data.outputValue(aOutNumPointRecords).setInt(hdr.num_point_records);
-			
-			data.outputValue(aOutPointScale).set3Float(hdr.x_scale, hdr.y_scale, hdr.z_scale);
-			data.outputValue(aOutPointOffset).set3Float(hdr.x_offset, hdr.y_offset, hdr.z_offset);
-			data.outputValue(aOutPointBBoxMin).set3Float(hdr.min_x, hdr.min_y, hdr.min_z);
-			data.outputValue(aOutPointBBoxMax).set3Float(hdr.max_x, hdr.max_y, hdr.max_z);
-			
-			m_bbox = MBoundingBox(MPoint(hdr.min_x, hdr.min_y, hdr.min_z), MPoint(hdr.max_x, hdr.max_y, hdr.max_z));
+		if (!m_las_stream.get()) {
+			reset_output_attributes(data);
+			return MS::kSuccess;
 		}
+		assert(m_las_stream->status() == LAS_IStream::Success);
 		
+		const LAS_Types::Header13& hdr = m_las_stream->header();
+		
+		data.outputValue(aOutSystemIdentifier).setString(hdr.system_identifier);
+		data.outputValue(aOutGeneratingSoftware).setString(hdr.generating_software);
+		{
+			MString date;
+			date += hdr.creation_day_of_year;
+			date += "/";
+			date += hdr.creation_year;
+			data.outputValue(aOutCreationDate).setString(date);
+		}
+		{
+			MString version;
+			version += hdr.version_major;
+			version += ".";
+			version += hdr.version_minor;
+			data.outputValue(aOutVersionString).setString(version);
+		}
+		data.outputValue(aOutNumVariableRecords).setInt(hdr.num_variable_length_records);
+		data.outputValue(aOutPointDataFormat).setInt(hdr.point_data_format_id);
+		data.outputValue(aOutNumPointRecords).setInt(hdr.num_point_records);
+		
+		data.outputValue(aOutPointScale).set3Float(hdr.x_scale, hdr.y_scale, hdr.z_scale);
+		data.outputValue(aOutPointOffset).set3Float(hdr.x_offset, hdr.y_offset, hdr.z_offset);
+		data.outputValue(aOutPointBBoxMin).set3Float(hdr.min_x, hdr.min_y, hdr.min_z);
+		data.outputValue(aOutPointBBoxMax).set3Float(hdr.max_x, hdr.max_y, hdr.max_z);
 		
 		return MS::kSuccess;
 	}
@@ -391,6 +443,8 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 		LAS_Types::PointDataRecord1 p;
 		
 		glf->glPointSize(m_gl_point_size);
+		glf->glPushMatrix();
+		glf->glMultMatrixd(&m_compensation_column_major.matrix[0][0]);
 		glf->glBegin(MGL_POINTS);
 		{
 			while (las_stream.read_next_point(p) == LAS_IStream::Success) {
@@ -399,19 +453,23 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 				{
 				case DMIntensity:
 				{
-					glf->glColor3s(p.intensity, p.intensity, p.intensity);
+					const uint16_t intensity = p.intensity * m_intensity_scale; 
+					glf->glColor3us(intensity, intensity, intensity);
 					break;
 				}
 				case DMReturnNumber:
 				{
-					glf->glColor3s(p.return_number(), p.num_returns(), p.return_number());
+					static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
+					glf->glColor3us(p.return_number() * scale_3_to_16, p.num_returns() * scale_3_to_16, p.return_number() * scale_3_to_16);
 					break;
 				}
 				};// end color handler
+				
 				glf->glVertex3iv(reinterpret_cast<const MGLint*>(&p.x));
 			}// end while iterating points
 		}
 		glf->glEnd();
+		glf->glPopMatrix();
 		
 		
 		/*
@@ -433,6 +491,10 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 	
 finish_drawing:
 	view.endGL();
+	if (m_las_stream.get() && m_las_stream->status() != LAS_IStream::Success) {
+		// can happen if something is not okay with the file. Remove it if its in an invalid state.
+		renew_las_reader(MString());
+	}
 }
 
 MBoundingBox LidarVisNode::boundingBox() const
@@ -442,5 +504,5 @@ MBoundingBox LidarVisNode::boundingBox() const
 
 bool LidarVisNode::isBounded() const
 {
-	return true;
+	return m_las_stream.get() != 0;
 }

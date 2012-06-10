@@ -40,11 +40,19 @@ global proc AElidarVisNodeTemplate(string $nodeName)
 									"AElidarVisNodeNameReplace" 
 									"lidarFilePath";
 		if (!`about -nt`) {
-			editorTemplate -addControl "useMMap";
+			editorTemplate -ann "Use a memory map, which greatly speeds up reading of point samples." 
+						-addControl "useMMap";
 		}
-		editorTemplate -addControl "useDisplayCache";
-		editorTemplate -addControl "displayMode";
-		editorTemplate -addControl "glPointSize";
+		editorTemplate -ann "Cache the points on the graphics card. Costs additional memory, which might make its use prohibitive"
+						-addControl "useDisplayCache";
+		editorTemplate -ann "Determine the style of the points to draw. Usually this affects only the color"
+						-addControl "displayMode";
+		editorTemplate -ann "Size of the points to draw"
+						-addControl "glPointSize";
+		editorTemplate -ann "Scale the Intensity by this value. Only used in 'Intensity' display mode"
+						-addControl "intensityScale";
+		editorTemplate -ann "If true, the point cloud will be moved to the origin of the locator"
+						-addControl "translateToOrigin";
 		
 	}
 	editorTemplate -endLayout;
