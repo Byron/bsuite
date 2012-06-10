@@ -32,7 +32,7 @@ void read_n(std::istream& istream, T& dest)
 void LAS_IStream::read_header()
 {
 	_istream.exceptions(std::istream::failbit|std::istream::failbit|std::istream::eofbit);
-	_istream.read(reinterpret_cast<char*>(&_header), sizeof(Header13Aligned));
+	_istream.read(reinterpret_cast<char*>(&_header), sizeof(LAS_Types::Header13Aligned));
 	
 	const std::istream::pos_type expected_ofs = 4+2+2+4+2+2+8+1+1+32+32+2+2+2+4+4;
 	if (_istream.tellg() != expected_ofs) {
@@ -74,13 +74,14 @@ void LAS_IStream::read_header()
 	_status = Success;
 }
 
-void LAS_IStream::read_next_point(LAS_IStream::PointDataRecord1 &p)
+void LAS_IStream::read_next_point(LAS_Types::PointDataRecord1 &p)
 {
 	static const size_t bsize = 28;
 	char buf[bsize];	// point format 1
 	assert(bsize == _header.point_data_record_length);
 	
 	read_n(_istream, buf);
+	
 	char* c = buf;
 	p.x = *(int32_t*)c;
 	c += sizeof(p.x);
@@ -126,7 +127,7 @@ LAS_IStream::LAS_IStream(std::istream &instream)
 }
 
 
-LAS_IStream::Header13 &LAS_IStream::Header13::to_host_order()
+LAS_Types::Header13 &LAS_Types::Header13::to_host_order()
 {
 	source_id = ntohs(source_id);
 	global_encoding = ntohs(global_encoding);

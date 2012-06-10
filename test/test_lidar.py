@@ -8,15 +8,17 @@ class TestLidar(TestLidarVisNodeBase):
 		assert n.isValid()
 		
 		# query header info
-		print n.outSystemIdentifier.asString()
-		print n.outGeneratingSoftware.asString()
-		print n.outCreationDate.asString()
-		print n.outVersionString.asString()
-		print n.outNumVariableRecords.asInt()
-		print n.outNumPointRecords.asInt()
-		print n.outPointDataFormat.asInt()
-		print n.outPointScale.child(0).asFloat()
+		assert not n.outSystemIdentifier.asString()
+		assert n.outGeneratingSoftware.asString() == "TerraScan"
+		assert n.outCreationDate.asString() == "0/0"
+		assert n.outVersionString.asString() == "1.2"
+		assert n.outNumVariableRecords.asInt() == 0
+		assert n.outNumPointRecords.asInt() == 99660
+		assert n.outPointDataFormat.asInt() == 1
+		assert n.outPointScaleX.asFloat() <= 0.01
+		assert n.outPointOffsetX.asFloat() == 0.0
 		
-		assert False
+		assert n.compute.asInt() == 0, "Computation should have been successful"
+		
 
 

@@ -15,13 +15,95 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef LASFILE_H
-#define LASFILE_H
+#ifndef LAS_ISTREAM_H
+#define LAS_ISTREAM_H
 
 #include <iosfwd>
 #include <inttypes.h>
 
+namespace LAS_Types
+{
+	struct Header13Aligned
+	{
+		char		sig[4];
+		uint16_t	source_id;
+		uint16_t	global_encoding;
+		uint32_t	guid_data1;
+		uint16_t	guid_data2;
+		uint16_t	guid_data3;
+		uint8_t		guid_data4[8];
+		uint8_t		version_major;
+		uint8_t		version_minor;
+		char		system_identifier[32];
+		char		generating_software[32];
+		uint16_t	creation_day_of_year;
+		uint16_t	creation_year;
+		uint16_t	header_size;
+		uint32_t	offset_to_point_data;
+		uint32_t	num_variable_length_records;
+	};
+	
+	struct Header13 : public Header13Aligned
+	{
+		uint8_t		point_data_format_id;
+		uint16_t	point_data_record_length;
+		uint32_t	num_point_records;
+		uint32_t	num_points_by_return[5];
+		double		x_scale;
+		double		y_scale;
+		double		z_scale;
+		double		x_offset;
+		double		y_offset;
+		double		z_offset;
+		double		max_x;
+		double		min_x;
+		double		max_y;
+		double		min_y;
+		double		max_z;
+		double		min_z;
+		uint64_t	start_of_waveform_data_packet_record;
+		
+		// convert this instance to host order - not required, its little-endian. Should convert it to big-endian on those systems though
+		Header13&	to_host_order();
+	};
+	
+	struct PointDataRecord0
+	{
+		int32_t		x;
+		int32_t		y;
+		int32_t		z;
+		uint16_t	intensity;
+		uint8_t		flags;
+		/*uint8_t		return_number : 3;
+		uint8_t		num_returns : 3;
+		uint8_t		scan_dir : 1;
+		uint8_t		edge_of_flight : 1;*/
+		uint8_t		classification;
+		int8_t		scan_angle_rank;
+		uint8_t		user_data;
+		uint16_t	point_source_id;
+		
+		//! Initialize the fields in this instance from the given data. It must be of size record_size.
+		PointDataRecord0& init_from_raw(const void* data);
+		
+		static const size_t	record_size = 4+4+4+2+1+1+1+1+2;
+	};
+	
+	struct PointDataRecord1 : public PointDataRecord0
+	{
+		double		gps_time;
+		
+		//! Initialize the fields in this instance from the given data. It must be of size record_size.
+		PointDataRecord1& init_from_raw(const void* data);
+		
+		static const size_t record_size = PointDataRecord0::record_size + 8;
+	};
 
+}// end LASTypes
+
+
+
+// A utillity reading a LAS file from a stream.
 class LAS_IStream
 {
 	public:
@@ -37,84 +119,22 @@ class LAS_IStream
 			StreamFailure
 		};
 		
-		struct Header13Aligned
-		{
-			char		sig[4];
-			uint16_t	source_id;
-			uint16_t	global_encoding;
-			uint32_t	guid_data1;
-			uint16_t	guid_data2;
-			uint16_t	guid_data3;
-			uint8_t		guid_data4[8];
-			uint8_t		version_major;
-			uint8_t		version_minor;
-			char		system_identifier[32];
-			char		generating_software[32];
-			uint16_t	creation_day_of_year;
-			uint16_t	creation_year;
-			uint16_t	header_size;
-			uint32_t	offset_to_point_data;
-			uint32_t	num_variable_length_records;
-		};
-		
-		struct Header13 : public Header13Aligned
-		{
-			uint8_t		point_data_format_id;
-			uint16_t	point_data_record_length;
-			uint32_t	num_point_records;
-			uint32_t	num_points_by_return[5];
-			double		x_scale;
-			double		y_scale;
-			double		z_scale;
-			double		x_offset;
-			double		y_offset;
-			double		z_offset;
-			double		max_x;
-			double		min_x;
-			double		max_y;
-			double		min_y;
-			double		max_z;
-			double		min_z;
-			uint64_t	start_of_waveform_data_packet_record;
-			
-			// convert this instance to host order - not required, its little-endian. Should convert it to big-endian on those systems though
-			Header13&	to_host_order();
-		};
-		
-		struct PointDataRecord0
-		{
-			int32_t		x;
-			int32_t		y;
-			int32_t		z;
-			uint16_t	intensity;
-			uint8_t		flags;
-			/*uint8_t		return_number : 3;
-			uint8_t		num_returns : 3;
-			uint8_t		scan_dir : 1;
-			uint8_t		edge_of_flight : 1;*/
-			uint8_t		classification;
-			int8_t		scan_angle_rank;
-			uint8_t		user_data;
-			uint16_t	point_source_id;
-		};
-		
-		struct PointDataRecord1 : public PointDataRecord0
-		{
-			double		gps_time;
-		};
-
 	protected:
-		std::istream&	_istream;
-		Status			_status;
-		Header13		_header;
+		std::istream&		_istream;
+		Status				_status;
+		LAS_Types::Header13	_header;
 		
 		
 		
 	private:
 		void			read_header();
-		void			read_next_point(PointDataRecord1& p);
+		void			read_next_point(LAS_Types::PointDataRecord1& p);
 		
 	public:
+		//! Intialize this instance with the given input stream.
+		//! It is assumed to be open already and ready for reading.
+		//! \note the stream will not be closed when this instance 
+		//! is destroyed, this is up to the user
 		LAS_IStream(std::istream& instream);
 		
 	public:
@@ -123,9 +143,9 @@ class LAS_IStream
 			return _status;
 		}
 		
-		const Header13&	header() const {
+		const LAS_Types::Header13&	header() const {
 			return _header;
 		}
 };
 
-#endif // LASFILE_H
+#endif // LAS_ISTREAM_H

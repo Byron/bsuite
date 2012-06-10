@@ -31,12 +31,13 @@
 #include <maya/MFloatVector.h>
 #include <maya/MFloatPointArray.h>
 
-
 // Fix unholy c++ incompatibility - typedefs to void are not allowed in gcc greater 4.1.2
 #include "ogl_headers.h"
 
 #include "base.h"
 #include "visnode.h"
+// whyever this gets defined ... may have something to do with the ogl headers 
+#undef Success
 
 #include "assert.h"
 
@@ -80,7 +81,11 @@ LidarVisNode::LidarVisNode()
 {}
 
 LidarVisNode::~LidarVisNode()
-{}
+{
+	// clear open handles
+	renew_las_reader(MString());
+	reset_caches();
+}
 
 void LidarVisNode::postConstructor()
 {
@@ -217,19 +222,74 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutSystemIdentifier));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutVersionString));
 	
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,  aNeedsCompute));
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,	aNeedsCompute));
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,		aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,		aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUsePointCache,	aNeedsCompute));
 
 	return MS::kSuccess;
 }
 
+void LidarVisNode::reset_output_attributes(MDataBlock& data)
+{
+	data.outputValue(aOutCreationDate).setString(MString());
+	data.outputValue(aOutGeneratingSoftware).setString(MString());
+	data.outputValue(aOutSystemIdentifier).setString(MString());
+	data.outputValue(aOutVersionString).setString(MString());
+	
+	data.outputValue(aOutNumPointRecords).setInt(0);
+	data.outputValue(aOutNumVariableRecords).setInt(0);
+	data.outputValue(aOutPointBBoxMax).set3Double(0, 0, 0);
+	data.outputValue(aOutPointBBoxMin).set3Double(0, 0, 0);
+	data.outputValue(aOutPointDataFormat).setInt(0);
+	data.outputValue(aOutPointOffset).set3Double(0, 0, 0);
+	data.outputValue(aOutPointScale).set3Double(0, 0, 0);
+}
+
+bool LidarVisNode::renew_las_reader(const MString &filepath)
+{
+	m_las_stream.reset();
+	if (m_ifstream.is_open()) {
+		m_ifstream.close();
+	}
+	
+	if (filepath.length() == 0) {
+		return false;
+	}
+	
+	MFileObject fobj;
+	
+	fobj.setRawFullName(filepath);
+	const MString res_path = fobj.resolvedFullName();
+	m_ifstream.open(res_path.asChar(), std::ios_base::in | std::ios_base::binary);
+	if (m_ifstream.fail()) {
+		m_error = "Could not open file " + res_path + " for reading";
+		return false;
+	}
+	
+	m_las_stream.reset(new LAS_IStream(m_ifstream));
+	if (m_las_stream->status() != LAS_IStream::Success) {
+		m_error = "Unsupported file format";
+		return false;
+	}
+	
+	return true;
+}
+
+void LidarVisNode::reset_caches()
+{
+	
+}
+
 bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx)
 {
 	if (plug == aLidarFileName) {
-		// update lidear stream
-	} else if (plug == aGlPointSize) {
+		renew_las_reader(dataHandle.asString());
+	} 
+	else if (plug == aUseMMap || plug == aUsePointCache) {
+		reset_caches();
+	}
+	else if (plug == aGlPointSize) {
 		m_gl_point_size = dataHandle.asFloat();
 	}
 	
@@ -242,16 +302,53 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 	// in all cases, just set us clean - if we are not setup, we would be called
 	// over and over again, lets limit this to just when something changes
 	data.setClean(plug);
+	
 	if (plug == aNeedsCompute) {
 		MDataHandle ncHandle = data.outputValue(aNeedsCompute);
-		// we are successfull, even if there is no valid texture
-		// We only use error codes if the sampling fails
-		// indicate error
+		// indicate error right awway
 		ncHandle.setInt(1);
+		if (m_las_stream.get() == 0) {
+			return MS::kSuccess;
+		}
 		
+		
+		// indicate everything is fine
+		m_error.clear();
+		ncHandle.setInt(0);
 		return MS::kSuccess;
 	} else {
 		// Assume its an output plug
+		reset_output_attributes(data);
+		if (m_las_stream.get()) {
+			assert(m_las_stream->status() == LAS_IStream::Success);
+			const LAS_Types::Header13& hdr = m_las_stream->header();
+			
+			data.outputValue(aOutSystemIdentifier).setString(hdr.system_identifier);
+			data.outputValue(aOutGeneratingSoftware).setString(hdr.generating_software);
+			{
+				MString date;
+				date += hdr.creation_day_of_year;
+				date += "/";
+				date += hdr.creation_year;
+				data.outputValue(aOutCreationDate).setString(date);
+			}
+			{
+				MString version;
+				version += hdr.version_major;
+				version += ".";
+				version += hdr.version_minor;
+				data.outputValue(aOutVersionString).setString(version);
+			}
+			data.outputValue(aOutNumVariableRecords).setInt(hdr.num_variable_length_records);
+			data.outputValue(aOutPointDataFormat).setInt(hdr.point_data_format_id);
+			data.outputValue(aOutNumPointRecords).setInt(hdr.num_point_records);
+			
+			data.outputValue(aOutPointScale).set3Float(hdr.x_scale, hdr.y_scale, hdr.z_scale);
+			data.outputValue(aOutPointOffset).set3Float(hdr.x_offset, hdr.y_offset, hdr.z_offset);
+			data.outputValue(aOutPointBBoxMin).set3Float(hdr.min_x, hdr.min_y, hdr.min_z);
+			data.outputValue(aOutPointBBoxMax).set3Float(hdr.max_x, hdr.max_y, hdr.max_z);
+		}
+		
 		
 		return MS::kSuccess;
 	}

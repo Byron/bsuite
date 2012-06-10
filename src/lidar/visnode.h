@@ -18,9 +18,13 @@
 #ifndef LIDAR_VISUALIZATION_NODE
 #define LIDAR_VISUALIZATION_NODE
 
+#include "LAS_IStream.h"
+
 #include <maya/MPxLocatorNode.h>
 #include <maya/MGLdefinitions.h>
 
+#include <fstream>
+#include <auto_ptr.h>
 
 
 //! Node helping to visualize lidar data
@@ -51,7 +55,9 @@ class LidarVisNode : public MPxLocatorNode
 		static const MString typeName;				//!< node type name
 
 	protected:
-		
+		void reset_output_attributes(MDataBlock &data);	//!< reset all output attributes to their initial values
+		bool renew_las_reader(const MString& filepath);	//!< initialize our reader with a new file
+		void reset_caches();							//!< clear all caches
 		
 	protected:
 		// Input attributes
@@ -64,7 +70,7 @@ class LidarVisNode : public MPxLocatorNode
 		// output attributes
 		static MObject aOutSystemIdentifier;	//!< creator's system id
 		static MObject aOutGeneratingSoftware;	//!< Id of the software which created the file
-		static MObject aOutCreationDate;		//!< string of month and year in which the file was created
+		static MObject aOutCreationDate;		//!< string of day of year and year in which the file was created
 		static MObject aOutVersionString;		//!< string in the format "major.minor"
 		static MObject aOutNumVariableRecords;	//!< amount of additional data streams
 		static MObject aOutPointDataFormat;		//!< Format id of the point data
@@ -82,6 +88,9 @@ class LidarVisNode : public MPxLocatorNode
 		MString			m_error;				//!< error string shown if non-empty
 		
 		MGLfloat		m_gl_point_size;		//!< size of a point when drawing (cache)	
+		
+		std::auto_ptr<LAS_IStream>		m_las_stream;	//!< pointer to las reader
+		std::ifstream					m_ifstream;		//!< file for reading samples
 };
 
 #endif
