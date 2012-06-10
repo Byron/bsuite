@@ -1,0 +1,80 @@
+
+global proc AELidarVisNodeBrowser(string $fileAttribute)
+{
+	// We use the most primitve file browser just to be maya 2008 compatible ... 
+	string $ptxFilter = "*.las";
+	string $result = `fileDialog -directoryMask $ptxFilter -mode 0`;
+	if ($result != "") {
+		setAttr $fileAttribute -type "string" $result;
+	}
+}
+
+global proc AELidarVisNodeNameReplace(string $fileAttribute)
+{
+	connectControl -fileName lidarVisNodeFileNameField $fileAttribute;
+	button -e -c ("AELidarVisNodeBrowser \""+$fileAttribute+"\"") browser;
+}
+
+global proc AELidarNameNew(string $fileAttribute)
+{
+	setUITemplate -pst attributeEditorTemplate;
+	rowLayout -nc 3 textureNameLayout;
+	{
+		text -label "LAS File";
+		textField lidarVisNodeFileNameField;
+		symbolButton -image "navButtonBrowse.xpm" browser;
+	}
+	setParent ..;
+	setUITemplate -ppt;
+	
+	AELidarVisNodeNameReplace($fileAttribute);
+}
+
+global proc AELidarVisNodeTemplate(string $nodeName)
+{
+	editorTemplate -beginScrollLayout;
+
+	editorTemplate -beginLayout "Lidar Options" -collapse 0;
+	{
+		editorTemplate -callCustom  "AELidarNameNew" 
+									"AELidarVisNodeNameReplace" 
+									"lidarFilePath";
+						
+		editorTemplate -addControl "useMMap";
+		editorTemplate -addControl "useDisplayCache";
+		editorTemplate -addControl "displayMode";
+		editorTemplate -addControl "glPointSize";
+		
+	}
+	editorTemplate -endLayout;
+	
+	editorTemplate -beginLayout "Lidar Header Information" -collapse 0;
+	{
+		editorTemplate -ann "ID of system which created the file"
+					-l "System Identifier" -addControl "outSystemIdentifier";
+		editorTemplate -ann "ID of software which generated the file"
+					-l "Generator" -addControl "outGeneratingSoftware" ;
+		editorTemplate -ann "month and year at which the file was created"
+					-l "Creation Date" -addControl "outCreationDate" ;
+		editorTemplate -ann "The version of the file"
+					-l "Version" -addControl "outVersionString" ;
+		editorTemplate -ann "Amount of variable length records" 
+					-l "Amount of Variable Length Records" -addControl "outNumVariableRecords" ;
+		editorTemplate -ann "Amount of point records stored in the file"
+					-l "Amount of Point Records" -addControl "outNumPointRecords" ;
+		editorTemplate -ann "ID of the point data format" 
+					-l "Point Data Format ID" -addControl "outPointDataFormat" ;
+		editorTemplate -ann "Suggested scaling of the points"
+					-l "Point Scale" -addControl "outPointScale" ;
+		editorTemplate -ann "Suggested offset of the points"
+					-l "Point Offset" -addControl "outPointOffset" ;
+		editorTemplate -l "BBox Min" -addControl "outBBoxMin";
+		editorTemplate -l "BBox Max" -addControl "outBBoxMax";
+		
+	}
+	editorTemplate -endLayout;
+	
+	editorTemplate -addExtraControls;
+	editorTemplate -endScrollLayout;
+}
+

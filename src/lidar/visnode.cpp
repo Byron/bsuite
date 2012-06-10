@@ -45,7 +45,7 @@
 /////////////////////////////////////////////////////////////////////
 
 const MTypeId LidarVisNode::typeId(0x00108bde);
-const MString LidarVisNode::typeName("LidarVisNode");
+const MString LidarVisNode::typeName("lidarVisNode");
 
 
 // input attributes
@@ -66,7 +66,8 @@ MObject LidarVisNode::aOutPointDataFormat;
 MObject LidarVisNode::aOutNumPointRecords;
 MObject LidarVisNode::aOutPointScale;
 MObject LidarVisNode::aOutPointOffset;
-MObject LidarVisNode::aOutPointBBox;
+MObject LidarVisNode::aOutPointBBoxMin;
+MObject LidarVisNode::aOutPointBBoxMax;
 
 // other attributes
 MObject LidarVisNode::aNeedsCompute;
@@ -100,17 +101,17 @@ MStatus LidarVisNode::initialize()
 
 	// Input attributes
 	////////////////////
-	aLidarFileName = typFn.create("ltexFilePath", "lfp", MFnData::kString, &status);
-	CHECK_MSTATUS(status);
+	aLidarFileName = typFn.create("lidarFilePath", "lfp", MFnData::kString, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
 	typFn.setInternal(true);
 	
 	aUseMMap = numFn.create("useMMap", "umm", MFnNumericData::kBoolean, 0, &status);
-	CHECK_MSTATUS(status);
-	typFn.setInternal(true);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	numFn.setInternal(true);
 	
-	aUsePointCache = numFn.create("useDisplaytCache", "udc", MFnNumericData::kBoolean, 0, &status);
-	CHECK_MSTATUS(status);
-	typFn.setInternal(true);
+	aUsePointCache = numFn.create("useDisplayCache", "udc", MFnNumericData::kBoolean, 0, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	numFn.setInternal(true);
 	
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
 	mfnEnum.addField("Color", (int)DMColor);
@@ -127,52 +128,99 @@ MStatus LidarVisNode::initialize()
 	
 	// Output attributes
 	/////////////////////
-	aNeedsCompute = numFn.create("needsComputation", "nc", MFnNumericData::kInt);
+	aNeedsCompute = numFn.create("compute", "com", MFnNumericData::kInt);
 	setup_as_output(numFn);
+	
+	aOutSystemIdentifier = typFn.create("outSystemIdentifier", "osid", MFnData::kString, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(typFn);
+	
+	aOutGeneratingSoftware = typFn.create("outGeneratingSoftware", "ogs", MFnData::kString, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(typFn);
+	
+	aOutCreationDate = typFn.create("outCreationDate", "ocd", MFnData::kString, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(typFn);
+	
+	aOutVersionString = typFn.create("outVersionString", "ovstr", MFnData::kString, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(typFn);
+	
+	aOutNumVariableRecords = numFn.create("outNumVariableRecords", "onvr", MFnNumericData::kInt, 0, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(numFn);
+	
+	aOutNumPointRecords = numFn.create("outNumPointRecords", "onpr", MFnNumericData::kInt, 0, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(numFn);
+	
+	aOutPointDataFormat = numFn.create("outPointDataFormat", "opdf", MFnNumericData::kInt, 0, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(numFn);
+	
+	aOutPointScale = numFn.createPoint("outPointScale", "ops", &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(numFn);
+	
+	aOutPointOffset = numFn.createPoint("outPointOffset", "opo", &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(numFn);
+
+	aOutPointBBoxMin = numFn.createPoint("outBBoxMin", "obbmin", &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(numFn);	
+	
+	aOutPointBBoxMax = numFn.createPoint("outBBoxMax", "obbmax", &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	setup_as_output(numFn);
+	
 	
 	
 	
 
 	// Add attributes
 	/////////////////
-	CHECK_MSTATUS(addAttribute(aLidarFileName));
-	CHECK_MSTATUS(addAttribute(aGlPointSize));
-	CHECK_MSTATUS(addAttribute(aUseMMap));
-	CHECK_MSTATUS(addAttribute(aUsePointCache));
-	CHECK_MSTATUS(addAttribute(aDisplayMode));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aLidarFileName));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aGlPointSize));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseMMap));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUsePointCache));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aDisplayMode));
 	
-	CHECK_MSTATUS(addAttribute(aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aNeedsCompute));
 	
-	CHECK_MSTATUS(addAttribute(aOutSystemIdentifier));
-	CHECK_MSTATUS(addAttribute(aOutGeneratingSoftware));
-	CHECK_MSTATUS(addAttribute(aOutCreationDate));
-	CHECK_MSTATUS(addAttribute(aOutVersionString));
-	CHECK_MSTATUS(addAttribute(aOutNumVariableRecords));
-	CHECK_MSTATUS(addAttribute(aOutPointDataFormat));
-	CHECK_MSTATUS(addAttribute(aOutNumPointRecords));
-	CHECK_MSTATUS(addAttribute(aOutPointScale));
-	CHECK_MSTATUS(addAttribute(aOutPointOffset));
-	CHECK_MSTATUS(addAttribute(aOutPointBBox));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutSystemIdentifier));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutGeneratingSoftware));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutCreationDate));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutVersionString));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutNumVariableRecords));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutPointDataFormat));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutNumPointRecords));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutPointScale));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutPointOffset));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutPointBBoxMin));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aOutPointBBoxMax));
 	
 	
 
 	// ATTRIBUTE AFFECTS
 	/////////////////////
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutCreationDate));
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutGeneratingSoftware));
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutNumPointRecords));
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutNumVariableRecords));
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutPointBBox));
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutPointDataFormat));
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutPointOffset));
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutPointScale));
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutSystemIdentifier));
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,	aOutVersionString));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutCreationDate));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutGeneratingSoftware));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutNumPointRecords));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutNumVariableRecords));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutPointBBoxMin));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutPointBBoxMax));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutPointDataFormat));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutPointOffset));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutPointScale));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutSystemIdentifier));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutVersionString));
 	
-	CHECK_MSTATUS(attributeAffects(aLidarFileName,  aNeedsCompute));
-	CHECK_MSTATUS(attributeAffects(aDisplayMode,	aNeedsCompute));
-	CHECK_MSTATUS(attributeAffects(aUseMMap,		aNeedsCompute));
-	CHECK_MSTATUS(attributeAffects(aUsePointCache,	aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,  aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,	aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,		aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUsePointCache,	aNeedsCompute));
 
 	return MS::kSuccess;
 }

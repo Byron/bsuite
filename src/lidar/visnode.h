@@ -71,7 +71,8 @@ class LidarVisNode : public MPxLocatorNode
 		static MObject aOutNumPointRecords;		//!< amount of point records stored in the file
 		static MObject aOutPointScale;			//!< vector of overall point scale factor
 		static MObject aOutPointOffset;			//!< vector of point offset
-		static MObject aOutPointBBox;			//!< bounding box which fits all points
+		static MObject aOutPointBBoxMin;		//!< min point of bounding box which fits all points
+		static MObject aOutPointBBoxMax;		//!< max point of bounding box which fits all points
 
 		// other attributes
 		static MObject aNeedsCompute;			//!< dummy output (for now) to check if we need to compute

@@ -8,7 +8,9 @@ import mrv.maya.nt as nt
 import maya.cmds as cmds
 import maya.OpenMaya as api
 
-__all__ = (	'cmds', 'api', 'nt', 'TestMayaBase', 'TestPtexVisNodeBase',
+import nose
+
+__all__ = (	'cmds', 'api', 'nt', 'TestMayaBase', 'TestPtexVisNodeBase', 'TestLidarVisNodeBase',
 			'fixture_path', 'save_for_debugging')
 
 
@@ -30,14 +32,52 @@ class TestMayaBase(unittest.TestCase):
 			cmds.loadPlugin(cls.test_plugin_path)
 			# even though loadPlugin may fail, it doesn't throw a runtime error
 			if not cmds.pluginInfo(cls.test_plugin_path, q=1, loaded=1):
-				raise AssertionError("Failed to load plugin")
+				raise AssertionError("Failed to load plugin at %s" % cls.test_plugin_path)
 		#END load plugin
 		
 	@classmethod
 	def openScene(cls, path):
 		"""Open the given scene forcibly"""
 		return mrv.maya.Scene.open(path, force=True)
+		
+	@classmethod
+	def makeNode(cls, typename):
+		"""Create a node of the given type name and return it.
+		If the node type does not exist, the test will be skipped"""
+		try:
+			return getattr(nt, typename)()
+		except AttributeError:
+			raise nose.SkipTest("plugin containing node of type %s was not loaded" % typename)
+		
+	@classmethod
+	def tearDownAll(cls):
+		mrv.maya.Scene.new(force=True)
+		if cmds.pluginInfo(cls.test_plugin_path, q=1, loaded=1):
+			cmds.unloadPlugin(cls.test_plugin_path)
+		#END unload plugin safely
 	
+
+class TestLidarVisNodeBase(TestMayaBase):
+	"""provides utilities to setup a lidar file"""
+	
+	@classmethod
+	def lidarPath(cls, name):
+		""":return: full path the ptexture with the given name"""
+		return fixture_path("lidar") / name
+
+	@classmethod
+	def setupScene(cls, lidar_filename):
+		"""create a new scene with a single lidar visualization node.
+		Make it load the given lidar_filepath.
+		:return: newly created lidar node"""
+		lf = cls.lidarPath(lidar_filename)
+		assert lf.isfile(), "lidar file did not exist at %s" % lf
+		mrv.maya.Scene.new(force=True)
+		
+		n = cls.makeNode("LidarVisNode")
+		n.lidarFilePath.setString(str(lf))
+		return n
+		
 
 class TestPtexVisNodeBase(TestMayaBase):
 	"""provides utilities to setup a ptexture file"""
@@ -56,10 +96,7 @@ class TestPtexVisNodeBase(TestMayaBase):
 		m = nt.Node("meshShape")
 		assert(isinstance(m, nt.Mesh))
 		
-		try:
-			n = nt.PtexVisNode()
-		except RuntimeError:
-			raise nose.SkipTest("Plugin was not loaded - this is not our run")
+		n = cls.makeNode("PtexVisNode")
 		m.outMesh.mconnectTo(n.inMesh)
 		n.ptfp.setString(str(cls.ptexturePath(ptexture_name)))
 		return n, m
