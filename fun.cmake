@@ -189,6 +189,7 @@ function(add_maya_project)
 			return()
 		endif()
 		
+		set(LATEST_MAYA_INCLUDE_DIR ${MAYA_INCLUDE_DIR})
 		
 		message(STATUS "Building project ${PROJECT_NAME} for maya ${MAYA_VERSION}")
 		# CREATE TARGET
@@ -249,5 +250,13 @@ function(add_maya_project)
 			endif() # project with tmrv path
 		endif() # project with test
 	endforeach()# FOR EACH MAYA VERSION
+	
+	# FOR CONVENIENCE, SET THE LATEST MAYA VERSION INCLUDE PATH
+	###########################################################
+	# To help qtcreator, we need to set the maya include on directory level.
+	# Otherwise it will not know the maya headers, which reduces convenience quite a bit
+	# As the include comes last, it will not be effective for the actual compile
+	include_directories(${LATEST_MAYA_INCLUDE_DIR})
+	
 endfunction()
 

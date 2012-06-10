@@ -15,31 +15,40 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef BSUITE_BASE_H
-#define BSUITE_BASE_H
+#include <maya/MFnPlugin.h>
 
-//********************************************************************
-//**	Forward Declarations
-//********************************************************************
-class MFnAttribute;
+#include "visnode.h"
+#include "base.h"
 
+//! Initialize the plugin in maya
+EXPORT MStatus initializePlugin(MObject obj)
+{
+	MFnPlugin plugin(obj, "Sebastian Thiel", "0.1");
+	MStatus stat;
+	
+	stat = plugin.registerNode(LidarVisNode::typeName, LidarVisNode::typeId, 
+								LidarVisNode::creator, LidarVisNode::initialize,
+								MPxNode::kLocatorNode);
+	if (stat.error()){
+		stat.perror("register lidar visualization node");
+		return stat;
+	}
 
-//********************************************************************
-//**	Macros
-//********************************************************************
+	return stat;
+}
 
-#ifdef WIN32
-	#define EXPORT __declspec( dllexport )
-#else
-	#define EXPORT extern "C" __attribute__ ((visibility("default")))
-#endif
+//! Deinitialize the plugin from maya
+EXPORT MStatus uninitializePlugin(MObject obj)
+{
+	MFnPlugin plugin(obj);
+	MStatus stat;
 
+	stat = plugin.deregisterNode(LidarVisNode::typeId);
+	if (stat.error()){
+		stat.perror("deregister LidarVisNode");
+		return stat;
+	}
+	
+	return stat;
+}
 
-//********************************************************************
-//**	Utilities
-//********************************************************************
-
-void setup_as_output(MFnAttribute& attr);
-
-
-#endif // BSUITE_BASE_H

@@ -32,21 +32,20 @@
 #include <maya/MFloatPointArray.h>
 
 
-// Fix unholy c++ incompatibility - typedefs to void are not allowed in gcc greater 4.1.2
-#include <maya/MGLdefinitions.h>
-#define MGLvoid void
-#include <maya/MGLFunctionTable.h>
-#undef MGLvoid
-#include <maya/MHardwareRenderer.h>
+#include "ogl_headers.h"
 
+#include "base.h"
 #include "util.h"
 #include "visnode.h"
 
 #include "assert.h"
 
-#include <cmath>
+#include "math_util.h"
 
 
+//********************************************************************
+//**	Class Implementation
+//********************************************************************
 /////////////////////////////////////////////////////////////////////
 
 const MTypeId PtexVisNode::typeId(0x00108bdd);
@@ -158,48 +157,48 @@ MStatus PtexVisNode::initialize()
 	// Output attributes
 	/////////////////////
 	aNeedsCompute = numFn.create("needsComputation", "nc", MFnNumericData::kInt);
-	setup_output(numFn);
+	setup_as_output(numFn);
 	
 	aOutMetaDataKeys = typFn.create("outMetaDataKeys", "omdk", MFnData::kStringArray, &status);
 	CHECK_MSTATUS(status);
 	typFn.setDefault(stringArrayFn.create());
-	setup_output(typFn);
+	setup_as_output(typFn);
 	
 	aOutNumChannels = numFn.create("outNumChannels", "onc", MFnNumericData::kInt);
-	setup_output(numFn);
+	setup_as_output(numFn);
 	
 	aOutNumFaces = numFn.create("outNumFaces", "onf", MFnNumericData::kInt);
-	setup_output(numFn);
+	setup_as_output(numFn);
 	
 	aOutAlphaChannel = numFn.create("outAlphaChannel", "oac", MFnNumericData::kInt);
-	setup_output(numFn);
+	setup_as_output(numFn);
 	
 	aOutHasEdits = numFn.create("outHasEdits", "ohe", MFnNumericData::kBoolean);
-	setup_output(numFn);
+	setup_as_output(numFn);
 	
 	aOutHasMipMaps = numFn.create("outHasMipMaps", "ohm", MFnNumericData::kBoolean);
-	setup_output(numFn);
+	setup_as_output(numFn);
 	
 	aOutNumSamples = numFn.create("outNumSamples", "ons", MFnNumericData::kInt);
-	setup_output(numFn);
+	setup_as_output(numFn);
 	
 	aOutMeshType = mfnEnum.create("outMeshType", "omt");
-	setup_output(mfnEnum);
+	setup_as_output(mfnEnum);
 	mfnEnum.addField("triangle", 0);
 	mfnEnum.addField("quad", 1);
 	
 	aOutDataType = mfnEnum.create("outDataType", "odt");
-	setup_output(mfnEnum);
+	setup_as_output(mfnEnum);
 	mfnEnum.addField("int8", 0);
 	mfnEnum.addField("int16", 1);
 	mfnEnum.addField("half", 2);
 	mfnEnum.addField("float", 3);
 	
 	aOutUBorderMode = mfnEnum.create("outUBorderMode", "oubm");
-	setup_output(mfnEnum);
+	setup_as_output(mfnEnum);
 	add_border_mode_fields(mfnEnum);
 	aOutVBorderMode = mfnEnum.create("outVBorderMode", "ovbm");
-	setup_output(mfnEnum);
+	setup_as_output(mfnEnum);
 	add_border_mode_fields(mfnEnum);
 	
 
@@ -340,18 +339,6 @@ bool PtexVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle
 	}
 	
 	return false;
-}
-
-//! \return dot product of two vectors
-template <typename T>
-float dot(const T& l, const T& r) {
-	return l.x*r.x + l.y*r.y + l.z*r.z;
-}
-
-//! \return length of the vector
-template <typename T>
-float len(const T& v) {
-	return std::sqrt(dot(v));
 }
 
 //! \return uv values for the given point on a triangle

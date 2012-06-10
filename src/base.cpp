@@ -15,31 +15,14 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef BSUITE_BASE_H
-#define BSUITE_BASE_H
-
-//********************************************************************
-//**	Forward Declarations
-//********************************************************************
-class MFnAttribute;
-
-
-//********************************************************************
-//**	Macros
-//********************************************************************
-
-#ifdef WIN32
-	#define EXPORT __declspec( dllexport )
-#else
-	#define EXPORT extern "C" __attribute__ ((visibility("default")))
-#endif
-
+#include "base.h"
 
 //********************************************************************
 //**	Utilities
 //********************************************************************
 
-void setup_as_output(MFnAttribute& attr);
-
-
-#endif // BSUITE_BASE_H
+void setup_as_output(MFnAttribute &attr)
+{
+	attr.setStorable(false);
+	attr.setWritable(false);
+}

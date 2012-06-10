@@ -21,6 +21,12 @@
 #include <maya/MFloatPoint.h>
 #include <vector>
 
+#include <cmath>
+
+
+//********************************************************************
+//**	Basic Types
+//********************************************************************
 
 //! Structure with 3 floats and most general vector methods
 struct Float3
@@ -29,12 +35,14 @@ struct Float3
 	float y;
 	float z;
 	
+	inline
 	Float3(float x=0.f, float y=0.f, float z=0.f)
 	    : x(x)
 	    , y(y)
 	    , z(z)
 	{}
 	
+	inline
 	Float3(const MFloatPoint& r)
 	    : x(r.x)
 	    , y(r.y)
@@ -66,6 +74,7 @@ struct Float4 : public Float3
 {
 	float w;
 	
+	inline
 	Float4(float x=0.f, float y=0.f, float z=0.f, float w=0.f)
 	    : Float3(x,y,z)
 	    , w(w)
@@ -74,5 +83,27 @@ struct Float4 : public Float3
 
 
 typedef std::vector<Float3>	Float3Vector;
+
+
+
+
+//********************************************************************
+//**	Utiltiies
+//********************************************************************
+
+
+//! \return dot product of two vectors
+template <typename T>
+inline float dot(const T& l, const T& r) {
+	return l.x*r.x + l.y*r.y + l.z*r.z;
+}
+
+//! \return length of the vector
+template <typename T>
+inline float len(const T& v) {
+	return std::sqrt(dot(v));
+}
+
+
 
 #endif // MATH_UTIL_H
