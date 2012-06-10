@@ -57,7 +57,7 @@ MObject LidarVisNode::aGlPointSize;
 MObject LidarVisNode::aIntensityScale;
 MObject LidarVisNode::aTranslateToOrigin;
 MObject LidarVisNode::aUseMMap;
-MObject LidarVisNode::aUsePointCache;
+MObject LidarVisNode::aUseDisplayList;
 MObject LidarVisNode::aDisplayMode;
 
 
@@ -92,6 +92,7 @@ const MMatrix LidarVisNode::convert_z_up_to_y_up_column_major(_initializer);
 LidarVisNode::LidarVisNode()
     : m_gl_point_size(1.0f)
 	, m_intensity_scale(1.0f)
+	, m_display_list(0)
 {}
 
 LidarVisNode::~LidarVisNode()
@@ -132,14 +133,16 @@ MStatus LidarVisNode::initialize()
 	numFn.setAffectsWorldSpace(true);
 	numFn.setInternal(true);
 	
-	aUsePointCache = numFn.create("useDisplayCache", "udc", MFnNumericData::kBoolean, 0, &status);
+	aUseDisplayList = numFn.create("useDisplayCache", "udc", MFnNumericData::kBoolean, 0, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
+	numFn.setInternal(true);
 	
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
 	mfnEnum.addField("Intensity", (int)DMIntensity);
 	mfnEnum.addField("ReturnNumber", (int)DMReturnNumber);
+	mfnEnum.addField("ReturnNumberIntensified", (int)DMReturnNumberIntensity);
 	
-	mfnEnum.setDefault((short)DMIntensity);
+	mfnEnum.setDefault((short)DMReturnNumberIntensity);
 	mfnEnum.setKeyable(true);
 	
 	aIntensityScale = numFn.create("intensityScale", "iscale", MFnNumericData::kFloat, 1.0);
@@ -212,7 +215,7 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aIntensityScale));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aTranslateToOrigin))
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseMMap));
-	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUsePointCache));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseDisplayList));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aDisplayMode));
 	
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aNeedsCompute));
@@ -247,7 +250,6 @@ MStatus LidarVisNode::initialize()
 	
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUsePointCache,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aTranslateToOrigin,	aNeedsCompute));
 	return MS::kSuccess;
 }
@@ -338,6 +340,8 @@ bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandl
 		m_intensity_scale = dataHandle.asFloat();
 	} else if (plug == aTranslateToOrigin) {
 		update_compensation_matrix_and_bbox(dataHandle.asBool());
+	} else if (plug == aUseDisplayList) {
+		m_use_display_list = dataHandle.asBool();
 	}
 	
 	return false;
@@ -361,7 +365,6 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 		
 		// Update caches which would be relevant for drawing !
 		assert(m_las_stream->status() == LAS_IStream::Success);
-		update_compensation_matrix_and_bbox(data.outputValue(aTranslateToOrigin).asBool());
 		
 		// indicate everything is fine
 		m_error.clear();
@@ -445,31 +448,79 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 		glf->glPointSize(m_gl_point_size);
 		glf->glPushMatrix();
 		glf->glMultMatrixd(&m_compensation_column_major.matrix[0][0]);
+		
+		// HANDLE DISPLAY LIST
+		//////////////////////
+		bool use_draw_list = false;
+		if (m_use_display_list) {
+			if (m_display_list == 0) {
+				// genLists must not be between glBegin and glEnd
+				m_display_list = glf->glGenLists(1);
+				// if this doesn't work, we will just keep drawing as usual ... and retry and retry ...
+				if (m_display_list == 0) {
+					// so we inform about it at least
+					MPlug(thisMObject(), aUseDisplayList).setBool(false);
+				} else {
+					glf->glNewList(m_display_list, MGL_COMPILE_AND_EXECUTE);
+					// just continue executing the drawing code to fill the list
+				}
+			} else {
+				use_draw_list = true;
+			}
+		} else {
+			if (m_display_list != 0) {
+				glf->glDeleteLists(m_display_list, 1);
+				m_display_list = 0;
+			}
+		}
+		
 		glf->glBegin(MGL_POINTS);
 		{
-			while (las_stream.read_next_point(p) == LAS_IStream::Success) {
-				// setup color
-				switch(mode)
-				{
-				case DMIntensity:
-				{
-					const uint16_t intensity = p.intensity * m_intensity_scale; 
-					glf->glColor3us(intensity, intensity, intensity);
-					break;
-				}
-				case DMReturnNumber:
-				{
-					static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
-					glf->glColor3us(p.return_number() * scale_3_to_16, p.num_returns() * scale_3_to_16, p.return_number() * scale_3_to_16);
-					break;
-				}
-				};// end color handler
+			static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
+			if (use_draw_list) {
+				assert(m_display_list);
+				glf->glCallList(m_display_list);
+			} else {
+				// PERFORM DRAWING
+				///////////////////
+				while (las_stream.read_next_point(p) == LAS_IStream::Success) {
+					// setup color
+					switch(mode)
+					{
+					case DMIntensity:
+					{
+						const uint16_t intensity = p.intensity * m_intensity_scale; 
+						glf->glColor3us(intensity, intensity, intensity);
+						break;
+					}
+					case DMReturnNumber:
+					{
+						glf->glColor3us(p.return_number() * scale_3_to_16, 
+										p.num_returns() * scale_3_to_16, 
+										p.return_number() * scale_3_to_16);
+						break;
+					}
+					case DMReturnNumberIntensity:
+					{
+						const uint16_t intensity = p.intensity * m_intensity_scale; 
+						glf->glColor3us(p.return_number() * scale_3_to_16 + intensity, 
+										p.num_returns() * scale_3_to_16 + intensity, 
+										p.return_number() * scale_3_to_16 + intensity);
+						break;
+					}
+					};// end color handler
+					
+					glf->glVertex3iv(reinterpret_cast<const MGLint*>(&p.x));
+				}// end while iterating points
 				
-				glf->glVertex3iv(reinterpret_cast<const MGLint*>(&p.x));
-			}// end while iterating points
+				if (m_display_list) {
+					glf->glEndList();
+				}
+			}// end handle use draw list
 		}
 		glf->glEnd();
 		glf->glPopMatrix();
+		
 		
 		
 		/*
