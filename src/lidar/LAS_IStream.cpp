@@ -19,11 +19,15 @@
 
 #include <iostream>
 #include <cstring>
-#include <arpa/inet.h>
-#include <assert.h>
+#ifdef WIN32
+	#include <Winsock2.h 
+#else
+	#include <arpa/inet.h>
+#endif
+#include <cassert>
 
 template <typename T>
-void read_n(std::istream& istream, T& dest) 
+inline void read_n(std::istream& istream, T& dest) 
 {
 	// stream exceptions are enabled
 	istream.read(reinterpret_cast<char*>(&dest), sizeof(T));
@@ -37,7 +41,7 @@ void LAS_IStream::read_header()
 	const std::istream::pos_type expected_ofs = 4+2+2+4+2+2+8+1+1+32+32+2+2+2+4+4;
 	if (_istream.tellg() != expected_ofs) {
 		std::cerr << _istream.tellg() << " != " << expected_ofs << std::endl;
-		_status = HeaderAlignmentFailure;
+		_status = UnexpectedHeaderAlignment;
 		return;
 	}
 	
@@ -69,44 +73,7 @@ void LAS_IStream::read_header()
 		_status = UnsupportedPointDataFormat;
 		return;
 	}
-	_istream.seekg(_header.offset_to_point_data, std::ios_base::beg);
-	
 	_status = Success;
-}
-
-void LAS_IStream::read_next_point(LAS_Types::PointDataRecord1 &p)
-{
-	static const size_t bsize = 28;
-	char buf[bsize];	// point format 1
-	assert(bsize == _header.point_data_record_length);
-	
-	read_n(_istream, buf);
-	
-	char* c = buf;
-	p.x = *(int32_t*)c;
-	c += sizeof(p.x);
-	p.y = *(int32_t*)c;
-	c += sizeof(p.x);
-	p.z = *(int32_t*)c;
-	c += sizeof(p.x);
-	p.intensity = *(uint16_t*)c;
-	c += sizeof(p.intensity);
-	
-	p.flags = *(uint8_t*)c;
-	c += sizeof(p.flags);
-	p.classification = *(uint8_t*)c;
-	c += sizeof(p.classification);
-	p.scan_angle_rank = *(uint8_t*)c;
-	c += sizeof(p.scan_angle_rank);
-	p.user_data = *(uint8_t*)c;
-	c += sizeof(p.user_data);
-	p.point_source_id= *(uint16_t*)c;
-	c += sizeof(p.point_source_id);
-	
-	p.gps_time= *(double*)c;
-	c += sizeof(p.gps_time);
-	
-	assert(static_cast<size_t>(c - buf) == bsize);
 }
 
 LAS_IStream::LAS_IStream(std::istream &instream)
@@ -124,6 +91,43 @@ LAS_IStream::LAS_IStream(std::istream &instream)
 		_status = StreamFailure;
 		throw;
 	}
+}
+
+LAS_IStream::Status LAS_IStream::reset_point_iteration()
+{
+	if (_status != Success) {
+		return _status;
+	}
+	// required to reset error, otherwise we cannot seek !
+	if (_istream.eof()) {
+		_istream.clear();
+	}
+	
+	_istream.seekg(_header.offset_to_point_data, std::ios_base::beg);
+	
+	if (_istream.fail()) {
+		_status = StreamFailure;
+	}
+	return _status;
+}
+
+LAS_IStream::Status LAS_IStream::read_next_point(LAS_Types::PointDataRecord1 &p)
+{
+	char buf[LAS_Types::PointDataRecord1::record_size];	// point format 1
+	assert(sizeof(buf) == _header.point_data_record_length);
+	
+	// stream exceptions are enabled
+	_istream.read(reinterpret_cast<char*>(&buf), sizeof(buf));
+	
+	if (_istream.eof()) {
+		return StreamFailure;
+	} else if (_istream.fail()) {
+		_status = StreamFailure;
+	} else {
+		p.init_from_raw(buf);
+		p.adjust_coordinate(&_header.x_scale,& _header.x_offset);
+	}
+	return _status;
 }
 
 

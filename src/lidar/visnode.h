@@ -34,9 +34,8 @@ class LidarVisNode : public MPxLocatorNode
 	
 	enum DisplayMode
 	{
-		DMColor = 0,				//!< display color as RGB of GLpoints
-		DMReturnNumber = 1,		//!< display return number as RGB
-		DMIntensity = 2			//!< display intensity as RGB
+		DMIntensity = 0,			//!< display intensity as RGB
+		DMReturnNumber = 1		//!< display return number as RGB
 	};
 	
 	public:
@@ -47,6 +46,8 @@ class LidarVisNode : public MPxLocatorNode
 		virtual bool	setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx);
 		virtual void    postConstructor();
 		virtual void	draw(M3dView &view, const MDagPath &path, M3dView::DisplayStyle style, M3dView::DisplayStatus);
+		virtual MBoundingBox boundingBox() const;
+		virtual bool	isBounded() const;
 
 		static  void*   creator();
 		static  MStatus initialize();
@@ -86,8 +87,8 @@ class LidarVisNode : public MPxLocatorNode
 
 	protected:
 		MString			m_error;				//!< error string shown if non-empty
-		
-		MGLfloat		m_gl_point_size;		//!< size of a point when drawing (cache)	
+		MGLfloat		m_gl_point_size;		//!< size of a point when drawing (cache)
+		MBoundingBox					m_bbox;	//!< bounding box cache		
 		
 		std::auto_ptr<LAS_IStream>		m_las_stream;	//!< pointer to las reader
 		std::ifstream					m_ifstream;		//!< file for reading samples

@@ -83,8 +83,74 @@ namespace LAS_Types
 		uint8_t		user_data;
 		uint16_t	point_source_id;
 		
-		//! Initialize the fields in this instance from the given data. It must be of size record_size.
-		PointDataRecord0& init_from_raw(const void* data);
+		// ----------------------------------------
+		// Interface
+		// ----------------------------------------
+		//! \name Interface
+		//! @{
+		
+		inline
+		uint8_t		return_number() const {
+			return flags & 0x07;
+		}
+		
+		inline
+		uint8_t		num_returns() const {
+			return flags & (0x07 << 3);
+		}
+		
+		inline
+		uint8_t		scan_dir() const {
+			return flags & (0x01 << 6);
+		}
+		
+		inline
+		uint8_t		edge_of_flight() const {
+			return flags & (0x01 << 7);
+		}
+		
+		//! Initialize the fields in this instance from the given data.
+		//! It will read record_size bytes.
+		//! \return new position of the data pointer
+		inline
+		const void* init_from_raw(const void* data)
+		{
+			const char* c = reinterpret_cast<const char*>(data);
+			x = *(int32_t*)c;
+			c += sizeof(x);
+			y = *(int32_t*)c;
+			c += sizeof(x);
+			z = *(int32_t*)c;
+			c += sizeof(x);
+			intensity = *(uint16_t*)c;
+			c += sizeof(intensity);
+			
+			flags = *(uint8_t*)c;
+			c += sizeof(flags);
+			classification = *(uint8_t*)c;
+			c += sizeof(classification);
+			scan_angle_rank = *(uint8_t*)c;
+			c += sizeof(scan_angle_rank);
+			user_data = *(uint8_t*)c;
+			c += sizeof(user_data);
+			point_source_id= *(uint16_t*)c;
+			c += sizeof(point_source_id);
+			
+			return c;
+		}
+		
+		//! Call this after init_from_raw with the respective scale and offset information
+		//! obtained from the header
+		inline
+		void adjust_coordinate(const double* scale, const double* offset)
+		{
+			x = (x * scale[0]) + offset[0];
+			y = (y * scale[1]) + offset[1];
+			z = (z * scale[2]) + offset[2];
+		}
+		
+		//! @} end Interface
+		
 		
 		static const size_t	record_size = 4+4+4+2+1+1+1+1+2;
 	};
@@ -93,8 +159,18 @@ namespace LAS_Types
 	{
 		double		gps_time;
 		
-		//! Initialize the fields in this instance from the given data. It must be of size record_size.
-		PointDataRecord1& init_from_raw(const void* data);
+		//! Initialize the fields in this instance from the given data.
+		//! It must be of size record_size, as this amount of bytes will be read.
+		//! \return new position of the data pointer
+		inline
+		const void* init_from_raw(const void* data)
+		{
+			const char* c = reinterpret_cast<const char*>(PointDataRecord0::init_from_raw(data));
+			gps_time= *(double*)c;
+			c += sizeof(gps_time);
+			
+			return c;
+		}
 		
 		static const size_t record_size = PointDataRecord0::record_size + 8;
 	};
@@ -114,8 +190,8 @@ class LAS_IStream
 			Invalid,
 			
 			InvalidHeader,				//!< Header could not be read or not a LAS file
+			UnexpectedHeaderAlignment,
 			UnsupportedPointDataFormat,
-			HeaderAlignmentFailure,
 			StreamFailure
 		};
 		
@@ -128,7 +204,6 @@ class LAS_IStream
 		
 	private:
 		void			read_header();
-		void			read_next_point(LAS_Types::PointDataRecord1& p);
 		
 	public:
 		//! Intialize this instance with the given input stream.
@@ -139,13 +214,26 @@ class LAS_IStream
 		
 	public:
 		
+		inline
 		Status	status() const {
 			return _status;
 		}
 		
+		inline
 		const LAS_Types::Header13&	header() const {
 			return _header;
 		}
+		
+		//! Call this to set the instance to begin iterating on point records.
+		//! You may only call read_next_point() if this method was called.
+		//! \return Status to indicate success or failure
+		//! \note you may call this method each time you want to restart iterating all samples.
+		Status reset_point_iteration();
+		
+		//! Read the next point record from the stream
+		Status read_next_point(LAS_Types::PointDataRecord1& p);
+		
+		
 };
 
 #endif // LAS_ISTREAM_H

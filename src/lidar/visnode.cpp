@@ -119,11 +119,10 @@ MStatus LidarVisNode::initialize()
 	numFn.setInternal(true);
 	
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
-	mfnEnum.addField("Color", (int)DMColor);
-	mfnEnum.addField("ReturnNumber", (int)DMReturnNumber);
 	mfnEnum.addField("Intensity", (int)DMIntensity);
+	mfnEnum.addField("ReturnNumber", (int)DMReturnNumber);
 	
-	mfnEnum.setDefault((short)DMColor);
+	mfnEnum.setDefault((short)DMIntensity);
 	mfnEnum.setKeyable(true);
 	
 	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kFloat, 1.0);
@@ -223,7 +222,6 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutVersionString));
 	
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aNeedsCompute));
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,		aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUsePointCache,	aNeedsCompute));
 
@@ -270,7 +268,7 @@ bool LidarVisNode::renew_las_reader(const MString &filepath)
 	m_las_stream.reset(new LAS_IStream(m_ifstream));
 	if (m_las_stream->status() != LAS_IStream::Success) {
 		m_error = "Unsupported file format";
-		return false;
+		return renew_las_reader(MString());
 	}
 	
 	return true;
@@ -278,13 +276,14 @@ bool LidarVisNode::renew_las_reader(const MString &filepath)
 
 void LidarVisNode::reset_caches()
 {
-	
+	m_bbox = MBoundingBox();
 }
 
 bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx)
 {
 	if (plug == aLidarFileName) {
 		renew_las_reader(dataHandle.asString());
+		reset_caches();
 	} 
 	else if (plug == aUseMMap || plug == aUsePointCache) {
 		reset_caches();
@@ -319,8 +318,7 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 	} else {
 		// Assume its an output plug
 		reset_output_attributes(data);
-		if (m_las_stream.get()) {
-			assert(m_las_stream->status() == LAS_IStream::Success);
+		if (m_las_stream.get() && m_las_stream->status() == LAS_IStream::Success) {
 			const LAS_Types::Header13& hdr = m_las_stream->header();
 			
 			data.outputValue(aOutSystemIdentifier).setString(hdr.system_identifier);
@@ -347,6 +345,8 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 			data.outputValue(aOutPointOffset).set3Float(hdr.x_offset, hdr.y_offset, hdr.z_offset);
 			data.outputValue(aOutPointBBoxMin).set3Float(hdr.min_x, hdr.min_y, hdr.min_z);
 			data.outputValue(aOutPointBBoxMax).set3Float(hdr.max_x, hdr.max_y, hdr.max_z);
+			
+			m_bbox = MBoundingBox(MPoint(hdr.min_x, hdr.min_y, hdr.min_z), MPoint(hdr.max_x, hdr.max_y, hdr.max_z));
 		}
 		
 		
@@ -358,14 +358,16 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 {
 	// make sure we are uptodate - trigger compute
 	MPlug(thisMObject(), aNeedsCompute).asInt();
+	const DisplayMode mode = static_cast<DisplayMode>(MPlug(thisMObject(), aDisplayMode).asInt());
 	
 	view.beginGL();
 	if (m_error.length()) {
 		view.drawText(MString("Error: ") + m_error, MPoint());
+		goto finish_drawing;
 	}
-		
 	
 	{ // start drawing
+		
 		MHardwareRenderer* renderer = MHardwareRenderer::theRenderer();
 		if (!renderer) {
 			m_error = "No hardware renderer";
@@ -378,9 +380,44 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 			goto finish_drawing;
 		}
 		
+		
+		assert(m_las_stream.get());
+		LAS_IStream& las_stream = *m_las_stream.get();
+		if (las_stream.reset_point_iteration() != LAS_IStream::Success) {
+			m_error = "could not initialize LAS stream for iteration";
+			goto finish_drawing;
+		}
+		
+		LAS_Types::PointDataRecord1 p;
+		
+		glf->glPointSize(m_gl_point_size);
+		glf->glBegin(MGL_POINTS);
+		{
+			while (las_stream.read_next_point(p) == LAS_IStream::Success) {
+				// setup color
+				switch(mode)
+				{
+				case DMIntensity:
+				{
+					glf->glColor3s(p.intensity, p.intensity, p.intensity);
+					break;
+				}
+				case DMReturnNumber:
+				{
+					glf->glColor3s(p.return_number(), p.num_returns(), p.return_number());
+					break;
+				}
+				};// end color handler
+				glf->glVertex3iv(reinterpret_cast<const MGLint*>(&p.x));
+			}// end while iterating points
+		}
+		glf->glEnd();
+		
+		
+		/*
 		glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
 		glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
-		/*{
+		{
 			glf->glEnableClientState(MGL_VERTEX_ARRAY);
 			glf->glVertexPointer(3, MGL_FLOAT, 0, m_sample_pos.data());
 			glf->glEnableClientState(MGL_COLOR_ARRAY);
@@ -388,11 +425,22 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 			
 			glf->glPointSize(m_gl_point_size);
 			glf->glDrawArrays(MGL_POINTS, 0, m_sample_pos.size());
-		}*/
+		}
 		glf->glPopAttrib();
 		glf->glPopClientAttrib();
+		*/
 	}
 	
 finish_drawing:
 	view.endGL();
+}
+
+MBoundingBox LidarVisNode::boundingBox() const
+{
+	return m_bbox;
+}
+
+bool LidarVisNode::isBounded() const
+{
+	return true;
 }
