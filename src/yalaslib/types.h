@@ -67,6 +67,8 @@ struct Header13 : public Header13Aligned
 	Header13&	to_host_order();
 };
 
+
+//! Default point structure
 struct PointDataRecord0
 {
 	int32_t		x;
@@ -74,14 +76,12 @@ struct PointDataRecord0
 	int32_t		z;
 	uint16_t	intensity;
 	uint8_t		flags;
-	/*uint8_t		return_number : 3;
-	uint8_t		num_returns : 3;
-	uint8_t		scan_dir : 1;
-	uint8_t		edge_of_flight : 1;*/
 	uint8_t		classification;
 	int8_t		scan_angle_rank;
 	uint8_t		user_data;
 	uint16_t	point_source_id;
+	
+	static const size_t	record_size = 4+4+4+2+1+1+1+1+2;
 	
 	// ----------------------------------------
 	// Interface
@@ -151,13 +151,14 @@ struct PointDataRecord0
 	
 	//! @} end Interface
 	
-	
-	static const size_t	record_size = 4+4+4+2+1+1+1+1+2;
 };
 
+//! Point structure with additional GPS time
 struct PointDataRecord1 : public PointDataRecord0
 {
 	double		gps_time;
+	
+	static const size_t record_size = PointDataRecord0::record_size + 8;
 	
 	//! Initialize the fields in this instance from the given data.
 	//! It must be of size record_size, as this amount of bytes will be read.
@@ -166,14 +167,161 @@ struct PointDataRecord1 : public PointDataRecord0
 	const void* init_from_raw(const void* data)
 	{
 		const char* c = reinterpret_cast<const char*>(PointDataRecord0::init_from_raw(data));
-		gps_time= *(double*)c;
+		gps_time = *(double*)c;
 		c += sizeof(gps_time);
 		
 		return c;
 	}
-	
-	static const size_t record_size = PointDataRecord0::record_size + 8;
 };
+
+
+//! Point structure with additional RGB info
+struct PointDataRecord2 : public PointDataRecord0
+{
+	uint16_t		red;
+	uint16_t		green;
+	uint16_t		blue;
+	
+	static const size_t record_size = PointDataRecord0::record_size + sizeof(red) * 3;
+	
+	//! Initialize the fields in this instance from the given data.
+	//! It must be of size record_size, as this amount of bytes will be read.
+	//! \return new position of the data pointer
+	inline
+	const void* init_from_raw(const void* data)
+	{
+		const char* c = reinterpret_cast<const char*>(PointDataRecord0::init_from_raw(data));
+		red = *(uint16_t*)c;
+		c += sizeof(red);
+		
+		green = *(uint16_t*)c;
+		c += sizeof(green);
+		
+		blue = *(uint16_t*)c;
+		c += sizeof(blue);
+		
+		return c;
+	}
+};
+
+
+//! Point structure with GPS and RGB info
+struct PointDataRecord3 : public PointDataRecord1
+{
+	uint16_t		red;
+	uint16_t		green;
+	uint16_t		blue;
+	
+	static const size_t record_size = PointDataRecord1::record_size + sizeof(red) * 3;
+	
+	//! Initialize the fields in this instance from the given data.
+	//! It must be of size record_size, as this amount of bytes will be read.
+	//! \return new position of the data pointer
+	inline
+	const void* init_from_raw(const void* data)
+	{
+		const char* c = reinterpret_cast<const char*>(PointDataRecord1::init_from_raw(data));
+		red = *(uint16_t*)c;
+		c += sizeof(red);
+		
+		green = *(uint16_t*)c;
+		c += sizeof(green);
+		
+		blue = *(uint16_t*)c;
+		c += sizeof(blue);
+		
+		return c;
+	}
+};
+
+// Point structure with GPS and Waveform packet info
+struct PointDataRecord4 : public PointDataRecord1
+{
+	uint8_t		wave_packet_descriptor_index;			//!< index into packe descriptor user data
+	uint64_t	waveform_data_offset;					//!< offset in bytes
+	uint32_t	waveform_packet_size;					//!< packet size in bytes
+	float		return_point_waveform_location;
+	float		extra_x;								//!< parametric line equation value for point extrapolation
+	float		extra_y;
+	float		extra_z;
+	
+	static const size_t record_size = PointDataRecord1::record_size + 1 + 8 + 4 + sizeof(float)*4;
+	
+	//! Initialize the fields in this instance from the given data.
+	//! It must be of size record_size, as this amount of bytes will be read.
+	//! \return new position of the data pointer
+	inline
+	const void* init_from_raw(const void* data)
+	{
+		const char* c = reinterpret_cast<const char*>(PointDataRecord1::init_from_raw(data));
+		wave_packet_descriptor_index = *(uint8_t*)c;
+		c += sizeof(wave_packet_descriptor_index);
+		
+		waveform_data_offset = *(uint64_t*)c;
+		c += sizeof(waveform_data_offset);
+		
+		waveform_packet_size = *(uint32_t*)c;
+		c += sizeof(waveform_packet_size);
+		
+		return_point_waveform_location = *(float*)c;
+		c += sizeof(return_point_waveform_location);
+		
+		extra_x = *(float*)c;
+		c += sizeof(extra_x);
+		extra_y = *(float*)c;
+		c += sizeof(extra_y);
+		extra_z = *(float*)c;
+		c += sizeof(extra_z);
+		
+		return c;
+	}
+	
+};
+
+// Point structure with GPS and color and Waveform packet info
+struct PointDataRecord5 : public PointDataRecord3
+{
+	uint8_t		wave_packet_descriptor_index;			//!< index into packe descriptor user data
+	uint64_t	waveform_data_offset;					//!< offset in bytes
+	uint32_t	waveform_packet_size;					//!< packet size in bytes
+	float		return_point_waveform_location;
+	float		extra_x;								//!< parametric line equation value for point extrapolation
+	float		extra_y;
+	float		extra_z;
+	
+	static const size_t record_size = PointDataRecord3::record_size + 1 + 8 + 4 + sizeof(float)*4;
+	
+	//! Initialize the fields in this instance from the given data.
+	//! It must be of size record_size, as this amount of bytes will be read.
+	//! \return new position of the data pointer
+	inline
+	const void* init_from_raw(const void* data)
+	{
+		const char* c = reinterpret_cast<const char*>(PointDataRecord3::init_from_raw(data));
+		wave_packet_descriptor_index = *(uint8_t*)c;
+		c += sizeof(wave_packet_descriptor_index);
+		
+		waveform_data_offset = *(uint64_t*)c;
+		c += sizeof(waveform_data_offset);
+		
+		waveform_packet_size = *(uint32_t*)c;
+		c += sizeof(waveform_packet_size);
+		
+		return_point_waveform_location = *(float*)c;
+		c += sizeof(return_point_waveform_location);
+		
+		extra_x = *(float*)c;
+		c += sizeof(extra_x);
+		extra_y = *(float*)c;
+		c += sizeof(extra_y);
+		extra_z = *(float*)c;
+		c += sizeof(extra_z);
+		
+		return c;
+	}
+	
+};
+
 
 }// end LASTypes
 }// END yalas
