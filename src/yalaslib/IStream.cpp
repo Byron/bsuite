@@ -17,14 +17,12 @@
 
 #include "IStream.h"
 
-#include <iostream>
 #include <cstring>
 #ifdef WIN32
 	#include <Winsock2.h 
 #else
 	#include <arpa/inet.h>
 #endif
-#include <cassert>
 
 namespace yalas {
 
@@ -70,11 +68,6 @@ void IStream::read_header()
 	read_n(_istream, _header.min_z);
 	read_n(_istream, _header.start_of_waveform_data_packet_record);
 	
-	
-	if (_header.point_data_format_id > 5) {
-		_status = UnsupportedPointDataFormat;
-		return;
-	}
 	_status = Success;
 }
 
@@ -100,6 +93,12 @@ IStream::Status IStream::reset_point_iteration()
 	if (_status != Success) {
 		return _status;
 	}
+	
+	if (_header.point_data_format_id > types::PointDataRecord5::format_id) {
+		_status = UnsupportedPointDataFormat;
+		return _status;
+	}
+	
 	// required to reset error, otherwise we cannot seek !
 	if (_istream.eof()) {
 		_istream.clear();
@@ -109,25 +108,6 @@ IStream::Status IStream::reset_point_iteration()
 	
 	if (_istream.fail()) {
 		_status = StreamFailure;
-	}
-	return _status;
-}
-
-IStream::Status IStream::read_next_point(types::PointDataRecord1 &p)
-{
-	char buf[types::PointDataRecord1::record_size];	// point format 1
-	assert(sizeof(buf) == _header.point_data_record_length);
-	
-	// stream exceptions are enabled
-	_istream.read(reinterpret_cast<char*>(&buf), sizeof(buf));
-	
-	if (_istream.eof()) {
-		return StreamFailure;
-	} else if (_istream.fail()) {
-		_status = StreamFailure;
-	} else {
-		p.init_from_raw(buf);
-		p.adjust_coordinate(&_header.x_scale,& _header.x_offset);
 	}
 	return _status;
 }

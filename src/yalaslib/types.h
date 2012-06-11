@@ -18,6 +18,7 @@
 #ifndef YALAS_TYPES_H
 #define YALAS_TYPES_H
 
+#include <cstdlib>
 #include <inttypes.h>
 
 namespace yalas {
@@ -82,6 +83,7 @@ struct PointDataRecord0
 	uint16_t	point_source_id;
 	
 	static const size_t	record_size = 4+4+4+2+1+1+1+1+2;
+	static const uint8_t format_id = 0;
 	
 	// ----------------------------------------
 	// Interface
@@ -159,6 +161,7 @@ struct PointDataRecord1 : public PointDataRecord0
 	double		gps_time;
 	
 	static const size_t record_size = PointDataRecord0::record_size + 8;
+	static const uint8_t format_id = 1;
 	
 	//! Initialize the fields in this instance from the given data.
 	//! It must be of size record_size, as this amount of bytes will be read.
@@ -205,6 +208,7 @@ struct RGBInfo
 struct PointDataRecord2 : public PointDataRecord0, public RGBInfo
 {
 	static const size_t record_size = PointDataRecord0::record_size + RGBInfo::record_size;
+	static const uint8_t format_id = 2;
 	
 	//! Initialize the fields in this instance from the given data.
 	//! It must be of size record_size, as this amount of bytes will be read.
@@ -222,6 +226,7 @@ struct PointDataRecord2 : public PointDataRecord0, public RGBInfo
 struct PointDataRecord3 : public PointDataRecord1, public RGBInfo
 {
 	static const size_t record_size = PointDataRecord1::record_size + RGBInfo::record_size;
+	static const uint8_t format_id = 3;
 	
 	//! Initialize the fields in this instance from the given data.
 	//! It must be of size record_size, as this amount of bytes will be read.
@@ -279,6 +284,7 @@ struct WaveformInfo
 struct PointDataRecord4 : public PointDataRecord1, public WaveformInfo
 {
 	static const size_t record_size = PointDataRecord1::record_size + WaveformInfo::record_size;
+	static const uint8_t format_id = 4;
 	
 	//! Initialize the fields in this instance from the given data.
 	//! It must be of size record_size, as this amount of bytes will be read.
@@ -295,6 +301,7 @@ struct PointDataRecord4 : public PointDataRecord1, public WaveformInfo
 struct PointDataRecord5 : public PointDataRecord3, WaveformInfo
 {
 	static const size_t record_size = PointDataRecord3::record_size + WaveformInfo::record_size;
+	static const uint8_t format_id = 5;
 	
 	//! Initialize the fields in this instance from the given data.
 	//! It must be of size record_size, as this amount of bytes will be read.

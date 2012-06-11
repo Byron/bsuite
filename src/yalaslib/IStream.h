@@ -18,9 +18,11 @@
 #ifndef LAS_ISTREAM_H
 #define LAS_ISTREAM_H
 
-#include <iosfwd>
-#include <inttypes.h>
 #include "types.h"
+
+#include <iostream>
+#include <inttypes.h>
+#include <cassert>
 
 namespace yalas
 {
@@ -77,7 +79,29 @@ namespace yalas
 			Status reset_point_iteration();
 			
 			//! Read the next point record from the stream
-			Status read_next_point(types::PointDataRecord1& p);
+			//! Note that the point type you are using must match the format specified 
+			//! in the header.
+			template <typename PointType>
+			inline
+			Status read_next_point(PointType& p)
+			{
+				char buf[PointType::record_size];	// point format 1
+				assert(sizeof(buf) == _header.point_data_record_length);
+				assert(PointType::format_id == _header.point_data_format_id);
+				
+				// stream exceptions are enabled
+				_istream.read(reinterpret_cast<char*>(&buf), sizeof(buf));
+				
+				if (_istream.eof()) {
+					return StreamFailure;
+				} else if (_istream.fail()) {
+					_status = StreamFailure;
+				} else {
+					p.init_from_raw(buf);
+					p.adjust_coordinate(&_header.x_scale,& _header.x_offset);
+				}
+				return _status;
+			}
 			
 			
 	};
