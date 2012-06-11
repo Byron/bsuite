@@ -32,15 +32,15 @@
 #include <maya/MFloatPointArray.h>
 
 
-#include "ogl_headers.h"
+#include "mayabaselib/ogl_headers.h"
 
-#include "base.h"
+#include "mayabaselib/base.h"
 #include "util.h"
 #include "visnode.h"
 
 #include "assert.h"
 
-#include "math_util.h"
+#include "baselib/math_util.h"
 
 
 //********************************************************************

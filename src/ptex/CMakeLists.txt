@@ -32,12 +32,11 @@ if(WAS_SUCCESSFUL)
 						. 
 						..
 						${PTEX_INCLUDE_DIR}
-					SOURCE_DIRS
-						.
-						../base
 					LINK_LIBRARIES
 						Ptex
 						z
+					LINK_MAYA_LIBRARIES
+						mayabase
 					LIBRARY_DIRS
 						${PTEX_LIBRARY_DIR}
 					WITH_TEST

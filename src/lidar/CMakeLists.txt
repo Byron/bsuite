@@ -6,8 +6,7 @@ add_maya_project(NAME
 					..
 				LINK_LIBRARIES
 					yalas
-				SOURCE_DIRS
-					.
-					../base
+				LINK_MAYA_LIBRARIES
+					mayabase
 				WITH_TEST
 				)

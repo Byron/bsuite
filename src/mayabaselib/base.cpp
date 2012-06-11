@@ -15,50 +15,25 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "util.h"
-#include "visnode.h"
+#include <maya/MFnAttribute.h>
+#include <maya/MFileObject.h>
 
-#include <maya/MFnPlugin.h>
+#include "base.h"
 
-#include <mayabaselib/base.h>
-#include <Ptexture.h>
+//********************************************************************
+//**	Utilities
+//********************************************************************
 
-PtexCache* gCache = 0;
-
-//! Initialize the plugin in maya
-EXPORT MStatus initializePlugin(MObject obj)
+void setup_as_output(MFnAttribute &attr)
 {
-	gCache = PtexCache::create();
-	
-	MFnPlugin plugin(obj, "Sebastian Thiel", "0.1");
-	MStatus stat;
-	
-	stat = plugin.registerNode(PtexVisNode::typeName, PtexVisNode::typeId, 
-								PtexVisNode::creator, PtexVisNode::initialize,
-								MPxNode::kLocatorNode);
-	if (stat.error()){
-		stat.perror("register visualization node");
-		return stat;
-	}
-
-	return stat;
+	attr.setStorable(false);
+	attr.setWritable(false);
 }
 
-//! Deinitialize the plugin from maya
-EXPORT MStatus uninitializePlugin(MObject obj)
+
+MString resolved_filepath(const MString& filepath)
 {
-	MFnPlugin plugin(obj);
-	MStatus stat;
-
-	stat = plugin.deregisterNode(PtexVisNode::typeId);
-	if (stat.error()){
-		stat.perror("deregister PtexVisNode");
-		return stat;
-	}
-	
-	// Finally clear ptexture cache
-	gCache->release();
-	gCache = NULL;
-	return stat;
+	MFileObject fobj;
+	fobj.setRawFullName(filepath);
+	return fobj.resolvedFullName();	
 }
-

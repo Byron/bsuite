@@ -18,7 +18,7 @@
 #include <maya/MFnPlugin.h>
 
 #include "visnode.h"
-#include "base.h"
+#include "mayabaselib/base.h"
 
 //! Initialize the plugin in maya
 EXPORT MStatus initializePlugin(MObject obj)

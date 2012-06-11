@@ -19,6 +19,7 @@
 #define LIDAR_VISUALIZATION_NODE
 
 #include "yalaslib/IStream.h"
+#include "baselib/typ.h"
 
 #include <maya/MPxLocatorNode.h>
 #include <maya/MGLdefinitions.h>
@@ -50,6 +51,7 @@ class LidarVisNode : public MPxLocatorNode
 	{
 		MGLushort	col[3];			//!< color triplet
 	};
+	
 	struct DrawPos
 	{
 		MGLint		pos[3];			//!< position vector
@@ -145,6 +147,7 @@ class LidarVisNode : public MPxLocatorNode
 		
 		ColCache				m_col_cache;	//!< cache keeping color of records
 		PosCache				m_pos_cache;	//!< cache keeping position of records
+		ROMappedFile			m_map;			//!< may contain a memory map of our lidar file
 };
 
 #endif

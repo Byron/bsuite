@@ -15,16 +15,36 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <maya/MFnAttribute.h>
+#ifndef BSUITE_BASE_H
+#define BSUITE_BASE_H
 
-#include "base.h"
+//********************************************************************
+//**	Includes
+//********************************************************************
+#include <maya/MString.h>
+
+//********************************************************************
+//**	Forward Declarations
+//********************************************************************
+class MFnAttribute;
+
+//********************************************************************
+//**	Macros
+//********************************************************************
+
+#ifdef WIN32
+	#define EXPORT __declspec( dllexport )
+#else
+	#define EXPORT extern "C" __attribute__ ((visibility("default")))
+#endif
+
 
 //********************************************************************
 //**	Utilities
 //********************************************************************
 
-void setup_as_output(MFnAttribute &attr)
-{
-	attr.setStorable(false);
-	attr.setWritable(false);
-}
+MString resolved_filepath(const MString& filepath);
+
+void setup_as_output(MFnAttribute& attr);
+
+#endif // BSUITE_BASE_H

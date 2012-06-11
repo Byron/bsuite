@@ -15,9 +15,83 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAYA_TYPES_H
-#define MAYA_TYPES_H
 
-#include <cstdint>
+#include "typ.h"
 
-#endif // MAYA_TYPES_H
+#ifndef WIN32
+	#include <sys/mman.h>
+	#include <stdio.h>
+	
+	#include <sys/types.h>
+	#include <sys/stat.h>
+	#include <unistd.h>
+	#include <fcntl.h>
+	#include <cstring>
+
+	#include <limits>
+#endif
+
+ROMappedFile::ROMappedFile()
+	: _mem(0)
+	, _len(0)
+{
+}
+
+ROMappedFile::~ROMappedFile()
+{
+	unmap_file();
+}
+
+ROMappedFile &ROMappedFile::map_file(const char *filepath)
+{
+	unmap_file();
+	assert(!is_mapped());
+	
+#ifndef WIN32
+	const int fid = open(filepath, O_RDONLY);
+	if (fid < 0) {
+		return *this;
+	}
+	
+	struct stat fid_info;
+	memset(&fid_info, 0, sizeof(fid_info));
+	
+	// check for 32 bit limitations - off_t will be 32 bit on a 32 bit system, so we will be limited 
+	// to mapping 2gig there
+	if (fstat(fid, &fid_info) < 0 || fid_info.st_size > std::numeric_limits<off_t>::max()) {
+		close(fid);
+		return *this;
+	}
+	
+	_mem = mmap(0, fid_info.st_size, PROT_READ, MAP_PRIVATE, fid, 0);
+	// mmap keeps a reference to the handle, keeping the file open effectively
+	close(fid);
+	
+	if (_mem) {
+		_len = fid_info.st_size;
+	}
+	
+	assert (is_mapped());
+#endif
+	return *this;
+}
+
+ROMappedFile &ROMappedFile::unmap_file()
+{
+#ifndef WIN32
+	if (is_mapped()) {
+		if (munmap(_mem, _len) == 0) {
+			_mem = 0;
+			_len = 0;
+		} else {
+			assert(false);
+		}
+	}
+#endif
+	return *this;
+}
+
+bool ROMappedFile::is_mapped() const
+{
+	return _mem != 0;
+}

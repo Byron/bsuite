@@ -117,7 +117,7 @@ struct PointDataRecord0
 	inline
 	const void* init_from_raw(const void* data)
 	{
-		const char* c = reinterpret_cast<const char*>(data);
+		const uint8_t* c = reinterpret_cast<const uint8_t*>(data);
 		x = *(int32_t*)c;
 		c += sizeof(x);
 		y = *(int32_t*)c;
@@ -127,13 +127,13 @@ struct PointDataRecord0
 		intensity = *(uint16_t*)c;
 		c += sizeof(intensity);
 		
-		flags = *(uint8_t*)c;
+		flags = *c;
 		c += sizeof(flags);
-		classification = *(uint8_t*)c;
+		classification = *c;
 		c += sizeof(classification);
-		scan_angle_rank = *(uint8_t*)c;
+		scan_angle_rank = *c;
 		c += sizeof(scan_angle_rank);
-		user_data = *(uint8_t*)c;
+		user_data = *c;
 		c += sizeof(user_data);
 		point_source_id= *(uint16_t*)c;
 		c += sizeof(point_source_id);
@@ -169,7 +169,7 @@ struct PointDataRecord1 : public PointDataRecord0
 	inline
 	const void* init_from_raw(const void* data)
 	{
-		const char* c = reinterpret_cast<const char*>(PointDataRecord0::init_from_raw(data));
+		const uint8_t* c = reinterpret_cast<const uint8_t*>(PointDataRecord0::init_from_raw(data));
 		gps_time = *(double*)c;
 		c += sizeof(gps_time);
 		
@@ -189,7 +189,7 @@ struct RGBInfo
 	inline
 	const void* init_from_raw(const void* data)
 	{
-		const char* c = reinterpret_cast<const char*>(data);
+		const uint8_t* c = reinterpret_cast<const uint8_t*>(data);
 		red = *(uint16_t*)c;
 		c += sizeof(red);
 		
@@ -255,8 +255,8 @@ struct WaveformInfo
 	inline
 	const void* init_from_raw(const void* data)
 	{
-		const char* c = reinterpret_cast<const char*>(data);
-		wave_packet_descriptor_index = *(uint8_t*)c;
+		const uint8_t* c = reinterpret_cast<const uint8_t*>(data);
+		wave_packet_descriptor_index = *c;
 		c += sizeof(wave_packet_descriptor_index);
 		
 		waveform_data_offset = *(uint64_t*)c;

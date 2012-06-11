@@ -1,6 +1,6 @@
 
 add_project(		NAME
-					yalas
+					base
 				TYPE
 					STATIC
 				)

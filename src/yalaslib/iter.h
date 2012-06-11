@@ -14,30 +14,48 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef YALAS_ITER_H
+#define YALAS_ITER_H
 
-#ifndef BSUITE_BASE_H
-#define BSUITE_BASE_H
+#include <baselib/typ.h>
 
-//********************************************************************
-//**	Forward Declarations
-//********************************************************************
-class MFnAttribute;
+namespace yalas
+{
 
-//********************************************************************
-//**	Macros
-//********************************************************************
+//! A utility iterator which can be utilized in while loops to iterate over 
+//! raw uncompressed memory to read points
+//! \tparam PointType type of point to use. It must be one of the point types defined in types.h
+class MemoryIterator
+{
+	const uint8_t*	_cur;		//!< Current memory pointer
+	const uint8_t*	_end;		//!< 
+	const double*	_ofs;
+	const double*	_scale;
+	
+	
+	public:
+	inline
+	MemoryIterator(const uint8_t* beg, const uint8_t* end, const double* ofs, const double* scale)
+		: _cur(beg)
+		, _end(end)
+		, _ofs(ofs)
+		, _scale(scale)
+	{}
+	
+	
+	template <typename PointType>
+	inline
+	bool read_next_point(PointType& p) {
+		if (_cur < _end) {
+			p.init_from_raw(_cur);
+			p.adjust_coordinate(_scale, _ofs);
+			_cur += PointType::record_size;
+			return true;
+		}
+		return false;
+	}
+};
 
-#ifdef WIN32
-	#define EXPORT __declspec( dllexport )
-#else
-	#define EXPORT extern "C" __attribute__ ((visibility("default")))
-#endif
+}// end namespace yalas
 
-
-//********************************************************************
-//**	Utilities
-//********************************************************************
-
-void setup_as_output(MFnAttribute& attr);
-
-#endif // BSUITE_BASE_H
+#endif // YALAS_ITER_H
