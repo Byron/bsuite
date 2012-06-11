@@ -18,7 +18,7 @@
 #ifndef LIDAR_VISUALIZATION_NODE
 #define LIDAR_VISUALIZATION_NODE
 
-#include "LAS_IStream.h"
+#include "yalaslib/IStream.h"
 
 #include <maya/MPxLocatorNode.h>
 #include <maya/MGLdefinitions.h>
@@ -27,6 +27,9 @@
 #include <fstream>
 #include <auto_ptr.h>
 #include <vector>
+
+
+class MGLFunctionTable;
 
 
 //! Node helping to visualize lidar data
@@ -39,7 +42,8 @@ class LidarVisNode : public MPxLocatorNode
 		DMNoColor = 0,				//!< performance mode whcih saves individual color calls to ogl
 		DMIntensity,				//!< display intensity as RGB
 		DMReturnNumber,				//!< display return number as RGB
-		DMReturnNumberIntensity		//!< mix return number with intensity as RGB
+		DMReturnNumberIntensity,	//!< mix return number with intensity as RGB
+		DMStoredColor				//!< display the stored color if possible
 	};
 	
 	struct DrawCol
@@ -51,7 +55,7 @@ class LidarVisNode : public MPxLocatorNode
 		MGLint		pos[3];			//!< position vector
 		
 		inline
-		void		init_from_point(const LAS_Types::PointDataRecord0& p) {
+		void		init_from_point(const yalas::types::PointDataRecord0& p) {
 			pos[0] = p.x;
 			pos[1] = p.y;
 			pos[2] = p.z;
@@ -86,7 +90,17 @@ class LidarVisNode : public MPxLocatorNode
 		void update_draw_cache(MDataBlock &data);	//!< fill in the draw cache
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
 		
-		inline void color_point(LAS_Types::PointDataRecord0& p, DrawCol &dc, const DisplayMode mode) const;
+		template <uint8_t format_id>
+		inline void color_point(const yalas::types::point_data_record<format_id>& p, DrawCol &dc, const DisplayMode mode) const;
+		inline void color_point_no_rgb(const yalas::types::PointDataRecord0& p, DrawCol &dc, const DisplayMode mode) const;
+		template <typename PointType>
+		inline void color_point_with_rgb_info(const PointType& p, DrawCol &dc, const DisplayMode mode) const;
+		
+		template <uint8_t format_id>
+		inline void draw_point_records(MGLFunctionTable* glf, yalas::IStream& las_stream, const DisplayMode mode) const;
+		
+		template <uint8_t format_id>
+		inline void update_point_cache(const DisplayMode mode);
 		
 	protected:
 		// Input attributes
@@ -95,7 +109,8 @@ class LidarVisNode : public MPxLocatorNode
 		static MObject aIntensityScale;			//!< scales the intensity by the given amount
 		static MObject aTranslateToOrigin;		//!< if true, the point samples will be translated back to the origin
 		static MObject aUseMMap;				//!< if true, we should use memory mapping (non-windows only !)
-		static MObject aUseDisplayCache;			//!< if true, all data will be cached on the gpu
+		static MObject aUseDisplayCache;		//!< if true, all data will be cached on the gpu
+		static MObject aNormalizeStoredCols;		//!< if true, stored colors will be upscaled to 16 bit - only necessary if stored normalized to 8 bit
 		static MObject aDisplayMode;			//!< display mode enumeration
 		
 		// output attributes
@@ -120,8 +135,9 @@ class LidarVisNode : public MPxLocatorNode
 		MGLfloat		m_gl_point_size;		//!< size of a point when drawing (cache)
 		MBoundingBox	m_bbox;					//!< bounding box cache
 		float			m_intensity_scale;		//!< value to scale the intensity with
+		bool			m_normalize_stored_cols;//!< if true, we will normalize stored colors which is not the case in all files !
 		
-		std::auto_ptr<LAS_IStream>		m_las_stream;	//!< pointer to las reader
+		std::auto_ptr<yalas::IStream>	m_las_stream;	//!< pointer to las reader
 		std::ifstream					m_ifstream;		//!< file for reading samples
 		
 		static const MMatrix	convert_z_up_to_y_up_column_major;	//!< matrix to convert z up to y up

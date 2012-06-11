@@ -4,6 +4,8 @@ add_maya_project(NAME
 				INCLUDE_DIRS
 					. 
 					..
+				LINK_LIBRARIES
+					yalas
 				SOURCE_DIRS
 					.
 					../base
