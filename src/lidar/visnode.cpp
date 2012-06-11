@@ -293,8 +293,8 @@ bool LidarVisNode::renew_las_reader(const MString &filepath)
 		return false;
 	}
 	
-	m_las_stream.reset(new LAS_IStream(m_ifstream));
-	if (m_las_stream->status() != LAS_IStream::Success) {
+	m_las_stream.reset(new yalas::IStream(m_ifstream));
+	if (m_las_stream->status() != yalas::IStream::Success) {
 		m_error = "Unsupported file format";
 		return renew_las_reader(MString());
 	}
@@ -321,9 +321,9 @@ void LidarVisNode::update_draw_cache(MDataBlock &data)
 	if (m_las_stream.get() == 0) {
 		return;
 	}
-	assert(m_las_stream->status() == LAS_IStream::Success);
+	assert(m_las_stream->status() == yalas::IStream::Success);
 	
-	if (m_las_stream->reset_point_iteration() != LAS_IStream::Success) {
+	if (m_las_stream->reset_point_iteration() != yalas::IStream::Success) {
 		return;
 	}
 	
@@ -335,17 +335,17 @@ void LidarVisNode::update_draw_cache(MDataBlock &data)
 		m_col_cache = ColCache();
 	}
 	
-	LAS_Types::PointDataRecord1 p;
+	yalas::types::PointDataRecord1 p;
 	
 	const PosCache::iterator pend = m_pos_cache.end();
 	if (mode == DMNoColor) {
-		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && m_las_stream->read_next_point(p) == LAS_IStream::Success; ++pit) {
+		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && m_las_stream->read_next_point(p) == yalas::IStream::Success; ++pit) {
 			pit->init_from_point(p);
 		}
 	} else {
 		const ColCache::iterator cend = m_col_cache.end();
 		ColCache::iterator cit = m_col_cache.begin();
-		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && m_las_stream->read_next_point(p) == LAS_IStream::Success; ++pit, ++cit) {
+		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && m_las_stream->read_next_point(p) == yalas::IStream::Success; ++pit, ++cit) {
 			pit->init_from_point(p);
 			color_point(p, *cit, mode);
 		}
@@ -356,7 +356,7 @@ void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
 {
 	m_compensation_column_major.setToIdentity();
 	if (translateToOrigin && m_las_stream.get()) {
-		const LAS_Types::Header13& hdr = m_las_stream->header();
+		const yalas::types::Header13& hdr = m_las_stream->header();
 		// enter data column -major
 		m_compensation_column_major.matrix[3][0] = -hdr.min_x;
 		m_compensation_column_major.matrix[3][1] = -hdr.min_y;
@@ -364,14 +364,14 @@ void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
 	}
 	m_compensation_column_major *= convert_z_up_to_y_up_column_major;
 	
-	const LAS_Types::Header13& hdr = m_las_stream->header();
+	const yalas::types::Header13& hdr = m_las_stream->header();
 	m_bbox = MBoundingBox(
 							MPoint(hdr.min_x, hdr.min_y, hdr.min_z) * m_compensation_column_major,
 							MPoint(hdr.max_x, hdr.max_y, hdr.max_z) * m_compensation_column_major
 				 );
 }
 
-void LidarVisNode::color_point(LAS_Types::PointDataRecord0 &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point(yalas::types::PointDataRecord0 &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
 {
 	static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
 	switch(mode)
@@ -464,9 +464,9 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 			reset_output_attributes(data);
 			return MS::kSuccess;
 		}
-		assert(m_las_stream->status() == LAS_IStream::Success);
+		assert(m_las_stream->status() == yalas::IStream::Success);
 		
-		const LAS_Types::Header13& hdr = m_las_stream->header();
+		const yalas::types::Header13& hdr = m_las_stream->header();
 		
 		data.outputValue(aOutSystemIdentifier).setString(hdr.system_identifier);
 		data.outputValue(aOutGeneratingSoftware).setString(hdr.generating_software);
@@ -548,19 +548,19 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 				glf->glPopClientAttrib();
 			} else {
 				assert(m_las_stream.get());
-				LAS_IStream& las_stream = *m_las_stream.get();
-				if (las_stream.reset_point_iteration() != LAS_IStream::Success) {
+				yalas::IStream& las_stream = *m_las_stream.get();
+				if (las_stream.reset_point_iteration() != yalas::IStream::Success) {
 					m_error = "could not initialize LAS stream for iteration";
 					goto finish_drawing;
 				}
 				
-				LAS_Types::PointDataRecord1 p;
+				yalas::types::PointDataRecord1 p;
 				glf->glBegin(MGL_POINTS);
 				{
 					// PERFORM DRAWING
 					///////////////////
 					DrawCol dc;
-					while (las_stream.read_next_point(p) == LAS_IStream::Success) {
+					while (las_stream.read_next_point(p) == yalas::IStream::Success) {
 						color_point(p ,dc, mode);
 						glf->glColor3usv(dc.col);
 						glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
@@ -574,7 +574,7 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 	
 finish_drawing:
 	view.endGL();
-	if (m_las_stream.get() && m_las_stream->status() != LAS_IStream::Success) {
+	if (m_las_stream.get() && m_las_stream->status() != yalas::IStream::Success) {
 		// can happen if something is not okay with the file. Remove it if its in an invalid state.
 		renew_las_reader(MString());
 	}

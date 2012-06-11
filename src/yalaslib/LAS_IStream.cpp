@@ -26,6 +26,8 @@
 #endif
 #include <cassert>
 
+namespace yalas {
+
 template <typename T>
 inline void read_n(std::istream& istream, T& dest) 
 {
@@ -33,10 +35,10 @@ inline void read_n(std::istream& istream, T& dest)
 	istream.read(reinterpret_cast<char*>(&dest), sizeof(T));
 }
 
-void LAS_IStream::read_header()
+void IStream::read_header()
 {
 	_istream.exceptions(std::istream::failbit|std::istream::failbit|std::istream::eofbit);
-	_istream.read(reinterpret_cast<char*>(&_header), sizeof(LAS_Types::Header13Aligned));
+	_istream.read(reinterpret_cast<char*>(&_header), sizeof(types::Header13Aligned));
 	
 	const std::istream::pos_type expected_ofs = 4+2+2+4+2+2+8+1+1+32+32+2+2+2+4+4;
 	if (_istream.tellg() != expected_ofs) {
@@ -76,7 +78,7 @@ void LAS_IStream::read_header()
 	_status = Success;
 }
 
-LAS_IStream::LAS_IStream(std::istream &instream)
+IStream::IStream(std::istream &instream)
 	: _istream(instream)
 	, _status(Invalid)
 {
@@ -93,7 +95,7 @@ LAS_IStream::LAS_IStream(std::istream &instream)
 	}
 }
 
-LAS_IStream::Status LAS_IStream::reset_point_iteration()
+IStream::Status IStream::reset_point_iteration()
 {
 	if (_status != Success) {
 		return _status;
@@ -111,9 +113,9 @@ LAS_IStream::Status LAS_IStream::reset_point_iteration()
 	return _status;
 }
 
-LAS_IStream::Status LAS_IStream::read_next_point(LAS_Types::PointDataRecord1 &p)
+IStream::Status IStream::read_next_point(types::PointDataRecord1 &p)
 {
-	char buf[LAS_Types::PointDataRecord1::record_size];	// point format 1
+	char buf[types::PointDataRecord1::record_size];	// point format 1
 	assert(sizeof(buf) == _header.point_data_record_length);
 	
 	// stream exceptions are enabled
@@ -131,7 +133,7 @@ LAS_IStream::Status LAS_IStream::read_next_point(LAS_Types::PointDataRecord1 &p)
 }
 
 
-LAS_Types::Header13 &LAS_Types::Header13::to_host_order()
+types::Header13 &types::Header13::to_host_order()
 {
 	source_id = ntohs(source_id);
 	global_encoding = ntohs(global_encoding);
@@ -159,3 +161,5 @@ LAS_Types::Header13 &LAS_Types::Header13::to_host_order()
 	
 	return *this;
 }
+
+}// END yalas namespace

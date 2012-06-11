@@ -51,7 +51,7 @@ class LidarVisNode : public MPxLocatorNode
 		MGLint		pos[3];			//!< position vector
 		
 		inline
-		void		init_from_point(const LAS_Types::PointDataRecord0& p) {
+		void		init_from_point(const yalas::types::PointDataRecord0& p) {
 			pos[0] = p.x;
 			pos[1] = p.y;
 			pos[2] = p.z;
@@ -86,7 +86,7 @@ class LidarVisNode : public MPxLocatorNode
 		void update_draw_cache(MDataBlock &data);	//!< fill in the draw cache
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
 		
-		inline void color_point(LAS_Types::PointDataRecord0& p, DrawCol &dc, const DisplayMode mode) const;
+		inline void color_point(yalas::types::PointDataRecord0& p, DrawCol &dc, const DisplayMode mode) const;
 		
 	protected:
 		// Input attributes
@@ -121,7 +121,7 @@ class LidarVisNode : public MPxLocatorNode
 		MBoundingBox	m_bbox;					//!< bounding box cache
 		float			m_intensity_scale;		//!< value to scale the intensity with
 		
-		std::auto_ptr<LAS_IStream>		m_las_stream;	//!< pointer to las reader
+		std::auto_ptr<yalas::IStream>	m_las_stream;	//!< pointer to las reader
 		std::ifstream					m_ifstream;		//!< file for reading samples
 		
 		static const MMatrix	convert_z_up_to_y_up_column_major;	//!< matrix to convert z up to y up
