@@ -1,4 +1,4 @@
 
-foreach(PLUGIN ptex lidar yalaslib)
+foreach(PLUGIN ptex lidar yalaslib mayabaselib baselib)
 	add_subdirectory(${PLUGIN})
 endforeach()

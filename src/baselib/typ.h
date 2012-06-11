@@ -15,9 +15,20 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAYA_TYPES_H
-#define MAYA_TYPES_H
+#ifndef MISC_TYPES_H
+#define MISC_TYPES_H
 
-#include <cstdint>
+#include <stdlib.h>
 
-#endif // MAYA_TYPES_H
+//! Simple utility to keep a mapped file
+//! For now we don't use git++'s sliding window memory map
+class ROMappedFile
+{
+	const void*	_mem;	//!< Mapped memory, aligned to page boundary, read-onl
+	size_t		_len;	//!< mount of mapped bytes
+	
+	public:
+		ROMappedFile();
+};
+
+#endif // MISC_TYPES_H

@@ -216,15 +216,21 @@ function(add_project)
 endfunction()
 
 
+function(_maya_project_id PROJECT_NAME MAYA_VERSION OUTPUT_VARIABLE)
+	set(${OUTPUT_VARIABLE} ${PROJECT_NAME}_Maya${MAYA_VERSION} PARENT_SCOPE)
+endfunction()
+
 # ======================================
 #add_maya_project(
 #					NAME name
+#					TYPE MODULE|STATIC
 #					MAYA_VERSIONS version1 [versionN]
 #					SOURCE_FILES file1 [...fileN]
 #					SOURCE_DIRS dir1 [...dirN]
 #					INCLUDE_DIRS dir1 [... dirN]
 #					LIBRARY_DIRS dir1 [... dirN]
 #					LINK_LIBRARIES lib1 [...libN]
+#					LINK_MAYA_LIBRARIES lib1 [...libN]
 #					DEFINES def1 [...defN]
 #					WITHOUT_EXCEPTIONS
 #					WITH_TEST
@@ -236,9 +242,18 @@ endfunction()
 #
 # NAME
 # 	The name of the project - it will also be the basename of the executable
+# TYPE
+#	MODULE if the target should be a shared module, which is supposed to be loaded
+#	by calls to dlopen().
+#	This is the default
+#	STATIC if the target should be a static library that others can link against.
 # MAYA_VERSIONS (optional)
 # 	one or more version of maya to use for headers and libraries, e.g. 2011, 2008
 # 	If unset, the globally configured list of maya versions is used
+# LINK_MAYA_LIBRARIES (optional)
+#	Allows to link against libraries created with add_maya_project type static.
+#	Just mention its base-name, and your project will be linked against 
+#	the matching static library, according to the actual maya version.
 # WITH_TEST
 #	If set, a python based test will be run which loads your compiled plugin.
 #	In your mrv/nose test implementation, you will have to verify that your plugin
@@ -249,7 +264,7 @@ function(add_maya_project)
 	cmake_parse_arguments(PROJECT 
 						"WITH_TEST;${ADD_PROJECT_NO_ARG_OPTS}"
 						"${ADD_PROJECT_SINGLE_ARG_OPTS}"
-						"MAYA_VERSIONS;${ADD_PROJECT_MULTI_ARG_OPTS}"
+						"LINK_MAYA_LIBRARIES;MAYA_VERSIONS;${ADD_PROJECT_MULTI_ARG_OPTS}"
 						${ARGN})
 	
 	if(NOT PROJECT_NAME)
@@ -262,6 +277,18 @@ function(add_maya_project)
 	
 	if(NOT PROJECT_MAYA_VERSIONS)
 		message(SEND_ERROR "Not a single maya version set must be set")
+	endif()
+	
+	if (NOT PROJECT_TYPE)
+		set(PROJECT_TYPE MODULE)
+	endif()
+	
+	if (NOT PROJECT_TYPE MATCHES "STATIC|MODULE")
+		message(SEND_ERROR "Invalid project type: ${PROJECT_TYPE}") 
+	endif()
+	
+	if (${PROJECT_TYPE} MATCHES MODULE)
+		set(IS_MODULE YES)
 	endif()
 	
 	# set source files
@@ -325,7 +352,7 @@ function(add_maya_project)
 	####################################
 	foreach(MAYA_VERSION IN LISTS PROJECT_MAYA_VERSIONS)
 		set(_MAYA_LOCATION ${MAYA_INSTALL_BASE_PATH}/maya${MAYA_VERSION}${MAYA_INSTALL_BASE_SUFFIX})
-		set(PROJECT_ID ${PROJECT_NAME}_Maya${MAYA_VERSION})
+		_maya_project_id(${PROJECT_NAME} ${MAYA_VERSION} PROJECT_ID)
 		
 		if(NOT EXISTS ${_MAYA_LOCATION})
 			message(SEND_ERROR "maya was not found at ${_MAYA_LOCATION} - please assure your MAYA_VERSIONS are set correctly, as well as your MAYA_INSTALL_BASE_SUFFIX, which could be -x64 on 64 bit systems")
@@ -352,7 +379,7 @@ function(add_maya_project)
 		# CREATE TARGET
 		###############
 		add_library(${PROJECT_ID}
-							MODULE
+							${PROJECT_TYPE}
 							${PROJECT_SOURCE_FILES})
 		
 		# TARGET LEVEL CONFIGURATION
@@ -375,37 +402,52 @@ function(add_maya_project)
 										${DEFAULT_MAYA_LIBRARIES} 
 										${PROJECT_LINK_LIBRARIES})
 		
+		# append maya specic libraries
+		foreach(LIBRARY_NAME IN LISTS PROJECT_LINK_MAYA_LIBRARIES)
+			_maya_project_id(${LIBRARY_NAME} ${MAYA_VERSION} LIBRARY_ID)
+			target_link_libraries(${PROJECT_ID} 
+									${LIBRARY_ID})
+		endforeach()
+		
 		if(PROJECT_DEFINES)
 			append_to_target_property(${PROJECT_ID} COMPILE_DEFINITIONS "${PROJECT_DEFINES}" NO)
 		endif()
 		
-		set_target_properties(${PROJECT_ID} PROPERTIES
-												OUTPUT_NAME 
-														${PROJECT_NAME}
-												PREFIX
-														""				# make sure we don't get the 'lib' prefix on linux
-												SUFFIX
-														${PROJECT_SUFFIX}
-												LIBRARY_OUTPUT_DIRECTORY
-													${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${MAYA_VERSION}
-												CLEAN_DIRECT_OUTPUT 1)
-												
-		if(PROJECT_WITH_TEST)
-			# Assure configuration
-			if(EXISTS ${TEST_TMRV_PATH})
-				add_test(NAME
-							${PROJECT_ID}
-						WORKING_DIRECTORY
-							${CMAKE_SOURCE_DIR}/test
-						COMMAND 
-							python ${TEST_TMRV_PATH} ${MAYA_VERSION} 
-									--mrv-mayapy batch_startup.py 
-									$<TARGET_FILE:${PROJECT_ID}>)
-				message(STATUS "Adding test for ${PROJECT_NAME} for maya ${MAYA_VERSION}")
-			else()
-				message(STATUS "Tests for ${PROJECT_ID} deactivated as tmrv path is not provided, check your configuration")
-			endif() # project with tmrv path
-		endif() # project with test
+		if (IS_MODULE)
+			set_target_properties(${PROJECT_ID} PROPERTIES
+													OUTPUT_NAME 
+															${PROJECT_NAME}
+													PREFIX
+															""				# make sure we don't get the 'lib' prefix on linux
+													SUFFIX
+															${PROJECT_SUFFIX}
+													LIBRARY_OUTPUT_DIRECTORY
+														${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${MAYA_VERSION}
+													CLEAN_DIRECT_OUTPUT 1)
+			
+			if(PROJECT_WITH_TEST)
+				# Assure configuration
+				if(EXISTS ${TEST_TMRV_PATH})
+					add_test(NAME
+								${PROJECT_ID}
+							WORKING_DIRECTORY
+								${CMAKE_SOURCE_DIR}/test
+							COMMAND 
+								python ${TEST_TMRV_PATH} ${MAYA_VERSION} 
+										--mrv-mayapy batch_startup.py 
+										$<TARGET_FILE:${PROJECT_ID}>)
+					message(STATUS "Adding test for ${PROJECT_NAME} for maya ${MAYA_VERSION}")
+				else()
+					message(STATUS "Tests for ${PROJECT_ID} deactivated as tmrv path is not provided, check your configuration")
+				endif() # project with tmrv path
+			endif() # project with test
+		else()
+			set_target_properties(${PROJECT_ID} PROPERTIES
+													OUTPUT_NAME 
+															${PROJECT_NAME}
+													ARCHIVE_OUTPUT_DIRECTORY
+														${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${MAYA_VERSION})
+		endif()# end handle module/static
 	endforeach()# FOR EACH MAYA VERSION
 	
 	# FOR CONVENIENCE, SET THE LATEST MAYA VERSION INCLUDE PATH

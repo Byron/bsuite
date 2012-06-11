@@ -2,7 +2,7 @@
 #define PTEX_VISUALIZATION_NODE
 
 #include "Ptexture.h"
-#include "math_util.h"
+#include "baselib/math_util.h"
 
 #include <maya/MPxLocatorNode.h>
 #include <maya/MGLdefinitions.h>

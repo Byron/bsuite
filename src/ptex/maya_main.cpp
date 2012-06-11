@@ -20,7 +20,7 @@
 
 #include <maya/MFnPlugin.h>
 
-#include <base.h>
+#include <mayabaselib/base.h>
 #include <Ptexture.h>
 
 PtexCache* gCache = 0;

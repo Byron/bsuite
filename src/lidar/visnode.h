@@ -50,6 +50,7 @@ class LidarVisNode : public MPxLocatorNode
 	{
 		MGLushort	col[3];			//!< color triplet
 	};
+	
 	struct DrawPos
 	{
 		MGLint		pos[3];			//!< position vector

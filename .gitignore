@@ -1,4 +1,6 @@
 doc/
+lib/
 bin/
 build/
 *.pyc
+*.pdf

@@ -32,9 +32,9 @@
 #include <maya/MFloatPointArray.h>
 
 // Fix unholy c++ incompatibility - typedefs to void are not allowed in gcc greater 4.1.2
-#include "ogl_headers.h"
+#include "mayabaselib/ogl_headers.h"
 
-#include "base.h"
+#include "mayabaselib/base.h"
 #include "visnode.h"
 // whyever this gets defined ... may have something to do with the ogl headers 
 #undef Success
