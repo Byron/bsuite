@@ -18,7 +18,7 @@
 #ifndef LIDAR_VISUALIZATION_NODE
 #define LIDAR_VISUALIZATION_NODE
 
-#include "yalaslib/LAS_IStream.h"
+#include "yalaslib/IStream.h"
 
 #include <maya/MPxLocatorNode.h>
 #include <maya/MGLdefinitions.h>
