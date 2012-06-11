@@ -203,12 +203,12 @@ function(add_project)
 	set_target_properties(${PROJECT_ID} PROPERTIES
 											OUTPUT_NAME 
 													${PROJECT_NAME}
-											PREFIX
-													${PROJECT_LIBRARY_PREFIX}
-											SUFFIX
-													${PROJECT_LIBRARY_SUFFIX}
 											CLEAN_DIRECT_OUTPUT 1)
 	
+	if (PROJECT_LIBRARY_PREFIX)
+		set_target_properties(${PROJECT_ID} PROPERTIES
+											PREFIX ${PROJECT_LIBRARY_PREFIX})
+	endif()
 	if (PROJECT_LIBRARY_SUFFIX)
 		set_target_properties(${PROJECT_ID} PROPERTIES
 											SUFFIX ${PROJECT_LIBRARY_SUFFIX})
