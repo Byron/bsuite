@@ -127,7 +127,7 @@ MStatus LidarVisNode::initialize()
 	aUseMMap = numFn.create("useMMap", "umm", MFnNumericData::kBoolean, 0, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
 	
-	aTranslateToOrigin = numFn.create("translateToOrigin", "tto", MFnNumericData::kBoolean, 0, &status);
+	aTranslateToOrigin = numFn.create("translateToOrigin", "tto", MFnNumericData::kBoolean, 1, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
 	numFn.setAffectsWorldSpace(true);
 	numFn.setInternal(true);

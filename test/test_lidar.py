@@ -21,4 +21,4 @@ class TestLidar(TestLidarVisNodeBase):
 		assert n.compute.asInt() == 0, "Computation should have been successful"
 		
 
-
+		# TODO: header info without valid file 

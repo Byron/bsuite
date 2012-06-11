@@ -1,6 +1,24 @@
 
 include(CMakeParseArguments)
 
+################
+# CONFIGURATION
+################
+set(ADD_PROJECT_NO_ARG_OPTS
+		WITHOUT_EXCEPTIONS)
+set(ADD_PROJECT_SINGLE_ARG_OPTS
+		NAME
+		TYPE
+		LIBRARY_SUFFIX
+		LIBRARY_PREFIX)
+set(ADD_PROJECT_MULTI_ARG_OPTS
+		SOURCE_FILES
+		SOURCE_DIRS
+		INCLUDE_DIRS
+		LIBRARY_DIRS
+		LINK_LIBRARIES
+		DEFINES)
+
 
 # =============================================================
 # find_sourcefiles_recursive(RESULT_VARIABLE DIRECTORIES EXCLUDE_PATHS)
@@ -47,6 +65,157 @@ function(append_to_target_property TARGET PROPERTY VALUES SPACE_SEPARATED)
 endfunction()
 
 
+
+# ======================================
+#add_project(
+#					NAME name
+#					TYPE EXECUTABLE|STATIC|MODULE|SHARED
+#					[LIBRARY_SUFFIX .ext]
+#					[LIBRARY_PREFIX lib]
+#					SOURCE_FILES file1 [...fileN]
+#					SOURCE_DIRS dir1 [...dirN]
+#					INCLUDE_DIRS dir1 [... dirN]
+#					LIBRARY_DIRS dir1 [... dirN]
+#					LINK_LIBRARIES lib1 [...libN]
+#					DEFINES def1 [...defN]
+#					WITHOUT_EXCEPTIONS
+#					WITH_TEST
+#				)
+# Generic function to add a project of a certain type.
+# NAME
+#	The name of the project. It can also appear as LINK_LIBRARIES argument
+#	in one of the other projects to link against it, which is useful if TYPE
+#	is an ARCHIVE.
+# TYPE
+#	EXECUTABLE if the target should be an executable that can be run from the
+#	commandline
+#	STATIC if the target should be a static library that others can link against.
+#	MODULE if the target should be a shared module, which is supposed to be loaded
+#	by calls to dlopen().
+#	SHARED if the target should be a shared library that can be linked in by other
+#	executables (or libraries) using the system's linker at program startup.
+#	This is useful if the same code is used by multiple shared libararies or if
+#	you want to makes sure that certain objects only exist exactly once in a program.
+# LIBRARY_SUFFIX (optional)
+#	If set, the suffix will be used as file extension in case of 
+#	MODULE or SHARED library target's output names.
+#	If unset, the system default will be used.
+# LIBRARY_PREFIX (optional)
+#	If set, the string will be prefixed to the output names of MODULE or SHARED
+#	library targets.
+# SOURCE_FILES (optional, if SOURCE_DIRS is set)
+#	Explicit list of source files, relative to the current source directory
+# SOURCE_DIRS (optional, if SOURCE_FILES is set)
+#	A list of directories where source files should be searched recursively
+#	If no source dir is set, the current one will be used
+# INCLUDE_DIRS (optionsl)
+#	List directories to be added to the include path
+#	If no include directory is used, the current one will be used.
+# LIBRARY_DIRS
+#	List of directories in which the linker should look for libraries.
+# LINK_LIBRARIES
+#	List of library names that should be linked into your output file
+# DEFINES
+#	Defines that should be set for your project
+# WITHOUT_EXCEPTIONS
+#	If set, exceptions will be disabled.
+function(add_project)
+	cmake_parse_arguments(PROJECT 
+						"${ADD_PROJECT_NO_ARG_OPTS}"
+						"${ADD_PROJECT_SINGLE_ARG_OPTS}"
+						"${ADD_PROJECT_MULTI_ARG_OPTS}"
+						${ARGN})
+	
+	if(NOT PROJECT_NAME)
+		message(SEND_ERROR "NAME must be set")
+	endif()
+	
+	if (NOT PROJECT_TYPE)
+		message(SEND_ERROR "TYPE must be set")
+	endif()
+	
+	# FIGURE OUT TYPE
+	##################
+	if (${PROJECT_TYPE} MATCHES EXECUTABLE)
+		set(IS_EXECUTABLE YES)
+	elseif (${PROJECT_TYPE} MATCHES "STATIC|MODULE|SHARED")
+		set(IS_LIBRARY YES)
+	else()
+		message(SEND_ERROR "project TYPE ${PROJECT_TYPE} is not supported")
+	endif()
+	
+	# set source files
+	if(NOT PROJECT_SOURCE_FILES)
+		if(NOT PROJECT_SOURCE_DIRS)
+			set(PROJECT_SOURCE_DIRS .)
+		endif()
+		find_sourcefiles_recursive(PROJECT_SOURCE_FILES "${PROJECT_SOURCE_DIRS}")
+	endif()
+	
+	if(NOT PROJECT_INCLUDE_DIRS)
+		set(PROJECT_INCLUDE_DIRS .)
+	endif()
+	
+	if(NOT PROJECT_SOURCE_FILES)
+		message(SEND_ERROR "Did not find any source file, or no source file specified. Use the SOURCE_FILES or SOURCE_DIRS parameter")
+	endif()
+	
+	# For now, its just the same, maybe later its not ... 
+	set(PROJECT_ID ${PROJECT_NAME})
+	
+	# DIRECTORY LEVEL CONFIGURATION
+	################################
+	# Should only run once
+	include_directories(${PROJECT_INCLUDE_DIRS})
+	link_directories(${PROJECT_LIBRARY_DIRS})
+	
+	message(STATUS "Setting up ${PROJECT_NAME} (${PROJECT_TYPE})")
+	
+	# CREATE TARGET
+	###############
+	if (IS_EXECUTABLE)
+		add_executable(${PROJECT_ID}
+						${PROJECT_SOURCE_FILES})
+	else()
+		add_library(${PROJECT_ID}
+							${PROJECT_TYPE}
+							${PROJECT_SOURCE_FILES})
+	endif()
+	# TARGET LEVEL CONFIGURATION
+	#############################
+	append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}${MAYA_LIB_DIR}" YES)
+	if (${CMAKE_BUILD_TYPE} MATCHES Release AND UNIX AND NOT APPLE AND NOT ${PROJECT_TYPE} MATCHES STATIC)
+		append_to_target_property(${PROJECT_ID} LINK_FLAGS "-Wl,--strip-all,-O2" YES)
+	endif()
+	
+	if(PROJECT_WITHOUT_EXCEPTIONS AND UNIX)
+		# TODO: windows version ... 
+		append_to_target_property(${PROJECT_ID} COMPILE_FLAGS -fno-exceptions YES)
+	endif()
+	
+	target_link_libraries(${PROJECT_ID}
+									${PROJECT_LINK_LIBRARIES})
+	
+	if(PROJECT_DEFINES)
+		append_to_target_property(${PROJECT_ID} COMPILE_DEFINITIONS "${PROJECT_DEFINES}" NO)
+	endif()
+	
+	set_target_properties(${PROJECT_ID} PROPERTIES
+											OUTPUT_NAME 
+													${PROJECT_NAME}
+											PREFIX
+													${PROJECT_LIBRARY_PREFIX}
+											SUFFIX
+													${PROJECT_LIBRARY_SUFFIX}
+											CLEAN_DIRECT_OUTPUT 1)
+	
+	if (PROJECT_LIBRARY_SUFFIX)
+		set_target_properties(${PROJECT_ID} PROPERTIES
+											SUFFIX ${PROJECT_LIBRARY_SUFFIX})
+	endif()
+endfunction()
+
+
 # ======================================
 #add_maya_project(
 #					NAME name
@@ -70,32 +239,17 @@ endfunction()
 # MAYA_VERSIONS (optional)
 # 	one or more version of maya to use for headers and libraries, e.g. 2011, 2008
 # 	If unset, the globally configured list of maya versions is used
-# SOURCE_FILES (optional, if SOURCE_DIRS is set)
-#	Explicit list of source files, relative to the current source directory
-# SOURCE_DIRS (optional, if SOURCE_FILES is set)
-#	A list of directories where source files should be searched recursively
-#	If no source dir is set, the current one will be used
-# INCLUDE_DIRS (optionsl)
-#	List directories to be added to the include path
-#	If no include directory is used, the current one will be used.
-# LIBRARY_DIRS
-#	List of directories in which the linker should look for libraries.
-# LINK_LIBRARIES
-#	List of library names that should be linked into your output file
-# DEFINES
-#	Defines that should be set for your project
-# WITHOUT_EXCEPTIONS
-#	If set, exceptions will be disabled.
 # WITH_TEST
 #	If set, a python based test will be run which loads your compiled plugin.
 #	In your mrv/nose test implementation, you will have to verify that your plugin
 #	is loaded.
+# All other arguments are documented in the add_project method
 # ======================================
 function(add_maya_project)
 	cmake_parse_arguments(PROJECT 
-						"WITH_TEST;WITHOUT_EXCEPTIONS"
-						"NAME"
-						"MAYA_VERSIONS;SOURCE_FILES;SOURCE_DIRS;INCLUDE_DIRS;LIBRARY_DIRS;LINK_LIBRARIES;DEFINES"
+						"WITH_TEST;${ADD_PROJECT_NO_ARG_OPTS}"
+						"${ADD_PROJECT_SINGLE_ARG_OPTS}"
+						"MAYA_VERSIONS;${ADD_PROJECT_MULTI_ARG_OPTS}"
 						${ARGN})
 	
 	if(NOT PROJECT_NAME)
@@ -152,6 +306,9 @@ function(add_maya_project)
 		set(INCL_DIR_FLAG "-I")
 	endif()
 	
+	# TODO: just build an arglist for the more generic ADD_PROJECT - put our code around it.
+	# Building argument lists is somewhat of a hassle, so we leave the working, but redundant code ... 
+	
 	# DIRECTORY LEVEL CONFIGURATION
 	################################
 	# Should only run once
@@ -191,7 +348,7 @@ function(add_maya_project)
 		
 		set(LATEST_MAYA_INCLUDE_DIR ${MAYA_INCLUDE_DIR})
 		
-		message(STATUS "Building project ${PROJECT_NAME} for maya ${MAYA_VERSION}")
+		message(STATUS "Setting up ${PROJECT_NAME} for maya ${MAYA_VERSION}")
 		# CREATE TARGET
 		###############
 		add_library(${PROJECT_ID}
