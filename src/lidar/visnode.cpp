@@ -57,7 +57,7 @@ MObject LidarVisNode::aGlPointSize;
 MObject LidarVisNode::aIntensityScale;
 MObject LidarVisNode::aTranslateToOrigin;
 MObject LidarVisNode::aUseMMap;
-MObject LidarVisNode::aUseDisplayList;
+MObject LidarVisNode::aUseDisplayCache;
 MObject LidarVisNode::aDisplayMode;
 
 
@@ -92,7 +92,6 @@ const MMatrix LidarVisNode::convert_z_up_to_y_up_column_major(_initializer);
 LidarVisNode::LidarVisNode()
     : m_gl_point_size(1.0f)
 	, m_intensity_scale(1.0f)
-	, m_display_list(0)
 {}
 
 LidarVisNode::~LidarVisNode()
@@ -133,16 +132,17 @@ MStatus LidarVisNode::initialize()
 	numFn.setAffectsWorldSpace(true);
 	numFn.setInternal(true);
 	
-	aUseDisplayList = numFn.create("useDisplayCache", "udc", MFnNumericData::kBoolean, 0, &status);
+	aUseDisplayCache = numFn.create("useDisplayCache", "udc", MFnNumericData::kBoolean, 0, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
 	numFn.setInternal(true);
 	
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
+	mfnEnum.addField("NoColor", (int)DMNoColor);
 	mfnEnum.addField("Intensity", (int)DMIntensity);
 	mfnEnum.addField("ReturnNumber", (int)DMReturnNumber);
 	mfnEnum.addField("ReturnNumberIntensified", (int)DMReturnNumberIntensity);
 	
-	mfnEnum.setDefault((short)DMReturnNumberIntensity);
+	mfnEnum.setDefault((short)DMNoColor);
 	mfnEnum.setKeyable(true);
 	
 	aIntensityScale = numFn.create("intensityScale", "iscale", MFnNumericData::kFloat, 1.0);
@@ -215,7 +215,7 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aIntensityScale));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aTranslateToOrigin))
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseMMap));
-	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseDisplayList));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseDisplayCache));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aDisplayMode));
 	
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aNeedsCompute));
@@ -250,7 +250,9 @@ MStatus LidarVisNode::initialize()
 	
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aTranslateToOrigin,	aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseDisplayCache,	aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,		aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aTranslateToOrigin,aNeedsCompute));
 	return MS::kSuccess;
 }
 
@@ -304,6 +306,50 @@ void LidarVisNode::reset_caches()
 {
 	m_bbox = MBoundingBox();
 	m_compensation_column_major.setToIdentity();
+	reset_draw_caches();
+}
+
+void LidarVisNode::reset_draw_caches()
+{
+	// totally clear even the reserved memory
+	m_col_cache = ColCache();
+	m_pos_cache = PosCache();
+}
+
+void LidarVisNode::update_draw_cache(MDataBlock &data)
+{
+	if (m_las_stream.get() == 0) {
+		return;
+	}
+	assert(m_las_stream->status() == LAS_IStream::Success);
+	
+	if (m_las_stream->reset_point_iteration() != LAS_IStream::Success) {
+		return;
+	}
+	
+	const DisplayMode mode = static_cast<const DisplayMode>(data.outputValue(aDisplayMode).asInt());
+	m_pos_cache.resize(m_las_stream->header().num_point_records);
+	if (mode != DMNoColor) {
+		m_col_cache.resize(m_las_stream->header().num_point_records);
+	} else {
+		m_col_cache = ColCache();
+	}
+	
+	LAS_Types::PointDataRecord1 p;
+	
+	const PosCache::iterator pend = m_pos_cache.end();
+	if (mode == DMNoColor) {
+		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && m_las_stream->read_next_point(p) == LAS_IStream::Success; ++pit) {
+			pit->init_from_point(p);
+		}
+	} else {
+		const ColCache::iterator cend = m_col_cache.end();
+		ColCache::iterator cit = m_col_cache.begin();
+		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && m_las_stream->read_next_point(p) == LAS_IStream::Success; ++pit, ++cit) {
+			pit->init_from_point(p);
+			color_point(p, *cit, mode);
+		}
+	}
 }
 
 void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
@@ -322,7 +368,39 @@ void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
 	m_bbox = MBoundingBox(
 							MPoint(hdr.min_x, hdr.min_y, hdr.min_z) * m_compensation_column_major,
 							MPoint(hdr.max_x, hdr.max_y, hdr.max_z) * m_compensation_column_major
-						);
+				 );
+}
+
+void LidarVisNode::color_point(LAS_Types::PointDataRecord0 &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+{
+	static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
+	switch(mode)
+	{
+	case DMNoColor: break;
+	case DMIntensity:
+	{
+		const uint16_t intensity = p.intensity * m_intensity_scale; 
+		dc.col[0] = intensity;
+		dc.col[1] = intensity;
+		dc.col[2] = intensity;
+		break;
+	}
+	case DMReturnNumber:
+	{
+		dc.col[0] = p.return_number() * scale_3_to_16;
+		dc.col[1] = p.num_returns() * scale_3_to_16;
+		dc.col[2] = p.return_number() * scale_3_to_16;
+		break;
+	}
+	case DMReturnNumberIntensity:
+	{
+		const uint16_t intensity = p.intensity * m_intensity_scale; 
+		dc.col[0] = p.return_number() * scale_3_to_16 + intensity;
+		dc.col[1] = p.num_returns() * scale_3_to_16 + intensity;
+		dc.col[2] = p.return_number() * scale_3_to_16 + intensity;
+		break;
+	}
+	};// end color handler
 }
 
 bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx)
@@ -339,9 +417,10 @@ bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandl
 	} else if (plug == aIntensityScale) {
 		m_intensity_scale = dataHandle.asFloat();
 	} else if (plug == aTranslateToOrigin) {
+		// Have to do the update right when it happens as otherwise, we might not realize soon enough
+		// that there is a new bbox if the update is triggered by the drawing itself, which is heavily
+		// affected by the bbox !
 		update_compensation_matrix_and_bbox(dataHandle.asBool());
-	} else if (plug == aUseDisplayList) {
-		m_use_display_list = dataHandle.asBool();
 	}
 	
 	return false;
@@ -358,13 +437,22 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 		MDataHandle ncHandle = data.outputValue(aNeedsCompute);
 		// indicate error right awway
 		ncHandle.setInt(1);
-		if (m_las_stream.get() == 0) {
-			reset_caches();
-			return MS::kSuccess;
-		}
 		
 		// Update caches which would be relevant for drawing !
-		assert(m_las_stream->status() == LAS_IStream::Success);
+		if (data.outputValue(aUseDisplayCache).asBool()) {
+			if (m_las_stream.get() == 0) {
+				reset_caches();
+				return MS::kSuccess;
+			}
+			// NOTE: could only update colors if required, and release the stream
+			// Currently it will re-read the positions as well, which is not required !
+			// However, it probably doesn't matter in terms of IO, except that we would 
+			// save a little MemoryIO
+			update_draw_cache(data);
+		} else {
+			// free all data
+			reset_draw_caches();
+		}
 		
 		// indicate everything is fine
 		m_error.clear();
@@ -413,7 +501,7 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 {
 	// make sure we are uptodate - trigger compute
 	MPlug(thisMObject(), aNeedsCompute).asInt();
-	const DisplayMode mode = static_cast<DisplayMode>(MPlug(thisMObject(), aDisplayMode).asInt());
+	const DisplayMode mode = static_cast<const DisplayMode>(MPlug(thisMObject(), aDisplayMode).asInt());
 	
 	view.beginGL();
 	if (m_error.length()) {
@@ -435,109 +523,53 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 			goto finish_drawing;
 		}
 		
-		
-		assert(m_las_stream.get());
-		LAS_IStream& las_stream = *m_las_stream.get();
-		if (las_stream.reset_point_iteration() != LAS_IStream::Success) {
-			m_error = "could not initialize LAS stream for iteration";
-			goto finish_drawing;
-		}
-		
-		LAS_Types::PointDataRecord1 p;
-		
 		glf->glPointSize(m_gl_point_size);
 		glf->glPushMatrix();
 		glf->glMultMatrixd(&m_compensation_column_major.matrix[0][0]);
-		
-		// HANDLE DISPLAY LIST
-		//////////////////////
-		bool use_draw_list = false;
-		if (m_use_display_list) {
-			if (m_display_list == 0) {
-				// genLists must not be between glBegin and glEnd
-				m_display_list = glf->glGenLists(1);
-				// if this doesn't work, we will just keep drawing as usual ... and retry and retry ...
-				if (m_display_list == 0) {
-					// so we inform about it at least
-					MPlug(thisMObject(), aUseDisplayList).setBool(false);
-				} else {
-					glf->glNewList(m_display_list, MGL_COMPILE_AND_EXECUTE);
-					// just continue executing the drawing code to fill the list
-				}
-			} else {
-				use_draw_list = true;
-			}
-		} else {
-			if (m_display_list != 0) {
-				glf->glDeleteLists(m_display_list, 1);
-				m_display_list = 0;
-			}
-		}
-		
-		glf->glBegin(MGL_POINTS);
 		{
-			static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
-			if (use_draw_list) {
-				assert(m_display_list);
-				glf->glCallList(m_display_list);
-			} else {
-				// PERFORM DRAWING
-				///////////////////
-				while (las_stream.read_next_point(p) == LAS_IStream::Success) {
-					// setup color
-					switch(mode)
-					{
-					case DMIntensity:
-					{
-						const uint16_t intensity = p.intensity * m_intensity_scale; 
-						glf->glColor3us(intensity, intensity, intensity);
-						break;
+			if (m_pos_cache.size()) {
+				glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
+				glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
+				{
+					glf->glEnableClientState(MGL_VERTEX_ARRAY);
+					glf->glVertexPointer(3, MGL_INT, 0, m_pos_cache.data());
+					if (m_col_cache.size()) {
+						glf->glEnableClientState(MGL_COLOR_ARRAY);
+						glf->glColorPointer(3, MGL_UNSIGNED_SHORT, 0, m_col_cache.data());
 					}
-					case DMReturnNumber:
-					{
-						glf->glColor3us(p.return_number() * scale_3_to_16, 
-										p.num_returns() * scale_3_to_16, 
-										p.return_number() * scale_3_to_16);
-						break;
-					}
-					case DMReturnNumberIntensity:
-					{
-						const uint16_t intensity = p.intensity * m_intensity_scale; 
-						glf->glColor3us(p.return_number() * scale_3_to_16 + intensity, 
-										p.num_returns() * scale_3_to_16 + intensity, 
-										p.return_number() * scale_3_to_16 + intensity);
-						break;
-					}
-					};// end color handler
 					
-					glf->glVertex3iv(reinterpret_cast<const MGLint*>(&p.x));
-				}// end while iterating points
-				
-				if (m_display_list) {
-					glf->glEndList();
+					glf->glDrawArrays(MGL_POINTS, 0, m_pos_cache.size());
+					if (glf->glGetError() != 0) {
+						m_error = "display cache not supported";
+						MPlug(thisMObject(), aUseDisplayCache).setBool(false);
+					}
 				}
-			}// end handle use draw list
+				glf->glPopAttrib();
+				glf->glPopClientAttrib();
+			} else {
+				assert(m_las_stream.get());
+				LAS_IStream& las_stream = *m_las_stream.get();
+				if (las_stream.reset_point_iteration() != LAS_IStream::Success) {
+					m_error = "could not initialize LAS stream for iteration";
+					goto finish_drawing;
+				}
+				
+				LAS_Types::PointDataRecord1 p;
+				glf->glBegin(MGL_POINTS);
+				{
+					// PERFORM DRAWING
+					///////////////////
+					DrawCol dc;
+					while (las_stream.read_next_point(p) == LAS_IStream::Success) {
+						color_point(p ,dc, mode);
+						glf->glColor3usv(dc.col);
+						glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+					}// end while iterating points
+				}
+				glf->glEnd();
+			}// end handle caching
 		}
-		glf->glEnd();
 		glf->glPopMatrix();
-		
-		
-		
-		/*
-		glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
-		glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
-		{
-			glf->glEnableClientState(MGL_VERTEX_ARRAY);
-			glf->glVertexPointer(3, MGL_FLOAT, 0, m_sample_pos.data());
-			glf->glEnableClientState(MGL_COLOR_ARRAY);
-			glf->glColorPointer(3, MGL_FLOAT, 0, m_sample_col.data());
-			
-			glf->glPointSize(m_gl_point_size);
-			glf->glDrawArrays(MGL_POINTS, 0, m_sample_pos.size());
-		}
-		glf->glPopAttrib();
-		glf->glPopClientAttrib();
-		*/
 	}
 	
 finish_drawing:

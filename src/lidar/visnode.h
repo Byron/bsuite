@@ -26,6 +26,7 @@
 
 #include <fstream>
 #include <auto_ptr.h>
+#include <vector>
 
 
 //! Node helping to visualize lidar data
@@ -35,10 +36,30 @@ class LidarVisNode : public MPxLocatorNode
 	
 	enum DisplayMode
 	{
-		DMIntensity = 0,			//!< display intensity as RGB
+		DMNoColor = 0,				//!< performance mode whcih saves individual color calls to ogl
+		DMIntensity,				//!< display intensity as RGB
 		DMReturnNumber,				//!< display return number as RGB
 		DMReturnNumberIntensity		//!< mix return number with intensity as RGB
 	};
+	
+	struct DrawCol
+	{
+		MGLushort	col[3];			//!< color triplet
+	};
+	struct DrawPos
+	{
+		MGLint		pos[3];			//!< position vector
+		
+		inline
+		void		init_from_point(const LAS_Types::PointDataRecord0& p) {
+			pos[0] = p.x;
+			pos[1] = p.y;
+			pos[2] = p.z;
+		}
+	};
+	
+	typedef std::vector<DrawCol>			ColCache;
+	typedef std::vector<DrawPos>			PosCache;
 	
 	public:
 		LidarVisNode();
@@ -61,7 +82,11 @@ class LidarVisNode : public MPxLocatorNode
 		void reset_output_attributes(MDataBlock &data);	//!< reset all output attributes to their initial values
 		bool renew_las_reader(const MString& filepath);	//!< initialize our reader with a new file
 		void reset_caches();							//!< clear all caches
+		void reset_draw_caches();						//!< clear draw caches only
+		void update_draw_cache(MDataBlock &data);	//!< fill in the draw cache
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
+		
+		inline void color_point(LAS_Types::PointDataRecord0& p, DrawCol &dc, const DisplayMode mode) const;
 		
 	protected:
 		// Input attributes
@@ -70,7 +95,7 @@ class LidarVisNode : public MPxLocatorNode
 		static MObject aIntensityScale;			//!< scales the intensity by the given amount
 		static MObject aTranslateToOrigin;		//!< if true, the point samples will be translated back to the origin
 		static MObject aUseMMap;				//!< if true, we should use memory mapping (non-windows only !)
-		static MObject aUseDisplayList;			//!< if true, all data will be cached on the gpu
+		static MObject aUseDisplayCache;			//!< if true, all data will be cached on the gpu
 		static MObject aDisplayMode;			//!< display mode enumeration
 		
 		// output attributes
@@ -95,14 +120,15 @@ class LidarVisNode : public MPxLocatorNode
 		MGLfloat		m_gl_point_size;		//!< size of a point when drawing (cache)
 		MBoundingBox	m_bbox;					//!< bounding box cache
 		float			m_intensity_scale;		//!< value to scale the intensity with
-		bool			m_use_display_list;		//!< true if we should use display lists
-		MGLuint			m_display_list;			//!< id of the display list we use for speedup
 		
 		std::auto_ptr<LAS_IStream>		m_las_stream;	//!< pointer to las reader
 		std::ifstream					m_ifstream;		//!< file for reading samples
 		
 		static const MMatrix	convert_z_up_to_y_up_column_major;	//!< matrix to convert z up to y up
-		MMatrix			m_compensation_column_major;	//!< column major compensation matrix for use by ogl
+		MMatrix					m_compensation_column_major;	//!< column major compensation matrix for use by ogl
+		
+		ColCache				m_col_cache;	//!< cache keeping color of records
+		PosCache				m_pos_cache;	//!< cache keeping position of records
 };
 
 #endif
