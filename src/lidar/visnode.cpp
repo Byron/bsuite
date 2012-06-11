@@ -141,6 +141,7 @@ MStatus LidarVisNode::initialize()
 	mfnEnum.addField("Intensity", (int)DMIntensity);
 	mfnEnum.addField("ReturnNumber", (int)DMReturnNumber);
 	mfnEnum.addField("ReturnNumberIntensified", (int)DMReturnNumberIntensity);
+	mfnEnum.addField("StoredColor", (int)DMStoredColor);
 	
 	mfnEnum.setDefault((short)DMNoColor);
 	mfnEnum.setKeyable(true);
@@ -360,7 +361,7 @@ inline void LidarVisNode::update_point_cache(const DisplayMode mode)
 		ColCache::iterator cit = m_col_cache.begin();
 		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && m_las_stream->read_next_point(p) == yalas::IStream::Success; ++pit, ++cit) {
 			pit->init_from_point(p);
-			color_point(p, *cit, mode);
+			color_point<format_id>(p, *cit, mode);
 		}
 	}
 }
@@ -384,12 +385,38 @@ void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
 				 );
 }
 
+
 template <uint8_t format_id>
-void LidarVisNode::color_point(yalas::types::point_data_record<format_id> &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point(const yalas::types::point_data_record<format_id>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+{
+	// no rgb by default
+	color_point_no_rgb(p, dc, mode);
+}
+
+template <>
+void LidarVisNode::color_point<2>(const yalas::types::point_data_record<2>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+{
+	color_point_with_rgb_info(p, dc, mode);
+}
+
+template <>
+void LidarVisNode::color_point<3>(const yalas::types::point_data_record<3>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+{
+	color_point_with_rgb_info(p, dc, mode);
+}
+
+template <>
+void LidarVisNode::color_point<5>(const yalas::types::point_data_record<5>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+{
+	color_point_with_rgb_info(p, dc, mode);
+}
+
+void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
 {
 	static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
 	switch(mode)
 	{
+	case DMStoredColor: break;
 	case DMNoColor: break;
 	case DMIntensity:
 	{
@@ -415,6 +442,26 @@ void LidarVisNode::color_point(yalas::types::point_data_record<format_id> &p, Dr
 		break;
 	}
 	};// end color handler
+}
+
+template <typename PointType>
+void LidarVisNode::color_point_with_rgb_info(const PointType &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+{
+	switch(mode)
+	{
+	case DMStoredColor:
+	{
+		dc.col[0] = p.red * 256;
+		dc.col[1] = p.green * 256;
+		dc.col[2] = p.blue * 256;
+		break;
+	}
+	default:
+	{
+		color_point_no_rgb(p, dc, mode);
+		break;
+	}
+	};
 }
 
 bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle &dataHandle, MDGContext &ctx)
@@ -608,7 +655,7 @@ void LidarVisNode::draw_point_records(MGLFunctionTable* glf, yalas::IStream& las
 	yalas::types::point_data_record<format_id> p;
 	
 	while (las_stream.read_next_point(p) == yalas::IStream::Success) {
-		color_point(p ,dc, mode);
+		color_point<format_id>(p ,dc, mode);
 		glf->glColor3usv(dc.col);
 		glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
 	}// end while iterating points

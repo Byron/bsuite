@@ -298,7 +298,7 @@ struct PointDataRecord4 : public PointDataRecord1, public WaveformInfo
 };
 
 // Point structure with GPS and color and Waveform packet info
-struct PointDataRecord5 : public PointDataRecord3, WaveformInfo
+struct PointDataRecord5 : public PointDataRecord3, public WaveformInfo
 {
 	static const size_t record_size = PointDataRecord3::record_size + WaveformInfo::record_size;
 	static const uint8_t format_id = 5;

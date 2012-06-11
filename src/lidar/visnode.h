@@ -42,7 +42,8 @@ class LidarVisNode : public MPxLocatorNode
 		DMNoColor = 0,				//!< performance mode whcih saves individual color calls to ogl
 		DMIntensity,				//!< display intensity as RGB
 		DMReturnNumber,				//!< display return number as RGB
-		DMReturnNumberIntensity		//!< mix return number with intensity as RGB
+		DMReturnNumberIntensity,	//!< mix return number with intensity as RGB
+		DMStoredColor				//!< display the stored color if possible
 	};
 	
 	struct DrawCol
@@ -90,7 +91,10 @@ class LidarVisNode : public MPxLocatorNode
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
 		
 		template <uint8_t format_id>
-		inline void color_point(yalas::types::point_data_record<format_id>& p, DrawCol &dc, const DisplayMode mode) const;
+		inline void color_point(const yalas::types::point_data_record<format_id>& p, DrawCol &dc, const DisplayMode mode) const;
+		inline void color_point_no_rgb(const yalas::types::PointDataRecord0& p, DrawCol &dc, const DisplayMode mode) const;
+		template <typename PointType>
+		inline void color_point_with_rgb_info(const PointType& p, DrawCol &dc, const DisplayMode mode) const;
 		
 		template <uint8_t format_id>
 		inline void draw_point_records(MGLFunctionTable* glf, yalas::IStream& las_stream, const DisplayMode mode) const;
