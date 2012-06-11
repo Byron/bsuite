@@ -26,6 +26,7 @@
 
 #include <fstream>
 #include <auto_ptr.h>
+#include <vector>
 
 
 //! Node helping to visualize lidar data
@@ -35,10 +36,30 @@ class LidarVisNode : public MPxLocatorNode
 	
 	enum DisplayMode
 	{
-		DMIntensity = 0,			//!< display intensity as RGB
+		DMNoColor = 0,				//!< performance mode whcih saves individual color calls to ogl
+		DMIntensity,				//!< display intensity as RGB
 		DMReturnNumber,				//!< display return number as RGB
 		DMReturnNumberIntensity		//!< mix return number with intensity as RGB
 	};
+	
+	struct DrawCol
+	{
+		MGLushort	col[3];			//!< color triplet
+	};
+	struct DrawPos
+	{
+		MGLint		pos[3];			//!< position vector
+		
+		inline
+		void		init_from_point(const LAS_Types::PointDataRecord0& p) {
+			pos[0] = p.x;
+			pos[1] = p.y;
+			pos[2] = p.z;
+		}
+	};
+	
+	typedef std::vector<DrawCol>			ColCache;
+	typedef std::vector<DrawPos>			PosCache;
 	
 	public:
 		LidarVisNode();
@@ -61,8 +82,11 @@ class LidarVisNode : public MPxLocatorNode
 		void reset_output_attributes(MDataBlock &data);	//!< reset all output attributes to their initial values
 		bool renew_las_reader(const MString& filepath);	//!< initialize our reader with a new file
 		void reset_caches();							//!< clear all caches
+		void reset_draw_caches();						//!< clear draw caches only
+		void update_draw_cache(MDataBlock &data);	//!< fill in the draw cache
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
-		inline void color_point(LAS_Types::PointDataRecord0& p, MGLushort col[3], const DisplayMode mode) const;
+		
+		inline void color_point(LAS_Types::PointDataRecord0& p, DrawCol &dc, const DisplayMode mode) const;
 		
 	protected:
 		// Input attributes
@@ -101,7 +125,10 @@ class LidarVisNode : public MPxLocatorNode
 		std::ifstream					m_ifstream;		//!< file for reading samples
 		
 		static const MMatrix	convert_z_up_to_y_up_column_major;	//!< matrix to convert z up to y up
-		MMatrix			m_compensation_column_major;	//!< column major compensation matrix for use by ogl
+		MMatrix					m_compensation_column_major;	//!< column major compensation matrix for use by ogl
+		
+		ColCache				m_col_cache;	//!< cache keeping color of records
+		PosCache				m_pos_cache;	//!< cache keeping position of records
 };
 
 #endif
