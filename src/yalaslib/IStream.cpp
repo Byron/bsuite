@@ -71,7 +71,7 @@ void IStream::read_header()
 	read_n(_istream, _header.start_of_waveform_data_packet_record);
 	
 	
-	if (_header.point_data_format_id > 4) {
+	if (_header.point_data_format_id > 5) {
 		_status = UnsupportedPointDataFormat;
 		return;
 	}
