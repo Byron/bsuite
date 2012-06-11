@@ -53,6 +53,8 @@ global proc AElidarVisNodeTemplate(string $nodeName)
 						-addControl "intensityScale";
 		editorTemplate -ann "If true, the point cloud will be moved to the origin of the locator"
 						-addControl "translateToOrigin";
+		editorTemplate -ann "If true, in StoredColors display mode, these will be normalized from 8 to 16 bit. Use it in case your colors are too dark"
+						-addControl "normalizeStoredColors";
 		
 	}
 	editorTemplate -endLayout;

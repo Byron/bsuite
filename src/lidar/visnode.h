@@ -109,7 +109,8 @@ class LidarVisNode : public MPxLocatorNode
 		static MObject aIntensityScale;			//!< scales the intensity by the given amount
 		static MObject aTranslateToOrigin;		//!< if true, the point samples will be translated back to the origin
 		static MObject aUseMMap;				//!< if true, we should use memory mapping (non-windows only !)
-		static MObject aUseDisplayCache;			//!< if true, all data will be cached on the gpu
+		static MObject aUseDisplayCache;		//!< if true, all data will be cached on the gpu
+		static MObject aNormalizeStoredCols;		//!< if true, stored colors will be upscaled to 16 bit - only necessary if stored normalized to 8 bit
 		static MObject aDisplayMode;			//!< display mode enumeration
 		
 		// output attributes
@@ -134,6 +135,7 @@ class LidarVisNode : public MPxLocatorNode
 		MGLfloat		m_gl_point_size;		//!< size of a point when drawing (cache)
 		MBoundingBox	m_bbox;					//!< bounding box cache
 		float			m_intensity_scale;		//!< value to scale the intensity with
+		bool			m_normalize_stored_cols;//!< if true, we will normalize stored colors which is not the case in all files !
 		
 		std::auto_ptr<yalas::IStream>	m_las_stream;	//!< pointer to las reader
 		std::ifstream					m_ifstream;		//!< file for reading samples

@@ -59,7 +59,7 @@ MObject LidarVisNode::aTranslateToOrigin;
 MObject LidarVisNode::aUseMMap;
 MObject LidarVisNode::aUseDisplayCache;
 MObject LidarVisNode::aDisplayMode;
-
+MObject LidarVisNode::aNormalizeStoredCols;
 
 // output attributes
 MObject LidarVisNode::aOutSystemIdentifier;
@@ -92,6 +92,7 @@ const MMatrix LidarVisNode::convert_z_up_to_y_up_column_major(_initializer);
 LidarVisNode::LidarVisNode()
     : m_gl_point_size(1.0f)
 	, m_intensity_scale(1.0f)
+	, m_normalize_stored_cols(false)
 {}
 
 LidarVisNode::~LidarVisNode()
@@ -135,6 +136,11 @@ MStatus LidarVisNode::initialize()
 	aUseDisplayCache = numFn.create("useDisplayCache", "udc", MFnNumericData::kBoolean, 0, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
 	numFn.setInternal(true);
+	
+	aNormalizeStoredCols = numFn.create("normalizeStoredColors", "nscol", MFnNumericData::kBoolean, 0, &status);
+	CHECK_MSTATUS_AND_RETURN_IT(status);
+	numFn.setInternal(true);
+	
 	
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
 	mfnEnum.addField("NoColor", (int)DMNoColor);
@@ -217,6 +223,7 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aTranslateToOrigin))
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseMMap));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseDisplayCache));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aNormalizeStoredCols));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aDisplayMode));
 	
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aNeedsCompute));
@@ -253,6 +260,8 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseDisplayCache,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,		aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aNormalizeStoredCols, aNeedsCompute));
+	
 	return MS::kSuccess;
 }
 
@@ -327,15 +336,23 @@ void LidarVisNode::update_draw_cache(MDataBlock &data)
 		return;
 	}
 	
-	const DisplayMode mode = static_cast<const DisplayMode>(data.outputValue(aDisplayMode).asInt());
+	DisplayMode mode = static_cast<const DisplayMode>(data.outputValue(aDisplayMode).asInt());
+	const uint8_t fmt = m_las_stream->header().point_data_format_id;
+	
+	// Sanity check - if people try to use stored color in files that don't have it, reset the mode
+	if (mode == DMStoredColor && fmt != 2 && fmt != 3 && fmt != 5) {
+		data.outputValue(aDisplayMode).setInt(DMNoColor);
+		mode = DMNoColor;
+	}
+	
 	m_pos_cache.resize(m_las_stream->header().num_point_records);
-	if (mode != DMNoColor) {
+	if (mode != DMNoColor ) {
 		m_col_cache.resize(m_las_stream->header().num_point_records);
 	} else {
 		m_col_cache = ColCache();
 	}
 	
-	switch(m_las_stream->header().point_data_format_id)
+	switch(fmt)
 	{
 	case 0: update_point_cache<0>(mode); break;
 	case 1: update_point_cache<1>(mode); break;
@@ -386,13 +403,14 @@ void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
 }
 
 
+// no rgb by default
 template <uint8_t format_id>
 void LidarVisNode::color_point(const yalas::types::point_data_record<format_id>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
 {
-	// no rgb by default
 	color_point_no_rgb(p, dc, mode);
 }
 
+// format 2, 3 and 5 have rgb info !
 template <>
 void LidarVisNode::color_point<2>(const yalas::types::point_data_record<2>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
 {
@@ -416,7 +434,7 @@ void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, D
 	static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
 	switch(mode)
 	{
-	case DMStoredColor: break;
+	case DMStoredColor: break;	//! handle it like no color in no-rgb mode
 	case DMNoColor: break;
 	case DMIntensity:
 	{
@@ -451,9 +469,16 @@ void LidarVisNode::color_point_with_rgb_info(const PointType &p, DrawCol& dc, co
 	{
 	case DMStoredColor:
 	{
-		dc.col[0] = p.red * 256;
-		dc.col[1] = p.green * 256;
-		dc.col[2] = p.blue * 256;
+		if (m_normalize_stored_cols) {
+			// assume its normalized to 8 bit, instead of 16
+			dc.col[0] = p.red * 256;
+			dc.col[1] = p.green * 256;
+			dc.col[2] = p.blue * 256;
+		} else {
+			dc.col[0] = p.red;
+			dc.col[1] = p.green;
+			dc.col[2] = p.blue;
+		}
 		break;
 	}
 	default:
@@ -482,6 +507,8 @@ bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandl
 		// that there is a new bbox if the update is triggered by the drawing itself, which is heavily
 		// affected by the bbox !
 		update_compensation_matrix_and_bbox(dataHandle.asBool());
+	} else if (plug == aNormalizeStoredCols) {
+		m_normalize_stored_cols = dataHandle.asBool();
 	}
 	
 	return false;
@@ -654,11 +681,17 @@ void LidarVisNode::draw_point_records(MGLFunctionTable* glf, yalas::IStream& las
 	DrawCol dc;
 	yalas::types::point_data_record<format_id> p;
 	
-	while (las_stream.read_next_point(p) == yalas::IStream::Success) {
-		color_point<format_id>(p ,dc, mode);
-		glf->glColor3usv(dc.col);
-		glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
-	}// end while iterating points
+	if (mode == DMNoColor) {
+		while (las_stream.read_next_point(p) == yalas::IStream::Success) {
+			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+		}// end while iterating points
+	} else {
+		while (las_stream.read_next_point(p) == yalas::IStream::Success) {
+			color_point<format_id>(p ,dc, mode);
+			glf->glColor3usv(dc.col);
+			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+		}// end while iterating points
+	}
 }
 
 MBoundingBox LidarVisNode::boundingBox() const
