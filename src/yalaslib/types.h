@@ -314,6 +314,42 @@ struct PointDataRecord5 : public PointDataRecord3, WaveformInfo
 	
 };
 
+//! A generic point data record which can be specialized to the actual format you need.
+template <uint8_t format_id>
+struct point_data_record
+{
+};
+
+template <>
+struct point_data_record<0> : public PointDataRecord0
+{
+};
+
+template <>
+struct point_data_record<1> : public PointDataRecord1
+{
+};
+
+template <>
+struct point_data_record<2> : public PointDataRecord2
+{
+};
+
+template <>
+struct point_data_record<3> : public PointDataRecord3
+{
+};
+
+template <>
+struct point_data_record<4> : public PointDataRecord4
+{
+};
+
+template <>
+struct point_data_record<5> : public PointDataRecord5
+{
+};
+
 
 }// end LASTypes
 }// END yalas

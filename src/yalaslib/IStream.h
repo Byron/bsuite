@@ -27,84 +27,82 @@
 namespace yalas
 {
 
-	// A utillity reading a LAS file from a stream.
-	class IStream
-	{
-		public:
+// A utillity reading a LAS file from a stream.
+class IStream
+{
+	public:
+		
+		enum Status
+		{
+			Success = 0,
+			Invalid,
 			
-			enum Status
-			{
-				Success = 0,
-				Invalid,
-				
-				InvalidHeader,				//!< Header could not be read or not a LAS file
-				UnexpectedHeaderAlignment,
-				UnsupportedPointDataFormat,
-				StreamFailure
-			};
+			InvalidHeader,				//!< Header could not be read or not a LAS file
+			UnexpectedHeaderAlignment,
+			UnsupportedPointDataFormat,
+			StreamFailure
+		};
+		
+	protected:
+		std::istream&		_istream;
+		Status				_status;
+		types::Header13		_header;
+		
+		
+		
+	private:
+		void			read_header();
+		
+	public:
+		//! Intialize this instance with the given input stream.
+		//! It is assumed to be open already and ready for reading.
+		//! \note the stream will not be closed when this instance 
+		//! is destroyed, this is up to the user
+		IStream(std::istream& instream);
+		
+	public:
+		
+		inline
+		Status	status() const {
+			return _status;
+		}
+		
+		inline
+		const types::Header13&	header() const {
+			return _header;
+		}
+		
+		//! Call this to set the instance to begin iterating on point records.
+		//! You may only call read_next_point() if this method was called.
+		//! \return Status to indicate success or failure
+		//! \note you may call this method each time you want to restart iterating all samples.
+		Status reset_point_iteration();
+		
+		//! Read the next point record from the stream
+		//! Note that the point type you are using must match the format specified 
+		//! in the header.
+		template <typename PointType>
+		inline
+		Status read_next_point(PointType& p)
+		{
+			char buf[PointType::record_size];	// point format 1
+			assert(sizeof(buf) == _header.point_data_record_length);
+			assert(PointType::format_id == _header.point_data_format_id);
 			
-		protected:
-			std::istream&		_istream;
-			Status				_status;
-			types::Header13		_header;
+			// stream exceptions are enabled
+			_istream.read(reinterpret_cast<char*>(&buf), sizeof(buf));
 			
-			
-			
-		private:
-			void			read_header();
-			
-		public:
-			//! Intialize this instance with the given input stream.
-			//! It is assumed to be open already and ready for reading.
-			//! \note the stream will not be closed when this instance 
-			//! is destroyed, this is up to the user
-			IStream(std::istream& instream);
-			
-		public:
-			
-			inline
-			Status	status() const {
-				return _status;
+			if (_istream.eof()) {
+				return StreamFailure;
+			} else if (_istream.fail()) {
+				_status = StreamFailure;
+			} else {
+				p.init_from_raw(buf);
+				p.adjust_coordinate(&_header.x_scale,& _header.x_offset);
 			}
-			
-			inline
-			const types::Header13&	header() const {
-				return _header;
-			}
-			
-			//! Call this to set the instance to begin iterating on point records.
-			//! You may only call read_next_point() if this method was called.
-			//! \return Status to indicate success or failure
-			//! \note you may call this method each time you want to restart iterating all samples.
-			Status reset_point_iteration();
-			
-			//! Read the next point record from the stream
-			//! Note that the point type you are using must match the format specified 
-			//! in the header.
-			template <typename PointType>
-			inline
-			Status read_next_point(PointType& p)
-			{
-				char buf[PointType::record_size];	// point format 1
-				assert(sizeof(buf) == _header.point_data_record_length);
-				assert(PointType::format_id == _header.point_data_format_id);
-				
-				// stream exceptions are enabled
-				_istream.read(reinterpret_cast<char*>(&buf), sizeof(buf));
-				
-				if (_istream.eof()) {
-					return StreamFailure;
-				} else if (_istream.fail()) {
-					_status = StreamFailure;
-				} else {
-					p.init_from_raw(buf);
-					p.adjust_coordinate(&_header.x_scale,& _header.x_offset);
-				}
-				return _status;
-			}
-			
-			
-	};
+			return _status;
+		}
+};
 
 }// END namespace yalas
 #endif // LAS_ISTREAM_H

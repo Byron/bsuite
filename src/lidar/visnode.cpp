@@ -252,7 +252,6 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseDisplayCache,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,		aNeedsCompute));
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aTranslateToOrigin,aNeedsCompute));
 	return MS::kSuccess;
 }
 
@@ -335,7 +334,21 @@ void LidarVisNode::update_draw_cache(MDataBlock &data)
 		m_col_cache = ColCache();
 	}
 	
-	yalas::types::PointDataRecord1 p;
+	switch(m_las_stream->header().point_data_format_id)
+	{
+	case 0: update_point_cache<0>(mode); break;
+	case 1: update_point_cache<1>(mode); break;
+	case 2: update_point_cache<2>(mode); break;
+	case 3: update_point_cache<3>(mode); break;
+	case 4: update_point_cache<4>(mode); break;
+	case 5: update_point_cache<5>(mode); break;
+	};
+}
+
+template <uint8_t format_id>
+inline void LidarVisNode::update_point_cache(const DisplayMode mode)
+{
+	yalas::types::point_data_record<format_id> p;
 	
 	const PosCache::iterator pend = m_pos_cache.end();
 	if (mode == DMNoColor) {
@@ -371,7 +384,8 @@ void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
 				 );
 }
 
-void LidarVisNode::color_point(yalas::types::PointDataRecord0 &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+template <uint8_t format_id>
+void LidarVisNode::color_point(yalas::types::point_data_record<format_id> &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
 {
 	static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
 	switch(mode)
@@ -554,17 +568,24 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 					goto finish_drawing;
 				}
 				
-				yalas::types::PointDataRecord1 p;
 				glf->glBegin(MGL_POINTS);
 				{
 					// PERFORM DRAWING
 					///////////////////
-					DrawCol dc;
-					while (las_stream.read_next_point(p) == yalas::IStream::Success) {
-						color_point(p ,dc, mode);
-						glf->glColor3usv(dc.col);
-						glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
-					}// end while iterating points
+					switch(las_stream.header().point_data_format_id)
+					{
+					case 0: draw_point_records<0>(glf, las_stream, mode); break;
+					case 1: draw_point_records<1>(glf, las_stream, mode); break;
+					case 2: draw_point_records<2>(glf, las_stream, mode); break;
+					case 3: draw_point_records<3>(glf, las_stream, mode); break;
+					case 4: draw_point_records<4>(glf, las_stream, mode); break;
+					case 5: draw_point_records<5>(glf, las_stream, mode); break;
+					default: {
+						m_error = "Unknown point format: ";
+						m_error += las_stream.header().point_data_format_id;
+						break;
+					}
+					}
 				}
 				glf->glEnd();
 			}// end handle caching
@@ -578,6 +599,19 @@ finish_drawing:
 		// can happen if something is not okay with the file. Remove it if its in an invalid state.
 		renew_las_reader(MString());
 	}
+}
+
+template <uint8_t format_id>
+void LidarVisNode::draw_point_records(MGLFunctionTable* glf, yalas::IStream& las_stream, const DisplayMode mode) const
+{
+	DrawCol dc;
+	yalas::types::point_data_record<format_id> p;
+	
+	while (las_stream.read_next_point(p) == yalas::IStream::Success) {
+		color_point(p ,dc, mode);
+		glf->glColor3usv(dc.col);
+		glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+	}// end while iterating points
 }
 
 MBoundingBox LidarVisNode::boundingBox() const

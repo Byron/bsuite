@@ -29,6 +29,9 @@
 #include <vector>
 
 
+class MGLFunctionTable;
+
+
 //! Node helping to visualize lidar data
 class LidarVisNode : public MPxLocatorNode
 {
@@ -86,7 +89,14 @@ class LidarVisNode : public MPxLocatorNode
 		void update_draw_cache(MDataBlock &data);	//!< fill in the draw cache
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
 		
-		inline void color_point(yalas::types::PointDataRecord0& p, DrawCol &dc, const DisplayMode mode) const;
+		template <uint8_t format_id>
+		inline void color_point(yalas::types::point_data_record<format_id>& p, DrawCol &dc, const DisplayMode mode) const;
+		
+		template <uint8_t format_id>
+		inline void draw_point_records(MGLFunctionTable* glf, yalas::IStream& las_stream, const DisplayMode mode) const;
+		
+		template <uint8_t format_id>
+		inline void update_point_cache(const DisplayMode mode);
 		
 	protected:
 		// Input attributes
