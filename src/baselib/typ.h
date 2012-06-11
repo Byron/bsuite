@@ -19,16 +19,68 @@
 #define MISC_TYPES_H
 
 #include <stdlib.h>
+#include <inttypes.h>
+#include <cassert>
+
+//! Utility which makes derived types non-copyable
+class NonCopyable
+{
+	NonCopyable(const NonCopyable&);
+	NonCopyable& operator = (const NonCopyable&);
+	
+	public:
+	NonCopyable(){}
+};
 
 //! Simple utility to keep a mapped file
 //! For now we don't use git++'s sliding window memory map
-class ROMappedFile
+//! \note as we deal with file-handles, we are (currently) not copyable
+class ROMappedFile : NonCopyable
 {
-	const void*	_mem;	//!< Mapped memory, aligned to page boundary, read-onl
+	void*		_mem;	//!< Mapped memory, aligned to page boundary, read-onl
 	size_t		_len;	//!< mount of mapped bytes
 	
 	public:
 		ROMappedFile();
+		~ROMappedFile();
+		
+	public:
+	// ----------------------------------------
+	// Interface
+	// ----------------------------------------
+	//! \name Interface
+	//! @{
+	
+	//! Map a file for read-only access. On success, you may query
+	//! you will be able to access the memory for reading. is_mapped() will return true.
+	//! \param filepath the path to the file to map
+	//! \note currently it will attempt to map the whole file.
+	ROMappedFile&	map_file(const char* filepath);
+	
+	//! Unmap the currently mapped file. If it was mapped, is_mapped() will be return false afterwards.
+	ROMappedFile&	unmap_file();
+	
+	//! \return true if this mapped file is actually mapped
+	bool			is_mapped() const;
+	
+	//! \return pointer at the given offset (relative to its starting location
+	template <typename T>
+	const T*		mem_at_ofs(const size_t ofs = 0) const
+	{
+		assert(is_mapped());
+		return reinterpret_cast<const T*>(reinterpret_cast<const uint8_t*>(_mem) + ofs);
+	}
+	
+	//! \return a pointer to one past the last byte of mapped memory
+	template <typename T>
+	const T*		mem_end() const
+	{
+		return mem_at_ofs<T>(_len);
+	}
+	
+	//! @} end Interface
+		
+		
 };
 
 #endif // MISC_TYPES_H

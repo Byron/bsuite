@@ -16,6 +16,7 @@
  */
 
 #include <maya/MFnAttribute.h>
+#include <maya/MFileObject.h>
 
 #include "base.h"
 
@@ -27,4 +28,12 @@ void setup_as_output(MFnAttribute &attr)
 {
 	attr.setStorable(false);
 	attr.setWritable(false);
+}
+
+
+MString resolved_filepath(const MString& filepath)
+{
+	MFileObject fobj;
+	fobj.setRawFullName(filepath);
+	return fobj.resolvedFullName();	
 }

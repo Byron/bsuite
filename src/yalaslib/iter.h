@@ -14,84 +14,48 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef YALAS_ITER_H
+#define YALAS_ITER_H
 
+#include <baselib/typ.h>
 
-#include "typ.h"
-
-#ifndef WIN32
-	#include <sys/mman.h>
-	#include <stdio.h>
-	
-	#include <sys/types.h>
-	#include <sys/stat.h>
-	#include <unistd.h>
-	#include <fcntl.h>
-	#include <cstring>
-
-	#include <limits>
-#endif
-
-ROMappedFile::ROMappedFile()
-	: _mem(0)
-	, _len(0)
+namespace yalas
 {
-}
 
-ROMappedFile::~ROMappedFile()
+//! A utility iterator which can be utilized in while loops to iterate over 
+//! raw uncompressed memory to read points
+//! \tparam PointType type of point to use. It must be one of the point types defined in types.h
+class MemoryIterator
 {
-	unmap_file();
-}
-
-ROMappedFile &ROMappedFile::map_file(const char *filepath)
-{
-	unmap_file();
-	assert(!is_mapped());
+	const uint8_t*	_cur;		//!< Current memory pointer
+	const uint8_t*	_end;		//!< 
+	const double*	_ofs;
+	const double*	_scale;
 	
-#ifndef WIN32
-	const int fid = open(filepath, O_RDONLY);
-	if (fid < 0) {
-		return *this;
-	}
 	
-	struct stat fid_info;
-	memset(&fid_info, 0, sizeof(fid_info));
+	public:
+	inline
+	MemoryIterator(const uint8_t* beg, const uint8_t* end, const double* ofs, const double* scale)
+		: _cur(beg)
+		, _end(end)
+		, _ofs(ofs)
+		, _scale(scale)
+	{}
 	
-	// check for 32 bit limitations - off_t will be 32 bit on a 32 bit system, so we will be limited 
-	// to mapping 2gig there
-	if (fstat(fid, &fid_info) < 0 || fid_info.st_size > std::numeric_limits<off_t>::max()) {
-		close(fid);
-		return *this;
-	}
 	
-	_mem = mmap(0, fid_info.st_size, PROT_READ, MAP_PRIVATE, fid, 0);
-	// mmap keeps a reference to the handle, keeping the file open effectively
-	close(fid);
-	
-	if (_mem) {
-		_len = fid_info.st_size;
-	}
-	
-	assert (is_mapped());
-#endif
-	return *this;
-}
-
-ROMappedFile &ROMappedFile::unmap_file()
-{
-#ifndef WIN32
-	if (is_mapped()) {
-		if (munmap(_mem, _len) == 0) {
-			_mem = 0;
-			_len = 0;
-		} else {
-			assert(false);
+	template <typename PointType>
+	inline
+	bool read_next_point(PointType& p) {
+		if (_cur < _end) {
+			p.init_from_raw(_cur);
+			p.adjust_coordinate(_scale, _ofs);
+			_cur += PointType::record_size;
+			return true;
 		}
+		return false;
 	}
-#endif
-	return *this;
-}
+};
 
-bool ROMappedFile::is_mapped() const
-{
-	return _mem != 0;
-}
+}// end namespace yalas
+
+#endif // YALAS_ITER_H

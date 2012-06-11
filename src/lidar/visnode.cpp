@@ -19,7 +19,6 @@
 #include <maya/MString.h>
 #include <maya/MTypeId.h>
 #include <maya/MPlug.h>
-#include <maya/MFileObject.h>
 #include <maya/MStringArray.h>
 #include <maya/MFnMesh.h>
 #include <maya/MDataBlock.h>
@@ -35,6 +34,7 @@
 #include "mayabaselib/ogl_headers.h"
 
 #include "mayabaselib/base.h"
+#include "yalaslib/iter.h"
 #include "visnode.h"
 // whyever this gets defined ... may have something to do with the ogl headers 
 #undef Success
@@ -125,7 +125,7 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(status);
 	typFn.setInternal(true);
 	
-	aUseMMap = numFn.create("useMMap", "umm", MFnNumericData::kBoolean, 0, &status);
+	aUseMMap = numFn.create("useMMap", "umm", MFnNumericData::kBoolean, 1, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
 	
 	aTranslateToOrigin = numFn.create("translateToOrigin", "tto", MFnNumericData::kBoolean, 1, &status);
@@ -288,14 +288,12 @@ bool LidarVisNode::renew_las_reader(const MString &filepath)
 		m_ifstream.close();
 	}
 	
+	m_map.unmap_file();
 	if (filepath.length() == 0) {
 		return false;
 	}
 	
-	MFileObject fobj;
-	
-	fobj.setRawFullName(filepath);
-	const MString res_path = fobj.resolvedFullName();
+	const MString res_path = resolved_filepath(filepath);
 	m_ifstream.open(res_path.asChar(), std::ios_base::in | std::ios_base::binary);
 	if (m_ifstream.fail()) {
 		m_error = "Could not open file " + res_path + " for reading";
@@ -368,19 +366,39 @@ inline void LidarVisNode::update_point_cache(const DisplayMode mode)
 {
 	yalas::types::point_data_record<format_id> p;
 	
-	const PosCache::iterator pend = m_pos_cache.end();
-	if (mode == DMNoColor) {
-		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && m_las_stream->read_next_point(p) == yalas::IStream::Success; ++pit) {
-			pit->init_from_point(p);
+	if (m_map.is_mapped()) {
+		const yalas::types::Header13& hdr = m_las_stream->header();
+		yalas::MemoryIterator it(m_map.mem_at_ofs<uint8_t>(hdr.offset_to_point_data), m_map.mem_end<uint8_t>(), &hdr.x_offset, &hdr.x_scale);
+		
+		const PosCache::iterator pend = m_pos_cache.end();
+		if (mode == DMNoColor) {
+			for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && it.read_next_point(p); ++pit) {
+				pit->init_from_point(p);
+			}
+		} else {
+			const ColCache::iterator cend = m_col_cache.end();
+			ColCache::iterator cit = m_col_cache.begin();
+			for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
+				pit->init_from_point(p);
+				color_point<format_id>(p, *cit, mode);
+			}
 		}
+		
 	} else {
-		const ColCache::iterator cend = m_col_cache.end();
-		ColCache::iterator cit = m_col_cache.begin();
-		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && m_las_stream->read_next_point(p) == yalas::IStream::Success; ++pit, ++cit) {
-			pit->init_from_point(p);
-			color_point<format_id>(p, *cit, mode);
+		const PosCache::iterator pend = m_pos_cache.end();
+		if (mode == DMNoColor) {
+			for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && m_las_stream->read_next_point(p) == yalas::IStream::Success; ++pit) {
+				pit->init_from_point(p);
+			}
+		} else {
+			const ColCache::iterator cend = m_col_cache.end();
+			ColCache::iterator cit = m_col_cache.begin();
+			for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && m_las_stream->read_next_point(p) == yalas::IStream::Success; ++pit, ++cit) {
+				pit->init_from_point(p);
+				color_point<format_id>(p, *cit, mode);
+			}
 		}
-	}
+	}// END handle mmap
 }
 
 void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
@@ -526,8 +544,19 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 		// indicate error right awway
 		ncHandle.setInt(1);
 		
+		// UPDATE MEMORY MAP
+		/////////////////////
+		// Do so first, as display cache generation is affected by this
+		if (data.inputValue(aUseMMap).asBool()) {
+			if (!m_map.is_mapped()) {
+				m_map.map_file(resolved_filepath(data.inputValue(aLidarFileName).asString()).asChar());
+			}
+		} else {
+			m_map.unmap_file();
+		}
+		
 		// Update caches which would be relevant for drawing !
-		if (data.outputValue(aUseDisplayCache).asBool()) {
+		if (data.inputValue(aUseDisplayCache).asBool()) {
 			if (m_las_stream.get() == 0) {
 				reset_caches();
 				return MS::kSuccess;
@@ -681,17 +710,35 @@ void LidarVisNode::draw_point_records(MGLFunctionTable* glf, yalas::IStream& las
 	DrawCol dc;
 	yalas::types::point_data_record<format_id> p;
 	
-	if (mode == DMNoColor) {
-		while (las_stream.read_next_point(p) == yalas::IStream::Success) {
-			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
-		}// end while iterating points
+	if (m_map.is_mapped()) {
+		const yalas::types::Header13& hdr = las_stream.header();
+		yalas::MemoryIterator it(m_map.mem_at_ofs<uint8_t>(hdr.offset_to_point_data), m_map.mem_end<uint8_t>(), &hdr.x_offset, &hdr.x_scale);
+		
+		if (mode == DMNoColor) {
+			while(it.read_next_point(p)) {
+				glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+			}
+		} else {
+			while (it.read_next_point(p)) {
+				color_point<format_id>(p ,dc, mode);
+				glf->glColor3usv(dc.col);
+				glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+			}// end while iterating points
+		}
+		
 	} else {
-		while (las_stream.read_next_point(p) == yalas::IStream::Success) {
-			color_point<format_id>(p ,dc, mode);
-			glf->glColor3usv(dc.col);
-			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
-		}// end while iterating points
-	}
+		if (mode == DMNoColor) {
+			while (las_stream.read_next_point(p) == yalas::IStream::Success) {
+				glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+			}// end while iterating points
+		} else {
+			while (las_stream.read_next_point(p) == yalas::IStream::Success) {
+				color_point<format_id>(p ,dc, mode);
+				glf->glColor3usv(dc.col);
+				glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+			}// end while iterating points
+		}
+	}// END handle mmap
 }
 
 MBoundingBox LidarVisNode::boundingBox() const
