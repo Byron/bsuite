@@ -43,6 +43,10 @@
 
 #include "baselib/math_util.h"
 
+#ifdef _OPENMP
+	#include <omp.h>
+#endif
+
 
 //********************************************************************
 //**	Class Implementation
@@ -409,6 +413,11 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 	SizeVector lut_destruct;
 	lut_destruct.reserve(numFaces);	// prevents a call to the constructor ! We write the data later
 	size_t* flut = static_cast<size_t*>(lut_destruct.data());
+	
+	// Ptex crashes if any filter is used - point seems to work well in multi-threaded mode !
+	const int thread_count = to_filter_type(MPlug(thisNode, aPtexFilterType).asShort()) == PtexFilter::f_point 
+									? omp_get_max_threads()
+									: 1;
 #endif
 	
 	// count memory we require for preallocation
@@ -519,7 +528,7 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 		const float fsize = MPlug(thisNode, aPtexFilterSize).asFloat();
 		
 #ifdef _OPENMP
-		#pragma omp parallel for private(pix) schedule(dynamic)
+#pragma omp parallel for private(pix) schedule(dynamic) num_threads(thread_count)
 #endif
 		for (int i = 0; i < numFaces; ++i) {
 			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
