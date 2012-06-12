@@ -57,7 +57,7 @@ MObject LidarVisNode::aGlPointSize;
 MObject LidarVisNode::aIntensityScale;
 MObject LidarVisNode::aTranslateToOrigin;
 MObject LidarVisNode::aUseMMap;
-MObject LidarVisNode::aUseDisplayCache;
+MObject LidarVisNode::aDisplayCacheMode;
 MObject LidarVisNode::aDisplayMode;
 MObject LidarVisNode::aNormalizeStoredCols;
 
@@ -93,6 +93,7 @@ LidarVisNode::LidarVisNode()
     : m_gl_point_size(1.0f)
 	, m_intensity_scale(1.0f)
 	, m_normalize_stored_cols(false)
+	, m_cache_needs_refresh(false)
 {}
 
 LidarVisNode::~LidarVisNode()
@@ -133,9 +134,11 @@ MStatus LidarVisNode::initialize()
 	numFn.setAffectsWorldSpace(true);
 	numFn.setInternal(true);
 	
-	aUseDisplayCache = numFn.create("useDisplayCache", "udc", MFnNumericData::kBoolean, 0, &status);
+	aDisplayCacheMode = mfnEnum.create("displayCacheMode", "dcm");
 	CHECK_MSTATUS_AND_RETURN_IT(status);
-	numFn.setInternal(true);
+	mfnEnum.addField("None", (short)CMNone);
+	mfnEnum.addField("SystemCache", (short)CMSystem);
+	mfnEnum.addField("GPUCache", (short)CMGPU);
 	
 	aNormalizeStoredCols = numFn.create("normalizeStoredColors", "nscol", MFnNumericData::kBoolean, 0, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
@@ -143,11 +146,11 @@ MStatus LidarVisNode::initialize()
 	
 	
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
-	mfnEnum.addField("NoColor", (int)DMNoColor);
-	mfnEnum.addField("Intensity", (int)DMIntensity);
-	mfnEnum.addField("ReturnNumber", (int)DMReturnNumber);
-	mfnEnum.addField("ReturnNumberIntensified", (int)DMReturnNumberIntensity);
-	mfnEnum.addField("StoredColor", (int)DMStoredColor);
+	mfnEnum.addField("NoColor", (short)DMNoColor);
+	mfnEnum.addField("Intensity", (short)DMIntensity);
+	mfnEnum.addField("ReturnNumber", (short)DMReturnNumber);
+	mfnEnum.addField("ReturnNumberIntensified", (short)DMReturnNumberIntensity);
+	mfnEnum.addField("StoredColor", (short)DMStoredColor);
 	
 	mfnEnum.setDefault((short)DMNoColor);
 	mfnEnum.setKeyable(true);
@@ -222,7 +225,7 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aIntensityScale));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aTranslateToOrigin))
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseMMap));
-	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseDisplayCache));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aDisplayCacheMode));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aNormalizeStoredCols));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aDisplayMode));
 	
@@ -257,9 +260,9 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aOutVersionString));
 	
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aNeedsCompute));
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseDisplayCache,	aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayCacheMode,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,		aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aNormalizeStoredCols, aNeedsCompute));
 	
 	return MS::kSuccess;
@@ -316,14 +319,14 @@ void LidarVisNode::reset_caches()
 	reset_draw_caches();
 }
 
-void LidarVisNode::reset_draw_caches()
+void LidarVisNode::reset_draw_caches(MGLFunctionTable *glf)
 {
-	// totally clear even the reserved memory
-	m_col_cache = ColCache();
-	m_pos_cache = PosCache();
+	m_sysbuf.resize(0);
+	m_gpubuf.resize(0);
 }
 
-void LidarVisNode::update_draw_cache(MDataBlock &data)
+template <typename Buffer>
+void LidarVisNode::update_draw_cache(Buffer &buf, DisplayMode mode, MGLFunctionTable& glf)
 {
 	if (m_las_stream.get() == 0) {
 		return;
@@ -334,63 +337,68 @@ void LidarVisNode::update_draw_cache(MDataBlock &data)
 		return;
 	}
 	
-	DisplayMode mode = static_cast<const DisplayMode>(data.outputValue(aDisplayMode).asInt());
 	const uint8_t fmt = m_las_stream->header().point_data_format_id;
 	
 	// Sanity check - if people try to use stored color in files that don't have it, reset the mode
 	if (mode == DMStoredColor && fmt != 2 && fmt != 3 && fmt != 5) {
-		data.outputValue(aDisplayMode).setInt(DMNoColor);
 		mode = DMNoColor;
 	}
 	
-	m_pos_cache.resize(m_las_stream->header().num_point_records);
-	if (mode != DMNoColor ) {
-		m_col_cache.resize(m_las_stream->header().num_point_records);
+	buf.resize(m_las_stream->header().num_point_records);
+	if (mode == DMNoColor ) {
+		buf.delete_array(ColorArray);
 	} else {
-		m_col_cache = ColCache();
+		buf.revive_array(ColorArray);
 	}
 	
 	switch(fmt)
 	{
-	case 0: update_point_cache<0>(mode); break;
-	case 1: update_point_cache<1>(mode); break;
-	case 2: update_point_cache<2>(mode); break;
-	case 3: update_point_cache<3>(mode); break;
-	case 4: update_point_cache<4>(mode); break;
-	case 5: update_point_cache<5>(mode); break;
+	case 0: update_point_cache<0>(buf, mode, glf); break;
+	case 1: update_point_cache<1>(buf, mode, glf); break;
+	case 2: update_point_cache<2>(buf, mode, glf); break;
+	case 3: update_point_cache<3>(buf, mode, glf); break;
+	case 4: update_point_cache<4>(buf, mode, glf); break;
+	case 5: update_point_cache<5>(buf, mode, glf); break;
 	};
 }
 
-template <uint8_t format_id>
-inline void LidarVisNode::update_point_cache(const DisplayMode mode)
+template <uint8_t format_id, typename Buffer>
+inline void LidarVisNode::update_point_cache(Buffer& buf, const DisplayMode mode, MGLFunctionTable &glf)
 {
 	if (m_map.is_mapped()) {
 		const yalas::types::Header13& hdr = m_las_stream->header();
 		yalas::MemoryIterator it(m_map.mem_at_ofs<uint8_t>(hdr.offset_to_point_data), m_map.mem_end<uint8_t>(), &hdr.x_offset, &hdr.x_scale);
 		
-		update_point_cache_with_iterator<format_id>(it, mode);
+		update_point_cache_with_iterator<format_id>(buf, it, mode, glf);
 	} else {
-		update_point_cache_with_iterator<format_id>(*m_las_stream, mode);
+		update_point_cache_with_iterator<format_id>(buf, *m_las_stream, mode, glf);
 	}// END handle mmap
 }
 
-template <uint8_t format_id, typename IteratorType>
-inline void LidarVisNode::update_point_cache_with_iterator(IteratorType& it, const DisplayMode mode)
+template <uint8_t format_id, typename IteratorType, typename Buffer>
+inline void LidarVisNode::update_point_cache_with_iterator(Buffer &buf, IteratorType& it, const DisplayMode mode, MGLFunctionTable &glf)
 {
+	if (!buf.begin_access()) {
+		return;
+	}
+	
 	yalas::types::point_data_record<format_id> p;
-	const PosCache::iterator pend = m_pos_cache.end();
+	VtxPrimitive*const pend = static_cast<VtxPrimitive*>(buf.end(VertexArray));
+	VtxPrimitive* pit = static_cast<VtxPrimitive*>(buf.begin(VertexArray));
+						
 	if (mode == DMNoColor) {
-		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && it.read_next_point(p); ++pit) {
+		for (; pit < pend && it.read_next_point(p); ++pit) {
 			pit->init_from_point(p);
 		}
 	} else {
-		const ColCache::iterator cend = m_col_cache.end();
-		ColCache::iterator cit = m_col_cache.begin();
-		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
+		ColPrimitive*const cend = static_cast<ColPrimitive*>(buf.end(ColorArray));
+		for (ColPrimitive* cit = static_cast<ColPrimitive*>(buf.begin(ColorArray)); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
 			pit->init_from_point(p);
 			color_point<format_id>(p, *cit, mode);
 		}
 	}
+	
+	buf.end_access();
 }
 
 void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
@@ -415,31 +423,31 @@ void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
 
 // no rgb by default
 template <uint8_t format_id>
-void LidarVisNode::color_point(const yalas::types::point_data_record<format_id>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point(const yalas::types::point_data_record<format_id>& p, ColPrimitive &dc, const LidarVisNode::DisplayMode mode) const
 {
 	color_point_no_rgb(p, dc, mode);
 }
 
 // format 2, 3 and 5 have rgb info !
 template <>
-void LidarVisNode::color_point<2>(const yalas::types::point_data_record<2>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point<2>(const yalas::types::point_data_record<2>& p, ColPrimitive& dc, const LidarVisNode::DisplayMode mode) const
 {
 	color_point_with_rgb_info(p, dc, mode);
 }
 
 template <>
-void LidarVisNode::color_point<3>(const yalas::types::point_data_record<3>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point<3>(const yalas::types::point_data_record<3>& p, ColPrimitive& dc, const LidarVisNode::DisplayMode mode) const
 {
 	color_point_with_rgb_info(p, dc, mode);
 }
 
 template <>
-void LidarVisNode::color_point<5>(const yalas::types::point_data_record<5>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point<5>(const yalas::types::point_data_record<5>& p, ColPrimitive& dc, const LidarVisNode::DisplayMode mode) const
 {
 	color_point_with_rgb_info(p, dc, mode);
 }
 
-void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, ColPrimitive &dc, const LidarVisNode::DisplayMode mode) const
 {
 	static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
 	switch(mode)
@@ -449,31 +457,31 @@ void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, D
 	case DMIntensity:
 	{
 		const uint16_t intensity = p.intensity * m_intensity_scale; 
-		dc.col[0] = intensity;
-		dc.col[1] = intensity;
-		dc.col[2] = intensity;
+		dc.field[0] = intensity;
+		dc.field[1] = intensity;
+		dc.field[2] = intensity;
 		break;
 	}
 	case DMReturnNumber:
 	{
-		dc.col[0] = p.return_number() * scale_3_to_16;
-		dc.col[1] = p.num_returns() * scale_3_to_16;
-		dc.col[2] = p.return_number() * scale_3_to_16;
+		dc.field[0] = p.return_number() * scale_3_to_16;
+		dc.field[1] = p.num_returns() * scale_3_to_16;
+		dc.field[2] = p.return_number() * scale_3_to_16;
 		break;
 	}
 	case DMReturnNumberIntensity:
 	{
 		const uint16_t intensity = p.intensity * m_intensity_scale; 
-		dc.col[0] = p.return_number() * scale_3_to_16 + intensity;
-		dc.col[1] = p.num_returns() * scale_3_to_16 + intensity;
-		dc.col[2] = p.return_number() * scale_3_to_16 + intensity;
+		dc.field[0] = p.return_number() * scale_3_to_16 + intensity;
+		dc.field[1] = p.num_returns() * scale_3_to_16 + intensity;
+		dc.field[2] = p.return_number() * scale_3_to_16 + intensity;
 		break;
 	}
 	};// end color handler
 }
 
 template <typename PointType>
-void LidarVisNode::color_point_with_rgb_info(const PointType &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point_with_rgb_info(const PointType &p, ColPrimitive &dc, const LidarVisNode::DisplayMode mode) const
 {
 	switch(mode)
 	{
@@ -481,13 +489,13 @@ void LidarVisNode::color_point_with_rgb_info(const PointType &p, DrawCol& dc, co
 	{
 		if (m_normalize_stored_cols) {
 			// assume its normalized to 8 bit, instead of 16
-			dc.col[0] = p.red * 256;
-			dc.col[1] = p.green * 256;
-			dc.col[2] = p.blue * 256;
+			dc.field[0] = p.red * 256;
+			dc.field[1] = p.green * 256;
+			dc.field[2] = p.blue * 256;
 		} else {
-			dc.col[0] = p.red;
-			dc.col[1] = p.green;
-			dc.col[2] = p.blue;
+			dc.field[0] = p.red;
+			dc.field[1] = p.green;
+			dc.field[2] = p.blue;
 		}
 		break;
 	}
@@ -547,21 +555,14 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 			m_map.unmap_file();
 		}
 		
-		// Update caches which would be relevant for drawing !
-		if (data.inputValue(aUseDisplayCache).asBool()) {
-			if (m_las_stream.get() == 0) {
-				reset_caches();
-				return MS::kSuccess;
-			}
-			// NOTE: could only update colors if required, and release the stream
-			// Currently it will re-read the positions as well, which is not required !
-			// However, it probably doesn't matter in terms of IO, except that we would 
-			// save a little MemoryIO
-			update_draw_cache(data);
-		} else {
-			// free all data
-			reset_draw_caches();
+		// should really have a stream at this point ... its questionable that this code can actually hit
+		if (m_las_stream.get() == 0) {
+			reset_caches();
+			return MS::kSuccess;
 		}
+		
+		// indicate cache needs refresh
+		m_cache_needs_refresh = true;
 		
 		// indicate everything is fine
 		m_error.clear();
@@ -610,7 +611,7 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 {
 	// make sure we are uptodate - trigger compute
 	MPlug(thisMObject(), aNeedsCompute).asInt();
-	const DisplayMode mode = static_cast<const DisplayMode>(MPlug(thisMObject(), aDisplayMode).asInt());
+	const DisplayMode display_mode = static_cast<const DisplayMode>(MPlug(thisMObject(), aDisplayMode).asShort());
 	
 	view.beginGL();
 	if (m_error.length()) {
@@ -632,29 +633,48 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 			goto finish_drawing;
 		}
 		
+		// UPDATE CACHES ?
+		/////////////////
+		// Update caches which would be relevant for drawing !
+		if (m_cache_needs_refresh) {
+			m_cache_needs_refresh = false;	// in any case, consider it done
+			const CacheMode cache_mode = (CacheMode)MPlug(thisMObject(), aDisplayCacheMode).asShort();
+			
+			m_gpubuf.set_glf(glf);	// init gpu buffer
+			
+			switch(cache_mode) 
+			{
+			case CMSystem: {
+				m_gpubuf.resize(0);
+				update_draw_cache(m_sysbuf, display_mode, *glf); 
+				break;
+			}
+			case CMGPU: {
+				m_sysbuf.resize(0);
+				update_draw_cache(m_gpubuf, display_mode, *glf);
+				break;
+			}
+			case CMNone: reset_draw_caches(glf); break;
+			}// and cache mode switch
+
+		}// END handle cache update
+		
 		glf->glPointSize(m_gl_point_size);
 		glf->glPushMatrix();
 		glf->glMultMatrixd(&m_compensation_column_major.matrix[0][0]);
 		{
-			if (m_pos_cache.size()) {
-				glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
-				glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
-				{
-					glf->glEnableClientState(MGL_VERTEX_ARRAY);
-					glf->glVertexPointer(3, MGL_INT, 0, m_pos_cache.data());
-					if (m_col_cache.size()) {
-						glf->glEnableClientState(MGL_COLOR_ARRAY);
-						glf->glColorPointer(3, MGL_UNSIGNED_SHORT, 0, m_col_cache.data());
-					}
-					
-					glf->glDrawArrays(MGL_POINTS, 0, m_pos_cache.size());
-					if (glf->glGetError() != 0) {
-						m_error = "display cache not supported";
-						MPlug(thisMObject(), aUseDisplayCache).setBool(false);
-					}
+			if (m_gpubuf.is_valid() || m_sysbuf.is_valid()) {
+				bool cached_draw_successful;
+				if (m_sysbuf.is_valid()) {
+					cached_draw_successful = m_sysbuf.draw(glf);
+				} else {
+					assert(m_gpubuf.is_valid());
+					cached_draw_successful = m_gpubuf.draw(glf);
 				}
-				glf->glPopAttrib();
-				glf->glPopClientAttrib();
+				if (!cached_draw_successful) {
+					m_error = "display cache not supported";
+					MPlug(thisMObject(), aDisplayCacheMode).setShort(0);
+				}
 			} else {
 				assert(m_las_stream.get());
 				yalas::IStream& las_stream = *m_las_stream.get();
@@ -669,12 +689,12 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 					///////////////////
 					switch(las_stream.header().point_data_format_id)
 					{
-					case 0: draw_point_records<0>(glf, las_stream, mode); break;
-					case 1: draw_point_records<1>(glf, las_stream, mode); break;
-					case 2: draw_point_records<2>(glf, las_stream, mode); break;
-					case 3: draw_point_records<3>(glf, las_stream, mode); break;
-					case 4: draw_point_records<4>(glf, las_stream, mode); break;
-					case 5: draw_point_records<5>(glf, las_stream, mode); break;
+					case 0: draw_point_records<0>(*glf, las_stream, display_mode); break;
+					case 1: draw_point_records<1>(*glf, las_stream, display_mode); break;
+					case 2: draw_point_records<2>(*glf, las_stream, display_mode); break;
+					case 3: draw_point_records<3>(*glf, las_stream, display_mode); break;
+					case 4: draw_point_records<4>(*glf, las_stream, display_mode); break;
+					case 5: draw_point_records<5>(*glf, las_stream, display_mode); break;
 					default: {
 						m_error = "Unknown point format: ";
 						m_error += las_stream.header().point_data_format_id;
@@ -697,32 +717,32 @@ finish_drawing:
 }
 
 template <uint8_t format_id>
-void LidarVisNode::draw_point_records(MGLFunctionTable* glf, yalas::IStream& las_stream, const DisplayMode mode) const
+void LidarVisNode::draw_point_records(MGLFunctionTable& glf, yalas::IStream& las_stream, const DisplayMode mode) const
 {
 	if (m_map.is_mapped()) {
 		const yalas::types::Header13& hdr = las_stream.header();
 		yalas::MemoryIterator it(m_map.mem_at_ofs<uint8_t>(hdr.offset_to_point_data), m_map.mem_end<uint8_t>(), &hdr.x_offset, &hdr.x_scale);
 		
-		draw_piont_records_with_iterator<format_id>(it, glf, mode);
+		draw_point_records_with_iterator<format_id>(it, glf, mode);
 	} else {
-		draw_piont_records_with_iterator<format_id>(las_stream, glf, mode);
+		draw_point_records_with_iterator<format_id>(las_stream, glf, mode);
 	}// END handle mmap
 }
 
 template <uint8_t format_id, typename IteratorType>
-inline void LidarVisNode::draw_piont_records_with_iterator(IteratorType& it, MGLFunctionTable* glf, const DisplayMode mode) const
+inline void LidarVisNode::draw_point_records_with_iterator(IteratorType& it, MGLFunctionTable& glf, const DisplayMode mode) const
 {
-	DrawCol dc;
 	yalas::types::point_data_record<format_id> p;
 	if (mode == DMNoColor) {
 		while(it.read_next_point(p)) {
-			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+			glf.glVertex3iv(static_cast<const MGLint*>(&p.x));
 		}
 	} else {
+		ColPrimitive dc;
 		while (it.read_next_point(p)) {
 			color_point<format_id>(p ,dc, mode);
-			glf->glColor3usv(dc.col);
-			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+			glf.glColor3usv(&dc.field[0]);
+			glf.glVertex3iv(static_cast<const MGLint*>(&p.x));
 		}// end while iterating points
 	}
 }
