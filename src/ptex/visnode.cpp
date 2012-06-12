@@ -153,13 +153,13 @@ MStatus PtexVisNode::initialize()
 	numFn.setMax(1.0);
 	numFn.setKeyable(true);
 	
-	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kFloat, 1.0);
-	numFn.setMin(0.0);
+	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kInt, 1.0);
+	numFn.setMin(1.0);
 	numFn.setKeyable(true);
 	numFn.setInternal(true);
 	
 	aSampleMultiplier = numFn.create("sampleMultiplier", "smlt", MFnNumericData::kFloat, 1.0);
-	numFn.setMin(0.0);
+	numFn.setMin(0.0001f);
 	numFn.setKeyable(true);
 	
 	// Output attributes
@@ -345,7 +345,7 @@ bool PtexVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle
 		release_texture_and_filter();
 		release_cache();
 	} else if (plug == aGlPointSize) {
-		m_gl_point_size = dataHandle.asFloat();
+		m_gl_point_size = dataHandle.asInt();
 	}
 	
 	return false;
@@ -401,7 +401,9 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 	// count memory we require for preallocation
 	size_t numTexels = 0;
 	for (int i = 0; i < numFaces; ++i) {
-		numTexels += (size_t)(tex->getFaceInfo(i).res.size() * mult);
+		const Ptex::Res& r = tex->getFaceInfo(i).res;
+		// emulate the way we use the multiplier later
+		numTexels += (size_t)((int)(r.u() * mult) * (int)(r.v() * mult));
 	}// for each face
 	
 	buf.resize(numTexels);
@@ -426,8 +428,8 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 		Float3		pos;			// position
 		for (int i = 0; i < numFaces; ++i) {
 			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
-			const int ures = fi.res.u();
-			const int vres = fi.res.v();
+			const int ures = (int)(fi.res.u() * mult);
+			const int vres = (int)(fi.res.v() * mult);
 			
 			for (int u = 0; u < ures; ++u) {
 				for (int v = 0; v < vres; ++v) {
@@ -563,8 +565,8 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 	}
 	}// switch displayMode
 	
-	assert(opos <= buf.end(VertexArray));
-	assert(ocol <= buf.end(ColorArray));
+	assert(opos == buf.end(VertexArray));
+	assert(ocol == buf.end(ColorArray));
 	
 	buf.end_access();
 	

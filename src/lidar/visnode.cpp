@@ -160,8 +160,8 @@ MStatus LidarVisNode::initialize()
 	numFn.setKeyable(true);
 	numFn.setInternal(true);
 	
-	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kFloat, 1.0);
-	numFn.setMin(0.0);
+	aGlPointSize = numFn.create("glPointSize", "glps", MFnNumericData::kInt, 1.0);
+	numFn.setMin(1.0);
 	numFn.setKeyable(true);
 	numFn.setInternal(true);
 	
@@ -517,7 +517,7 @@ bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandl
 		}
 	} 
 	else if (plug == aGlPointSize) {
-		m_gl_point_size = dataHandle.asFloat();
+		m_gl_point_size = dataHandle.asInt();
 	} else if (plug == aIntensityScale) {
 		m_intensity_scale = dataHandle.asFloat();
 	} else if (plug == aTranslateToOrigin) {
