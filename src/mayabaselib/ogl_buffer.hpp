@@ -104,8 +104,6 @@ class ogl_buffer
 	//! \return true if all the buffers in this instance are set and can be used !
 	bool			is_valid() const;
 	
-	//! \return amount of draw primitives stored in this instance
-	size_t			size() const;
 	//! @} end Query Interface
 	
 	
@@ -216,10 +214,6 @@ class ogl_system_buffer : public ogl_buffer <VertexPrimitive, ColorPrimitive>
 	
 	bool			is_valid() const {
 		return _len != 0;
-	}
-	
-	size_t			size() const {
-		return _len;
 	}
 	
 	inline

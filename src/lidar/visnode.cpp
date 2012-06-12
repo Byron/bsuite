@@ -321,9 +321,11 @@ void LidarVisNode::reset_caches()
 void LidarVisNode::reset_draw_caches(MGLFunctionTable *glf)
 {
 	m_sysbuf.resize(0);
+	m_gpubuf.resize(0);
 }
 
-void LidarVisNode::update_draw_cache(DisplayMode mode, MGLFunctionTable& glf)
+template <typename Buffer>
+void LidarVisNode::update_draw_cache(Buffer &buf, DisplayMode mode, MGLFunctionTable& glf)
 {
 	if (m_las_stream.get() == 0) {
 		return;
@@ -350,51 +352,51 @@ void LidarVisNode::update_draw_cache(DisplayMode mode, MGLFunctionTable& glf)
 	
 	switch(fmt)
 	{
-	case 0: update_point_cache<0>(mode, glf); break;
-	case 1: update_point_cache<1>(mode, glf); break;
-	case 2: update_point_cache<2>(mode, glf); break;
-	case 3: update_point_cache<3>(mode, glf); break;
-	case 4: update_point_cache<4>(mode, glf); break;
-	case 5: update_point_cache<5>(mode, glf); break;
+	case 0: update_point_cache<0>(buf, mode, glf); break;
+	case 1: update_point_cache<1>(buf, mode, glf); break;
+	case 2: update_point_cache<2>(buf, mode, glf); break;
+	case 3: update_point_cache<3>(buf, mode, glf); break;
+	case 4: update_point_cache<4>(buf, mode, glf); break;
+	case 5: update_point_cache<5>(buf, mode, glf); break;
 	};
 }
 
-template <uint8_t format_id>
-inline void LidarVisNode::update_point_cache(const DisplayMode mode, MGLFunctionTable &glf)
+template <uint8_t format_id, typename Buffer>
+inline void LidarVisNode::update_point_cache(Buffer& buf, const DisplayMode mode, MGLFunctionTable &glf)
 {
 	if (m_map.is_mapped()) {
 		const yalas::types::Header13& hdr = m_las_stream->header();
 		yalas::MemoryIterator it(m_map.mem_at_ofs<uint8_t>(hdr.offset_to_point_data), m_map.mem_end<uint8_t>(), &hdr.x_offset, &hdr.x_scale);
 		
-		update_point_cache_with_iterator<format_id>(it, mode, glf);
+		update_point_cache_with_iterator<format_id>(buf, it, mode, glf);
 	} else {
-		update_point_cache_with_iterator<format_id>(*m_las_stream, mode, glf);
+		update_point_cache_with_iterator<format_id>(buf, *m_las_stream, mode, glf);
 	}// END handle mmap
 }
 
-template <uint8_t format_id, typename IteratorType>
-inline void LidarVisNode::update_point_cache_with_iterator(IteratorType& it, const DisplayMode mode, MGLFunctionTable &glf)
+template <uint8_t format_id, typename IteratorType, typename Buffer>
+inline void LidarVisNode::update_point_cache_with_iterator(Buffer &buf, IteratorType& it, const DisplayMode mode, MGLFunctionTable &glf)
 {
-	if (!m_sysbuf.begin_access()) {
+	if (!buf.begin_access()) {
 		return;
 	}
 	
 	yalas::types::point_data_record<format_id> p;
-	VtxPrimitive*const pend = m_sysbuf.buf_end<VtxPrimitive>();
+	VtxPrimitive*const pend = buf.buf_end<VtxPrimitive>();
 	if (mode == DMNoColor) {
-		for (VtxPrimitive* pit = m_sysbuf.buf_begin<VtxPrimitive>(); pit < pend && it.read_next_point(p); ++pit) {
+		for (VtxPrimitive* pit = buf.buf_begin<VtxPrimitive>(); pit < pend && it.read_next_point(p); ++pit) {
 			pit->init_from_point(p);
 		}
 	} else {
-		ColPrimitive*const cend = m_sysbuf.buf_end<ColPrimitive>();
-		ColPrimitive* cit = m_sysbuf.buf_begin<ColPrimitive>();
-		for (VtxPrimitive* pit = m_sysbuf.buf_begin<VtxPrimitive>(); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
+		ColPrimitive*const cend = buf.buf_end<ColPrimitive>();
+		ColPrimitive* cit = buf.buf_begin<ColPrimitive>();
+		for (VtxPrimitive* pit = buf.buf_begin<VtxPrimitive>(); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
 			pit->init_from_point(p);
 			color_point<format_id>(p, *cit, mode);
 		}
 	}
 	
-	m_sysbuf.end_access();
+	buf.end_access();
 }
 
 void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
@@ -607,7 +609,7 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 {
 	// make sure we are uptodate - trigger compute
 	MPlug(thisMObject(), aNeedsCompute).asInt();
-	const DisplayMode mode = static_cast<const DisplayMode>(MPlug(thisMObject(), aDisplayMode).asShort());
+	const DisplayMode display_mode = static_cast<const DisplayMode>(MPlug(thisMObject(), aDisplayMode).asShort());
 	
 	view.beginGL();
 	if (m_error.length()) {
@@ -636,20 +638,37 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 			m_cache_needs_refresh = false;	// in any case, consider it done
 			const CacheMode cache_mode = (CacheMode)MPlug(thisMObject(), aDisplayCacheMode).asShort();
 			
-			if (cache_mode != CMNone) {
-				update_draw_cache(mode, *glf);
-			} else {
-				// free all data
-				reset_draw_caches(glf);
+			m_gpubuf.set_glf(glf);	// init gpu buffer
+			
+			switch(cache_mode) 
+			{
+			case CMSystem: {
+				m_gpubuf.resize(0);
+				update_draw_cache(m_sysbuf, display_mode, *glf); 
+				break;
 			}
+			case CMGPU: {
+				m_sysbuf.resize(0);
+				// update_draw_cache(m_gpubuf, display_mode, *glf);
+			}
+			case CMNone: reset_draw_caches(glf); break;
+			}// and cache mode switch
+
 		}// END handle cache update
 		
 		glf->glPointSize(m_gl_point_size);
 		glf->glPushMatrix();
 		glf->glMultMatrixd(&m_compensation_column_major.matrix[0][0]);
 		{
-			if (m_sysbuf.is_valid()) {
-				if (!m_sysbuf.draw(glf)) {	
+			if (m_gpubuf.is_valid() || m_sysbuf.is_valid()) {
+				bool cached_draw_successful;
+				if (m_sysbuf.is_valid()) {
+					cached_draw_successful = m_sysbuf.draw(glf);
+				} else {
+					assert(m_gpubuf.is_valid());
+					cached_draw_successful = m_gpubuf.draw(glf);
+				}
+				if (!cached_draw_successful) {
 					m_error = "display cache not supported";
 					MPlug(thisMObject(), aDisplayCacheMode).setShort(0);
 				}
@@ -667,12 +686,12 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 					///////////////////
 					switch(las_stream.header().point_data_format_id)
 					{
-					case 0: draw_point_records<0>(*glf, las_stream, mode); break;
-					case 1: draw_point_records<1>(*glf, las_stream, mode); break;
-					case 2: draw_point_records<2>(*glf, las_stream, mode); break;
-					case 3: draw_point_records<3>(*glf, las_stream, mode); break;
-					case 4: draw_point_records<4>(*glf, las_stream, mode); break;
-					case 5: draw_point_records<5>(*glf, las_stream, mode); break;
+					case 0: draw_point_records<0>(*glf, las_stream, display_mode); break;
+					case 1: draw_point_records<1>(*glf, las_stream, display_mode); break;
+					case 2: draw_point_records<2>(*glf, las_stream, display_mode); break;
+					case 3: draw_point_records<3>(*glf, las_stream, display_mode); break;
+					case 4: draw_point_records<4>(*glf, las_stream, display_mode); break;
+					case 5: draw_point_records<5>(*glf, las_stream, display_mode); break;
 					default: {
 						m_error = "Unknown point format: ";
 						m_error += las_stream.header().point_data_format_id;

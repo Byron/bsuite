@@ -92,7 +92,6 @@ class LidarVisNode : public MPxLocatorNode
 		bool renew_las_reader(const MString& filepath);	//!< initialize our reader with a new file
 		void reset_caches();								//!< clear all caches
 		void reset_draw_caches(MGLFunctionTable* glf = 0);	//!< clear draw caches only
-		void update_draw_cache(DisplayMode mode, MGLFunctionTable &glf);		//!< fill in the draw cache
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
 		
 		template <uint8_t format_id>
@@ -107,11 +106,14 @@ class LidarVisNode : public MPxLocatorNode
 		template <uint8_t format_id, typename IteratorType>
 		inline void draw_point_records_with_iterator(IteratorType& it, MGLFunctionTable& glf, const DisplayMode mode) const;
 		
-		template <uint8_t format_id>
-		inline void update_point_cache(const DisplayMode mode, MGLFunctionTable& glf);
+		template <typename Buffer>
+		void update_draw_cache(Buffer& buf, DisplayMode mode, MGLFunctionTable &glf);		//!< fill in the draw cache
 		
-		template <uint8_t format_id, typename IteratorType>
-		inline void update_point_cache_with_iterator(IteratorType& it, const DisplayMode mode, MGLFunctionTable& glf);
+		template <uint8_t format_id, typename Buffer>
+		inline void update_point_cache(Buffer& buf, const DisplayMode mode, MGLFunctionTable& glf);
+		
+		template <uint8_t format_id, typename IteratorType, typename Buffer>
+		inline void update_point_cache_with_iterator(Buffer& buf, IteratorType& it, const DisplayMode mode, MGLFunctionTable& glf);
 		
 	protected:
 		// Input attributes
