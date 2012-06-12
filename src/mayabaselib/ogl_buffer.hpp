@@ -314,12 +314,19 @@ class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 	static const MGLuint	invalid_buf = -1;	//!< indicates the buffer is invalid
 	
 	MGLuint				_gl_buf[num_buffers];	//!< buffer with vtx primitives
+	void*				_map[num_buffers];		//!< mapped data pointers, only valid between begin and end access
 	size_t				_len;					//!< amount of primitives per buffer
 	MGLFunctionTable*	_glf;					//!< gl function table - without it, we cannot work
 	
 	private:
+	
 	inline bool			is_valid_buf(MGLuint buf) const {
 		return buf != invalid_buf;
+	}
+	
+	inline void			reset_arrays() {
+		_gl_buf[Vtx] = _gl_buf[Col] = invalid_buf;
+		_map[Vtx] = _map[Col] = 0;
 	}
 	
 	public:
@@ -327,7 +334,7 @@ class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 			: _len(0)
 			, _glf(0)
 		{
-			_gl_buf[Vtx] = _gl_buf[Col] = invalid_buf;
+			reset_arrays();
 		}
 		
 		~ogl_gpu_buffer()
@@ -359,6 +366,55 @@ class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 		
 		//! @} end Interface
 		
+		bool begin_access() {
+			if (!is_valid() || !_glf) {
+				return false;
+			}
+			
+			assert(_map[Vtx] == 0);	// multiple calls to begin access ?
+			_map[Vtx] = _glf->glMapBufferARB(MGL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY);
+			if (is_valid_buf(_gl_buf[Col])) {
+				_map[Col] = _glf->glMapBufferARB(MGL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY);
+			}
+			
+			return _glf->glGetError() == 0;
+		}
+		
+		void end_access() {
+			if (!_glf || !_map[Vtx]) {
+				return;
+			}
+			
+			_glf->glUnmapBufferARB(_gl_buf[Vtx]);
+			if (is_valid_buf(_gl_buf[Col])) {
+				_glf->glUnmapBufferARB(_gl_buf[Col]);
+			}
+		}
+		
+		
+		inline
+		bool draw(MGLFunctionTable* glf) const {
+			if (glf == 0 || glf != _glf || !is_valid()) {
+				return false;
+			}
+			
+			glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
+			glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
+			{
+				glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf[Vtx]);
+				setup_primitive_array<VertexPrimitive>(glf, 0);
+				if (is_valid_buf(_gl_buf[Col])) {
+					glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf[Col]);
+					setup_primitive_array<ColorPrimitive>(glf, 0);
+				}
+				
+				glf->glDrawArrays(MGL_POINTS, 0, _len);
+			}
+			glf->glPopAttrib();
+			glf->glPopClientAttrib();
+			
+			return glf->glGetError() == 0;
+		}
 		
 		//! \note will automatically revive formerly deleted buffers !
 		inline
@@ -373,7 +429,7 @@ class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 			
 			if (new_size == 0) {
 				_glf->glDeleteBuffersARB(num_buffers, _gl_buf);
-				_gl_buf[Vtx] = _gl_buf[Col] = invalid_buf;
+				reset_arrays();
 				
 				// for good measure, make the user reset the pointer after he set us 0
 				_glf = 0;
