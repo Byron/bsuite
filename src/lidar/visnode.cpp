@@ -320,9 +320,7 @@ void LidarVisNode::reset_caches()
 
 void LidarVisNode::reset_draw_caches()
 {
-	// totally clear even the reserved memory
-	m_col_cache = ColCache();
-	m_pos_cache = PosCache();
+	m_sysbuf.resize(0);
 }
 
 void LidarVisNode::update_draw_cache(MDataBlock &data)
@@ -345,11 +343,11 @@ void LidarVisNode::update_draw_cache(MDataBlock &data)
 		mode = DMNoColor;
 	}
 	
-	m_pos_cache.resize(m_las_stream->header().num_point_records);
-	if (mode != DMNoColor ) {
-		m_col_cache.resize(m_las_stream->header().num_point_records);
+	m_sysbuf.resize(m_las_stream->header().num_point_records);
+	if (mode == DMNoColor ) {
+		m_sysbuf.delete_array(ColorArray);
 	} else {
-		m_col_cache = ColCache();
+		m_sysbuf.revive_array(ColorArray);
 	}
 	
 	switch(fmt)
@@ -380,15 +378,15 @@ template <uint8_t format_id, typename IteratorType>
 inline void LidarVisNode::update_point_cache_with_iterator(IteratorType& it, const DisplayMode mode)
 {
 	yalas::types::point_data_record<format_id> p;
-	const PosCache::iterator pend = m_pos_cache.end();
+	VtxPrimitive*const pend = m_sysbuf.buf_end<VtxPrimitive>(VertexArray);
 	if (mode == DMNoColor) {
-		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && it.read_next_point(p); ++pit) {
+		for (VtxPrimitive* pit = m_sysbuf.buf_begin<VtxPrimitive>(VertexArray); pit < pend && it.read_next_point(p); ++pit) {
 			pit->init_from_point(p);
 		}
 	} else {
-		const ColCache::iterator cend = m_col_cache.end();
-		ColCache::iterator cit = m_col_cache.begin();
-		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
+		ColPrimitive*const cend = m_sysbuf.buf_end<ColPrimitive>(ColorArray);
+		ColPrimitive* cit = m_sysbuf.buf_begin<ColPrimitive>(ColorArray);
+		for (VtxPrimitive* pit = m_sysbuf.buf_begin<VtxPrimitive>(VertexArray); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
 			pit->init_from_point(p);
 			color_point<format_id>(p, *cit, mode);
 		}
@@ -417,31 +415,31 @@ void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
 
 // no rgb by default
 template <uint8_t format_id>
-void LidarVisNode::color_point(const yalas::types::point_data_record<format_id>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point(const yalas::types::point_data_record<format_id>& p, ColPrimitive &dc, const LidarVisNode::DisplayMode mode) const
 {
 	color_point_no_rgb(p, dc, mode);
 }
 
 // format 2, 3 and 5 have rgb info !
 template <>
-void LidarVisNode::color_point<2>(const yalas::types::point_data_record<2>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point<2>(const yalas::types::point_data_record<2>& p, ColPrimitive& dc, const LidarVisNode::DisplayMode mode) const
 {
 	color_point_with_rgb_info(p, dc, mode);
 }
 
 template <>
-void LidarVisNode::color_point<3>(const yalas::types::point_data_record<3>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point<3>(const yalas::types::point_data_record<3>& p, ColPrimitive& dc, const LidarVisNode::DisplayMode mode) const
 {
 	color_point_with_rgb_info(p, dc, mode);
 }
 
 template <>
-void LidarVisNode::color_point<5>(const yalas::types::point_data_record<5>& p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point<5>(const yalas::types::point_data_record<5>& p, ColPrimitive& dc, const LidarVisNode::DisplayMode mode) const
 {
 	color_point_with_rgb_info(p, dc, mode);
 }
 
-void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, ColPrimitive &dc, const LidarVisNode::DisplayMode mode) const
 {
 	static const uint16_t scale_3_to_16 = std::numeric_limits<uint16_t>::max() / 0x07;
 	switch(mode)
@@ -451,31 +449,31 @@ void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, D
 	case DMIntensity:
 	{
 		const uint16_t intensity = p.intensity * m_intensity_scale; 
-		dc.col[0] = intensity;
-		dc.col[1] = intensity;
-		dc.col[2] = intensity;
+		dc.field[0] = intensity;
+		dc.field[1] = intensity;
+		dc.field[2] = intensity;
 		break;
 	}
 	case DMReturnNumber:
 	{
-		dc.col[0] = p.return_number() * scale_3_to_16;
-		dc.col[1] = p.num_returns() * scale_3_to_16;
-		dc.col[2] = p.return_number() * scale_3_to_16;
+		dc.field[0] = p.return_number() * scale_3_to_16;
+		dc.field[1] = p.num_returns() * scale_3_to_16;
+		dc.field[2] = p.return_number() * scale_3_to_16;
 		break;
 	}
 	case DMReturnNumberIntensity:
 	{
 		const uint16_t intensity = p.intensity * m_intensity_scale; 
-		dc.col[0] = p.return_number() * scale_3_to_16 + intensity;
-		dc.col[1] = p.num_returns() * scale_3_to_16 + intensity;
-		dc.col[2] = p.return_number() * scale_3_to_16 + intensity;
+		dc.field[0] = p.return_number() * scale_3_to_16 + intensity;
+		dc.field[1] = p.num_returns() * scale_3_to_16 + intensity;
+		dc.field[2] = p.return_number() * scale_3_to_16 + intensity;
 		break;
 	}
 	};// end color handler
 }
 
 template <typename PointType>
-void LidarVisNode::color_point_with_rgb_info(const PointType &p, DrawCol& dc, const LidarVisNode::DisplayMode mode) const
+void LidarVisNode::color_point_with_rgb_info(const PointType &p, ColPrimitive &dc, const LidarVisNode::DisplayMode mode) const
 {
 	switch(mode)
 	{
@@ -483,13 +481,13 @@ void LidarVisNode::color_point_with_rgb_info(const PointType &p, DrawCol& dc, co
 	{
 		if (m_normalize_stored_cols) {
 			// assume its normalized to 8 bit, instead of 16
-			dc.col[0] = p.red * 256;
-			dc.col[1] = p.green * 256;
-			dc.col[2] = p.blue * 256;
+			dc.field[0] = p.red * 256;
+			dc.field[1] = p.green * 256;
+			dc.field[2] = p.blue * 256;
 		} else {
-			dc.col[0] = p.red;
-			dc.col[1] = p.green;
-			dc.col[2] = p.blue;
+			dc.field[0] = p.red;
+			dc.field[1] = p.green;
+			dc.field[2] = p.blue;
 		}
 		break;
 	}
@@ -550,7 +548,7 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 		}
 		
 		// Update caches which would be relevant for drawing !
-		if (data.inputValue(aDisplayCacheMode).asBool()) {
+		if (data.inputValue(aDisplayCacheMode).asInt()) {
 			if (m_las_stream.get() == 0) {
 				reset_caches();
 				return MS::kSuccess;
@@ -638,25 +636,11 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 		glf->glPushMatrix();
 		glf->glMultMatrixd(&m_compensation_column_major.matrix[0][0]);
 		{
-			if (m_pos_cache.size()) {
-				glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
-				glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
-				{
-					glf->glEnableClientState(MGL_VERTEX_ARRAY);
-					glf->glVertexPointer(3, MGL_INT, 0, m_pos_cache.data());
-					if (m_col_cache.size()) {
-						glf->glEnableClientState(MGL_COLOR_ARRAY);
-						glf->glColorPointer(3, MGL_UNSIGNED_SHORT, 0, m_col_cache.data());
-					}
-					
-					glf->glDrawArrays(MGL_POINTS, 0, m_pos_cache.size());
-					if (glf->glGetError() != 0) {
-						m_error = "display cache not supported";
-						MPlug(thisMObject(), aDisplayCacheMode).setBool(false);
-					}
+			if (m_sysbuf.is_valid()) {
+				if (!m_sysbuf.draw(glf)) {	
+					m_error = "display cache not supported";
+					MPlug(thisMObject(), aDisplayCacheMode).setInt(0);
 				}
-				glf->glPopAttrib();
-				glf->glPopClientAttrib();
 			} else {
 				assert(m_las_stream.get());
 				yalas::IStream& las_stream = *m_las_stream.get();
@@ -714,16 +698,16 @@ void LidarVisNode::draw_point_records(MGLFunctionTable* glf, yalas::IStream& las
 template <uint8_t format_id, typename IteratorType>
 inline void LidarVisNode::draw_piont_records_with_iterator(IteratorType& it, MGLFunctionTable* glf, const DisplayMode mode) const
 {
-	DrawCol dc;
 	yalas::types::point_data_record<format_id> p;
 	if (mode == DMNoColor) {
 		while(it.read_next_point(p)) {
 			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
 		}
 	} else {
+		ColPrimitive dc;
 		while (it.read_next_point(p)) {
 			color_point<format_id>(p ,dc, mode);
-			glf->glColor3usv(dc.col);
+			glf->glColor3usv(&dc.field[0]);
 			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
 		}// end while iterating points
 	}

@@ -48,31 +48,20 @@ class LidarVisNode : public MPxLocatorNode
 		DMStoredColor				//!< display the stored color if possible
 	};
 	
-	struct DrawCol
+	struct VtxPrimitive : public draw_primitive<MGLint, 3>
 	{
-		MGLushort	col[3];			//!< color triplet
-	};
-	
-	struct DrawPos
-	{
-		MGLint		pos[3];			//!< position vector
-		
 		inline
-		void		init_from_point(const yalas::types::PointDataRecord0& p) {
-			pos[0] = p.x;
-			pos[1] = p.y;
-			pos[2] = p.z;
+		void	init_from_point(const yalas::types::PointDataRecord0& p) {
+			field[0] = p.x;
+			field[1] = p.y;
+			field[2] = p.z;
 		}
 	};
 	
-	typedef std::vector<DrawCol>			ColCache;
-	typedef std::vector<DrawPos>			PosCache;
-	
-	typedef draw_primitive<MGLint, 3>		VtxPrimitve;
 	typedef draw_primitive<MGLushort, 3>	ColPrimitive;
 	
-	typedef ogl_system_buffer<VtxPrimitve, ColPrimitive>	OGLSysBuf;
-	typedef ogl_gpu_buffer<VtxPrimitve, ColPrimitive>		OGLGPUBuf;
+	typedef ogl_system_buffer<VtxPrimitive, ColPrimitive>	OGLSysBuf;
+	typedef ogl_gpu_buffer<VtxPrimitive, ColPrimitive>		OGLGPUBuf;
 	
 	public:
 		LidarVisNode();
@@ -100,10 +89,10 @@ class LidarVisNode : public MPxLocatorNode
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
 		
 		template <uint8_t format_id>
-		inline void color_point(const yalas::types::point_data_record<format_id>& p, DrawCol &dc, const DisplayMode mode) const;
-		inline void color_point_no_rgb(const yalas::types::PointDataRecord0& p, DrawCol &dc, const DisplayMode mode) const;
+		inline void color_point(const yalas::types::point_data_record<format_id>& p, ColPrimitive &dc, const DisplayMode mode) const;
+		inline void color_point_no_rgb(const yalas::types::PointDataRecord0& p, ColPrimitive &dc, const DisplayMode mode) const;
 		template <typename PointType>
-		inline void color_point_with_rgb_info(const PointType& p, DrawCol &dc, const DisplayMode mode) const;
+		inline void color_point_with_rgb_info(const PointType& p, ColPrimitive &dc, const DisplayMode mode) const;
 		
 		template <uint8_t format_id>
 		inline void draw_point_records(MGLFunctionTable* glf, yalas::IStream& las_stream, const DisplayMode mode) const;
@@ -159,10 +148,8 @@ class LidarVisNode : public MPxLocatorNode
 		MMatrix					m_compensation_column_major;	//!< column major compensation matrix for use by ogl
 		
 		OGLSysBuf				m_sysbuf;		//!< Systembased buffer for our data
-		OGLGPUBuf				m_gpubuf;		//!< buffer directly on the graphics-card
+		//OGLGPUBuf				m_gpubuf;		//!< buffer directly on the graphics-card
 		
-		ColCache				m_col_cache;	//!< cache keeping color of records
-		PosCache				m_pos_cache;	//!< cache keeping position of records
 		ROMappedFile			m_map;			//!< may contain a memory map of our lidar file
 };
 

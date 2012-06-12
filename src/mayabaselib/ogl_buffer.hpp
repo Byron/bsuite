@@ -21,40 +21,24 @@
 //********************************************************************
 //**	Include
 //********************************************************************
-#include <mayabaselib/ogl_headers.h>
-#include <stdlib.h>
-
-//********************************************************************
-//**	Enumerations
-//********************************************************************
-
-enum BufferMode
-{
-	GPUMemory,		//!< Use GPU memory
-	SystemMemory	//!< Use System Memory
-};
-
-enum BufferType
-{
-	VertexArray = 1,//!< Id for the vertex array
-	ColorArray = 2	//!< Id for the color array
-};
-
-
-//! A generic primitive suitable for drawing
-template <typename Type, size_t num_fields>
-struct draw_primitive
-{
-	typedef Type type;
-	static const size_t	field_count = num_fields;
-	
-	type				dat[field_count];
-};
+#include "mayabaselib/detail/ogl_buffer_fun.hpp"
 
 
 //********************************************************************
 //**	Template Types
 //********************************************************************
+
+//! A generic primitive suitable for drawing
+//! It consists of a field type and an amount of fields
+template <typename Type, size_t num_fields>
+struct draw_primitive
+{
+	typedef Type		field_type;
+	static const size_t	field_count = num_fields;
+	
+	field_type			field[field_count];
+};
+
 
 //! A buffer object which provides you with storage space to put your cached point clouds.
 //! This base provides an interface declaration which can be used among the different versions.
@@ -92,28 +76,31 @@ class ogl_buffer
 	//! Will be 0 if the buffer is not set !
 	template <typename T>
 	inline
-	const T*		buf_begin(BufferType) const;
+	const T*		buf_begin(const BufferType) const;
 	
 	//! \return one past the last byte in the buffer of the given type, or 0 if the buffer is not set
 	template <typename T>
 	inline
-	const T*		buf_end(BufferType) const;
+	const T*		buf_end(const BufferType) const;
 	
 	//! non-const version of the one above
 	template <typename T>
 	inline
-	T*				buf_begin(BufferType);
+	T*				buf_begin(const BufferType);
 	
 	//! non-const version of the one above
 	template <typename T>
 	inline
-	T*				buf_end(BufferType);
+	T*				buf_end(const BufferType);
 	
 	//! Call to end buffer access
 	void			end_access();
 	
 	//! \return true if all the buffers in this instance are set and can be used !
 	bool			is_valid() const;
+	
+	//! \return amount of draw primitives stored in this instance
+	size_t			size() const;
 	//! @} end Query Interface
 	
 	
@@ -125,14 +112,23 @@ class ogl_buffer
 	//! @{
 	
 	//! Draw the data in this instance as efficiently as possible
-	void draw(MGLFunctionTable* glf) const;
+	//! \return true if drawing succeeded
+	bool draw(MGLFunctionTable* glf) const;
 	
 	//! Resize the buffers in this instance to the given value
 	//! Setting this to 0 will effectively clear the buffer
 	//! \return true on success, false on failure.
-	//! \note as it is possible to store data directly on the graphics-card, a glf pointer needs to be provided
-	//! If the resize succeeds, your buffer is_valid(), otherwise it is not.
-	bool resize(MGLFunctionTable* glf, const size_t new_size = 0);
+	bool resize(const size_t new_size = 0);
+	
+	//! Delete the buffer of the given type, so it will not be drawn, or consume memory
+	//! \return true on success and false if the buffer could not be deleted.
+	//! \note deleted buffers will be revived after a call to resize assuming that
+	//! it the size is new.
+	bool delete_array(const BufferType);
+	
+	//! Revive a previously deleted array
+	//! \return true if the new array now is alive, or false if this instance is not initialized
+	bool revive_array(const BufferType);
 	
 	//! @} end Edit Interface
 	
@@ -156,7 +152,7 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 	
 	~ogl_system_buffer()
 	{
-		resize(0, 0);
+		resize(0);
 	}
 	
 	public:
@@ -167,7 +163,7 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 	
 	template <typename T>
 	inline
-	const T*		buf_begin(BufferType type) const {
+	const T*		buf_begin(const BufferType type) const {
 		switch(type)
 		{
 		case VertexArray:	return reinterpret_cast<const T*>(_vtx_buf);
@@ -178,7 +174,7 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 	
 	template <typename T>
 	inline
-	const T*		buf_end(BufferType type) const {
+	const T*		buf_end(const BufferType type) const {
 		switch(type)
 		{
 		case VertexArray:	return reinterpret_cast<const T*>(_vtx_buf + _len);
@@ -189,7 +185,7 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 	
 	template <typename T>
 	inline
-	T*				buf_begin(BufferType type) {
+	T*				buf_begin(const BufferType type) {
 		switch(type)
 		{
 		case VertexArray:	return reinterpret_cast<T*>(_vtx_buf);
@@ -200,7 +196,7 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 	
 	template <typename T>
 	inline
-	T*				buf_end(BufferType type) {
+	T*				buf_end(const BufferType type) {
 		switch(type)
 		{
 		case VertexArray:	return reinterpret_cast<T*>(_vtx_buf + _len);
@@ -215,14 +211,35 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 		return _len != 0;
 	}
 	
+	size_t			size() const {
+		return _len;
+	}
+	
 	inline
-	void draw(MGLFunctionTable* glf) const {
+	bool draw(MGLFunctionTable* glf) const {
+		if (glf == 0 || !is_valid()) {
+			return false;
+		}
 		
+		glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
+		glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
+		{
+			setup_primitive_array<VertexPrimitive, VertexArray>(glf, _vtx_buf);
+			if (_col_buf) {
+				setup_primitive_array<ColorPrimitive, ColorArray>(glf, _col_buf);
+			}
+			
+			glf->glDrawArrays(MGL_POINTS, 0, _len);
+		}
+		glf->glPopAttrib();
+		glf->glPopClientAttrib();
+		
+		return glf->glGetError() == 0;
 	}
 	
 	//! Resize this instance. Its safe to pass in 0 as glf
 	inline
-	bool resize(MGLFunctionTable*, const size_t new_size = 0) {
+	bool resize(const size_t new_size = 0) {
 		if (new_size == _len) {
 			return true;
 		}
@@ -236,22 +253,42 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 			return true;
 		}
 		
-		if (_len) {
-			_vtx_buf = reinterpret_cast<VertexPrimitive*>(realloc(_vtx_buf, sizeof(*_vtx_buf) * new_size));
-			_col_buf = reinterpret_cast<ColorPrimitive*>(realloc(_col_buf, sizeof(*_col_buf) * new_size));
-		} else {
-			_vtx_buf = reinterpret_cast<VertexPrimitive*>(malloc(sizeof(*_vtx_buf) * new_size));
-			_col_buf = reinterpret_cast<ColorPrimitive*>(malloc(sizeof(*_col_buf) * new_size));
-		}
+		// As we allocate large blocks, we just use realloc for convenience, which does the same for a 0 pointer
+		// as malloc !
+		_vtx_buf = reinterpret_cast<VertexPrimitive*>(realloc(_vtx_buf, sizeof(*_vtx_buf) * new_size));
+		_col_buf = reinterpret_cast<ColorPrimitive*>(realloc(_col_buf, sizeof(*_col_buf) * new_size));
 		
 		// did any of the buffer's not get allocated ?
 		if (!_vtx_buf || !_col_buf) {
-			resize(0, 0);
+			resize(0);
 			return false;
 		}
 		
 		_len = new_size;
 		return is_valid();
+	}
+	
+	bool delete_array(const BufferType type)
+	{
+		if (type != ColorArray) {
+			return false;
+		}
+		
+		free(_col_buf);
+		_col_buf = 0;
+		return true;
+	}
+	
+	bool revive_array(const BufferType type) {
+		if (!is_valid() || type != ColorArray) {
+			return false;
+		}
+		
+		if (_col_buf == 0) {
+			_col_buf = reinterpret_cast<ColorPrimitive*>(malloc(sizeof(*_col_buf) * _len));
+		}
+		
+		return _col_buf != 0;
 	}
 };
 
