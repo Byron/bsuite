@@ -396,7 +396,12 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 	const int numFaces = tex->numFaces();
 	const int numChannels = tex->numChannels();
 	const DisplayMode displayMode = (DisplayMode)MPlug(thisNode, aDisplayMode).asShort();
-	const float mult = MPlug(thisNode, aSampleMultiplier).asFloat();
+	float mult = MPlug(thisNode, aSampleMultiplier).asFloat();
+	
+	// only absolute sampling supports higher values. The others are along UV!
+	if (displayMode == TexelTile && mult > 1.0) {
+		mult = 1.0;
+	}
 	
 	// count memory we require for preallocation
 	size_t numTexels = 0;
@@ -424,7 +429,8 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 	{
 	case TexelTile:
 	{
-		const float step = 0.01f;
+		const float inv_mult = 1.0f / mult;
+		const float step = 0.01f * inv_mult;
 		Float3		pos;			// position
 		for (int i = 0; i < numFaces; ++i) {
 			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
@@ -433,7 +439,7 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 			
 			for (int u = 0; u < ures; ++u) {
 				for (int v = 0; v < vres; ++v) {
-					tex->getPixel(i, u, v, &pix.x, 0, numChannels);
+					tex->getPixel(i, u * inv_mult, v * inv_mult, &pix.x, 0, numChannels);
 					*opos++ = pos;
 					*ocol++ = pix;
 					pos.y += step;
