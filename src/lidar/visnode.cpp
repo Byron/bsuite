@@ -136,8 +136,8 @@ MStatus LidarVisNode::initialize()
 	aDisplayCacheMode = mfnEnum.create("displayCacheMode", "dcm");
 	CHECK_MSTATUS_AND_RETURN_IT(status);
 	mfnEnum.addField("None", 0);
-	mfnEnum.addField("SystemCache", (int)SystemMemory);
-	mfnEnum.addField("GPUCache", (int)GPUMemory);
+	mfnEnum.addField("SystemCache", (short)SystemMemory);
+	mfnEnum.addField("GPUCache", (short)GPUMemory);
 	
 	aNormalizeStoredCols = numFn.create("normalizeStoredColors", "nscol", MFnNumericData::kBoolean, 0, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
@@ -145,11 +145,11 @@ MStatus LidarVisNode::initialize()
 	
 	
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
-	mfnEnum.addField("NoColor", (int)DMNoColor);
-	mfnEnum.addField("Intensity", (int)DMIntensity);
-	mfnEnum.addField("ReturnNumber", (int)DMReturnNumber);
-	mfnEnum.addField("ReturnNumberIntensified", (int)DMReturnNumberIntensity);
-	mfnEnum.addField("StoredColor", (int)DMStoredColor);
+	mfnEnum.addField("NoColor", (short)DMNoColor);
+	mfnEnum.addField("Intensity", (short)DMIntensity);
+	mfnEnum.addField("ReturnNumber", (short)DMReturnNumber);
+	mfnEnum.addField("ReturnNumberIntensified", (short)DMReturnNumberIntensity);
+	mfnEnum.addField("StoredColor", (short)DMStoredColor);
 	
 	mfnEnum.setDefault((short)DMNoColor);
 	mfnEnum.setKeyable(true);
@@ -320,6 +320,7 @@ void LidarVisNode::reset_caches()
 
 void LidarVisNode::reset_draw_caches()
 {
+	std::cerr << "resetting draw caches" << std::endl;
 	m_sysbuf.resize(0);
 }
 
@@ -334,12 +335,12 @@ void LidarVisNode::update_draw_cache(MDataBlock &data)
 		return;
 	}
 	
-	DisplayMode mode = static_cast<const DisplayMode>(data.outputValue(aDisplayMode).asInt());
+	DisplayMode mode = static_cast<const DisplayMode>(data.outputValue(aDisplayMode).asShort());
 	const uint8_t fmt = m_las_stream->header().point_data_format_id;
 	
 	// Sanity check - if people try to use stored color in files that don't have it, reset the mode
 	if (mode == DMStoredColor && fmt != 2 && fmt != 3 && fmt != 5) {
-		data.outputValue(aDisplayMode).setInt(DMNoColor);
+		data.inputValue(aDisplayMode).setShort(DMNoColor);
 		mode = DMNoColor;
 	}
 	
@@ -554,7 +555,8 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 		}
 		
 		// Update caches which would be relevant for drawing !
-		if (data.inputValue(aDisplayCacheMode).asInt()) {
+		std::cerr << data.inputValue(aDisplayCacheMode).asShort() << " == display cache mode" << std::endl;
+		if (data.inputValue(aDisplayCacheMode).asShort()) {
 			if (m_las_stream.get() == 0) {
 				reset_caches();
 				return MS::kSuccess;
@@ -616,7 +618,7 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 {
 	// make sure we are uptodate - trigger compute
 	MPlug(thisMObject(), aNeedsCompute).asInt();
-	const DisplayMode mode = static_cast<const DisplayMode>(MPlug(thisMObject(), aDisplayMode).asInt());
+	const DisplayMode mode = static_cast<const DisplayMode>(MPlug(thisMObject(), aDisplayMode).asShort());
 	
 	view.beginGL();
 	if (m_error.length()) {
@@ -645,7 +647,7 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 			if (m_sysbuf.is_valid()) {
 				if (!m_sysbuf.draw(glf)) {	
 					m_error = "display cache not supported";
-					MPlug(thisMObject(), aDisplayCacheMode).setInt(0);
+					MPlug(thisMObject(), aDisplayCacheMode).setShort(0);
 				}
 			} else {
 				assert(m_las_stream.get());
