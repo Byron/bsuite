@@ -30,6 +30,7 @@
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MFloatVector.h>
 #include <maya/MFloatPointArray.h>
+#include <maya/MPlugArray.h>
 
 
 #include "mayabaselib/ogl_headers.h"
@@ -451,15 +452,25 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 		}
 		
 		MStatus stat;
-		MFnMesh meshFn(MPlug(thisNode, aInMesh).asMObject(), &stat);
-		if (stat.error()) {
-			m_error = "no mesh provided";
+		// init from conneted node - don't have datablock here :(
+		MPlug inMeshPlug(thisNode, aInMesh);
+		MPlugArray cons;
+		inMeshPlug.connectedTo(cons, true, false);
+		
+		if (cons.length() != 1) {
+			m_error = "no mesh connected to our inMesh attribute";
 			break;
 		}
+		MFnMesh meshFn(cons[0].node(), &stat);
+		
 		
 		// For now, lets support one-on-one mappings without sub-face support
 		if (meshFn.numPolygons() != tex->numFaces()) {
-			m_error = "Face count of texture does not match polygon count of connected mesh. Currently these must match one on one";
+			m_error = "Face count of texture does not match polygon count of connected mesh. Currently these must match one on one: ";
+			m_error += meshFn.numPolygons();
+			m_error += " != ";
+			m_error += tex->numFaces();
+			m_error += "(mesh.tricount != tex.tricount)";
 			break;
 		}
 		
@@ -551,6 +562,11 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 		break;
 	}
 	}// switch displayMode
+	
+	assert(opos <= buf.end(VertexArray));
+	assert(ocol <= buf.end(ColorArray));
+	
+	buf.end_access();
 	
 	// reset previous error - at this point we have samples
 	if (m_error.length() && numTexels && rval) {
@@ -665,7 +681,8 @@ void PtexVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplayStyl
 	
 	// UPDATE SAMPLE BUFFERS
 	////////////////////////
-	{
+	if (m_needs_cache_update) {
+		m_needs_cache_update = false;
 		const DisplayCacheMode cache_mode = (DisplayCacheMode)MPlug(thisMObject(), aDisplayCacheMode).asShort();
 		if (cache_mode == DCSystem) {
 			m_gpubuf.resize(0);
@@ -678,16 +695,19 @@ void PtexVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplayStyl
 		}
 	}
 	
+	
+	glf->glPointSize(m_gl_point_size);
 	if (m_gpubuf.is_valid()) {
 		res = m_gpubuf.draw(glf);
-	} else if (m_gpubuf.is_valid()) {
+	} else if (m_sysbuf.is_valid()) {
 		res = m_sysbuf.draw(glf);
-	} else {
+	} else if (m_error.length() == 0) {
 		m_error = "Nothing to display";
 	}
 	
 	if (res == false && m_error.length() == 0) {
-		m_error = "Display of samples failed";
+		m_error = "Display of samples failed, GL error code: ";
+		m_error += glf->glGetError();
 	}
 	
 finish_drawing:
