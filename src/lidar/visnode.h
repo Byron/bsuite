@@ -20,6 +20,7 @@
 
 #include "yalaslib/IStream.h"
 #include "baselib/typ.h"
+#include "mayabaselib/ogl_buffer.hpp"
 
 #include <maya/MPxLocatorNode.h>
 #include <maya/MGLdefinitions.h>
@@ -66,6 +67,12 @@ class LidarVisNode : public MPxLocatorNode
 	
 	typedef std::vector<DrawCol>			ColCache;
 	typedef std::vector<DrawPos>			PosCache;
+	
+	typedef draw_primitive<MGLint, 3>		VtxPrimitve;
+	typedef draw_primitive<MGLushort, 3>	ColPrimitive;
+	
+	typedef ogl_system_buffer<VtxPrimitve, ColPrimitive>	OGLSysBuf;
+	typedef ogl_gpu_buffer<VtxPrimitve, ColPrimitive>		OGLGPUBuf;
 	
 	public:
 		LidarVisNode();
@@ -117,8 +124,8 @@ class LidarVisNode : public MPxLocatorNode
 		static MObject aIntensityScale;			//!< scales the intensity by the given amount
 		static MObject aTranslateToOrigin;		//!< if true, the point samples will be translated back to the origin
 		static MObject aUseMMap;				//!< if true, we should use memory mapping (non-windows only !)
-		static MObject aUseDisplayCache;		//!< if true, all data will be cached on the gpu
-		static MObject aNormalizeStoredCols;		//!< if true, stored colors will be upscaled to 16 bit - only necessary if stored normalized to 8 bit
+		static MObject aDisplayCacheMode;		//!< Identify the type of display cache to use
+		static MObject aNormalizeStoredCols;	//!< if true, stored colors will be upscaled to 16 bit - only necessary if stored normalized to 8 bit
 		static MObject aDisplayMode;			//!< display mode enumeration
 		
 		// output attributes
@@ -150,6 +157,9 @@ class LidarVisNode : public MPxLocatorNode
 		
 		static const MMatrix	convert_z_up_to_y_up_column_major;	//!< matrix to convert z up to y up
 		MMatrix					m_compensation_column_major;	//!< column major compensation matrix for use by ogl
+		
+		OGLSysBuf				m_sysbuf;		//!< Systembased buffer for our data
+		OGLGPUBuf				m_gpubuf;		//!< buffer directly on the graphics-card
 		
 		ColCache				m_col_cache;	//!< cache keeping color of records
 		PosCache				m_pos_cache;	//!< cache keeping position of records

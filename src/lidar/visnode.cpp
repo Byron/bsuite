@@ -57,7 +57,7 @@ MObject LidarVisNode::aGlPointSize;
 MObject LidarVisNode::aIntensityScale;
 MObject LidarVisNode::aTranslateToOrigin;
 MObject LidarVisNode::aUseMMap;
-MObject LidarVisNode::aUseDisplayCache;
+MObject LidarVisNode::aDisplayCacheMode;
 MObject LidarVisNode::aDisplayMode;
 MObject LidarVisNode::aNormalizeStoredCols;
 
@@ -133,9 +133,11 @@ MStatus LidarVisNode::initialize()
 	numFn.setAffectsWorldSpace(true);
 	numFn.setInternal(true);
 	
-	aUseDisplayCache = numFn.create("useDisplayCache", "udc", MFnNumericData::kBoolean, 0, &status);
+	aDisplayCacheMode = mfnEnum.create("displayCacheMode", "dcm");
 	CHECK_MSTATUS_AND_RETURN_IT(status);
-	numFn.setInternal(true);
+	mfnEnum.addField("None", 0);
+	mfnEnum.addField("SystemCache", (int)SystemMemory);
+	mfnEnum.addField("GPUCache", (int)GPUMemory);
 	
 	aNormalizeStoredCols = numFn.create("normalizeStoredColors", "nscol", MFnNumericData::kBoolean, 0, &status);
 	CHECK_MSTATUS_AND_RETURN_IT(status);
@@ -222,7 +224,7 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aIntensityScale));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aTranslateToOrigin))
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseMMap));
-	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aUseDisplayCache));
+	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aDisplayCacheMode));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aNormalizeStoredCols));
 	CHECK_MSTATUS_AND_RETURN_IT(addAttribute(aDisplayMode));
 	
@@ -258,7 +260,7 @@ MStatus LidarVisNode::initialize()
 	
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
-	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseDisplayCache,	aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayCacheMode,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,		aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aNormalizeStoredCols, aNeedsCompute));
 	
@@ -548,7 +550,7 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 		}
 		
 		// Update caches which would be relevant for drawing !
-		if (data.inputValue(aUseDisplayCache).asBool()) {
+		if (data.inputValue(aDisplayCacheMode).asBool()) {
 			if (m_las_stream.get() == 0) {
 				reset_caches();
 				return MS::kSuccess;
@@ -650,7 +652,7 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 					glf->glDrawArrays(MGL_POINTS, 0, m_pos_cache.size());
 					if (glf->glGetError() != 0) {
 						m_error = "display cache not supported";
-						MPlug(thisMObject(), aUseDisplayCache).setBool(false);
+						MPlug(thisMObject(), aDisplayCacheMode).setBool(false);
 					}
 				}
 				glf->glPopAttrib();
