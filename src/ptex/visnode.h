@@ -3,6 +3,7 @@
 
 #include "Ptexture.h"
 #include "baselib/math_util.h"
+#include "mayabaselib/ogl_buffer.hpp"
 
 #include <maya/MPxLocatorNode.h>
 #include <maya/MGLdefinitions.h>
@@ -24,6 +25,30 @@ class PtexVisNode : public MPxLocatorNode
 		FaceRelative = 1,			//!< display in face space, along uvs
 		FaceAbsolute = 2			//!< display in face space, along longest edge
 	};
+	
+	enum DisplayCacheMode
+	{
+		DCSystem = 0,				//! Cache in system memory
+		DCGPU						//! Cache directly on the GPU
+	};
+	
+	template <BufferType type>
+	struct DrawPrimitive : public draw_primitive<MGLfloat, 3, type>
+	{
+		inline
+		DrawPrimitive& operator = (const Float3& rhs) {
+			this->field[0] = rhs.x;
+			this->field[1] = rhs.y;
+			this->field[2] = rhs.z;
+			return *this;
+		}
+	};
+	
+	typedef DrawPrimitive<VertexArray> VtxPrimitive;
+	typedef DrawPrimitive<ColorArray> ColPrimitive;
+	
+	typedef ogl_system_buffer<VtxPrimitive, ColPrimitive>	OGLSysBuf;
+	typedef ogl_gpu_buffer<VtxPrimitive, ColPrimitive>		OGLGPUBuf;
 	
 	public:
 		PtexVisNode();
@@ -62,7 +87,8 @@ class PtexVisNode : public MPxLocatorNode
 		//! pushed through opengl.
 		//! \return true on success
 		//! \note changes error code on failure
-		bool update_sample_buffer(MDataBlock& data);
+		template <typename Buffer>
+		bool update_sample_buffer(Buffer& buf);
 		
 	protected:
 		// Input attributes
@@ -72,6 +98,7 @@ class PtexVisNode : public MPxLocatorNode
 		static MObject aInMesh;					//!< mesh to display the ptex information for
 		static MObject aGlPointSize;			//!< size of a point when drawing
 		static MObject aDisplayMode;			//!< defines the way we display samples
+		static MObject aDisplayCacheMode;		//!< defines the way we cache samples for display
 		static MObject aSampleMultiplier;		//!< Multiply amount of samples taken
 		
 		// output attributes
@@ -94,9 +121,10 @@ class PtexVisNode : public MPxLocatorNode
 		PtexFilterPtr	m_ptex_filter;			//!< filter ptr to be used for ptex evaluation
 		PtexTexturePtr	m_ptex_texture;			//!< texture pointer
 		MString			m_error;				//!< error string
+		bool			m_needs_cache_update;	//!< if tree, the cache needs updating on next drawing
 		
-		Float3Vector	m_sample_pos;			//!< sample positions
-		Float3Vector	m_sample_col;			//!< sample colors
+		OGLSysBuf		m_sysbuf;				//!< system based cache for primitives
+		OGLGPUBuf		m_gpubuf;				//!< gpu based cache for primitives
 		MGLfloat		m_gl_point_size;		//!< size of a point when drawing (cache)	
 };
 

@@ -42,6 +42,8 @@ global proc AEptexVisNodeTemplate(string $nodeName)
 						
 		editorTemplate -addControl "ptexFilterType";
 		editorTemplate -addControl "ptexFilterSize";
+		editorTemplate -ann "Cache in system memory or directly on GPU"
+						-l "Display Cache" -addControl "displayCacheMode";
 		editorTemplate -ann "texelTile: Show textures faces in one line; faceRelative: samples along u and v; faceAbsolute: samples along actual positions"
 						-addControl "displayMode";
 		editorTemplate -addControl "glPointSize";
