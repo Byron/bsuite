@@ -234,6 +234,7 @@ endfunction()
 #					DEFINES def1 [...defN]
 #					WITHOUT_EXCEPTIONS
 #					WITH_TEST
+#					WITH_OPENMP
 #				)
 #
 # This function allows to configure an average project and automatically add
@@ -258,11 +259,17 @@ endfunction()
 #	If set, a python based test will be run which loads your compiled plugin.
 #	In your mrv/nose test implementation, you will have to verify that your plugin
 #	is loaded.
+# WITH_OPENMP
+#	If set, openmp support will be enabled for this project.
+#	If not so, the build system will not use omp.
+#	Make sure that you use the #ifdef _OPENMP macro to protect against 
+#	situations where openmp is not present, in case of compilers which hate
+#	unknown pragmas.
 # All other arguments are documented in the add_project method
 # ======================================
 function(add_maya_project)
 	cmake_parse_arguments(PROJECT 
-						"WITH_TEST;${ADD_PROJECT_NO_ARG_OPTS}"
+						"WITH_OPENMP;WITH_TEST;${ADD_PROJECT_NO_ARG_OPTS}"
 						"${ADD_PROJECT_SINGLE_ARG_OPTS}"
 						"LINK_MAYA_LIBRARIES;MAYA_VERSIONS;${ADD_PROJECT_MULTI_ARG_OPTS}"
 						${ARGN})
@@ -333,6 +340,19 @@ function(add_maya_project)
 		set(INCL_DIR_FLAG "-I")
 	endif()
 	
+	if (PROJECT_WITH_OPENMP)
+		include(FindOpenMP 
+					OPTIONAL 
+					RESULT_VARIABLE
+						OPENMP_INCLUDE_WORKED)
+		
+		if (NOT OPENMP_INCLUDE_WORKED OR NOT OPENMP_FOUND)
+			message(WARNING "This system has not support for OpenMP as desired by project '${PROJECT_NAME}' - it will not use openmp")
+		else()
+			message(STATUS "OpenMP enabled for project '${PROJECT_NAME}'")
+		endif()
+	endif()
+	
 	# TODO: just build an arglist for the more generic ADD_PROJECT - put our code around it.
 	# Building argument lists is somewhat of a hassle, so we leave the working, but redundant code ... 
 	
@@ -396,6 +416,10 @@ function(add_maya_project)
 		if(PROJECT_WITHOUT_EXCEPTIONS AND UNIX)
 			# TODO: windows version ... 
 			append_to_target_property(${PROJECT_ID} COMPILE_FLAGS -fno-exceptions YES)
+		endif()
+		
+		if (PROJECT_WITH_OPENMP AND OPENMP_FOUND)
+			append_to_target_property(${PROJECT_ID} COMPILE_FLAGS "${OpenMP_CXX_FLAGS}" YES)
 		endif()
 		
 		target_link_libraries(${PROJECT_ID} 
