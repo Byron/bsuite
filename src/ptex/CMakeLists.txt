@@ -41,5 +41,6 @@ if(WAS_SUCCESSFUL)
 						${PTEX_LIBRARY_DIR}
 					WITH_TEST
 					WITHOUT_EXCEPTIONS
+					WITH_OPENMP
 					)
 endif()

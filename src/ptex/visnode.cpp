@@ -43,6 +43,10 @@
 
 #include "baselib/math_util.h"
 
+#ifdef _OPENMP
+	#include <omp.h>
+#endif
+
 
 //********************************************************************
 //**	Class Implementation
@@ -403,9 +407,27 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 		mult = 1.0;
 	}
 	
+#ifdef _OPENMP
+	// just use vector to assure we don't leak. We use direct memory access later, which is somewhat evil !
+	typedef std::vector<size_t> SizeVector;
+	SizeVector lut_destruct;
+	lut_destruct.reserve(numFaces);	// prevents a call to the constructor ! We write the data later
+	size_t* flut = static_cast<size_t*>(lut_destruct.data());
+	
+	// Ptex crashes if any filter is used - point seems to work well in multi-threaded mode !
+	const int thread_count = to_filter_type(MPlug(thisNode, aPtexFilterType).asShort()) == PtexFilter::f_point 
+									? omp_get_max_threads()
+									: 1;
+#endif
+	
 	// count memory we require for preallocation
 	size_t numTexels = 0;
 	for (int i = 0; i < numFaces; ++i) {
+#ifdef _OPENMP
+		// build a lookup table for each face, to allow accesing the texel directly
+		flut[i] = numTexels;
+#endif
+		
 		const Ptex::Res& r = tex->getFaceInfo(i).res;
 		// emulate the way we use the multiplier later
 		numTexels += (size_t)((int)(r.u() * mult) * (int)(r.v() * mult));
@@ -432,11 +454,14 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 		const float inv_mult = 1.0f / mult;
 		const float step = 0.01f * inv_mult;
 		Float3		pos;			// position
+		
+		// NOTE: can't properly paralellize this without another LUT for the posX
+		// As this is not really useful (unless you are debugging), we spare the work here
 		for (int i = 0; i < numFaces; ++i) {
 			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
 			const int ures = (int)(fi.res.u() * mult);
 			const int vres = (int)(fi.res.v() * mult);
-			
+					
 			for (int u = 0; u < ures; ++u) {
 				for (int v = 0; v < vres; ++v) {
 					tex->getPixel(i, u * inv_mult, v * inv_mult, &pix.x, 0, numChannels);
@@ -495,8 +520,16 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 		meshFn.getPoints(vtx);
 		#define TFLOAT3 MFloatPoint
 #endif
+		MIntArray tcounts;
+		MIntArray tverts;
+		meshFn.getTriangles(tcounts, tverts);
+		tcounts.clear();
+		
 		const float fsize = MPlug(thisNode, aPtexFilterSize).asFloat();
-		int tverts[3];						// stores 3 triangle vertex ids
+		
+#ifdef _OPENMP
+#pragma omp parallel for private(pix) schedule(dynamic) num_threads(thread_count)
+#endif
 		for (int i = 0; i < numFaces; ++i) {
 			const Ptex::FaceInfo& fi = tex->getFaceInfo(i);
 			const int ures = (int)(fi.res.u() * mult);
@@ -504,10 +537,15 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 			const float ufres = (float)ures;
 			const float vfres = (float)vres;
 			
-			meshFn.getPolygonTriangleVertices(i, 0, tverts);
-			const TFLOAT3& a = vtx[tverts[0]];
-			const TFLOAT3& b = vtx[tverts[1]];
-			const TFLOAT3& c = vtx[tverts[2]];
+			const uint32_t triofs = i * 3;
+			const TFLOAT3& a = vtx[tverts[triofs + 0]];
+			const TFLOAT3& b = vtx[tverts[triofs + 1]];
+			const TFLOAT3& c = vtx[tverts[triofs + 2]];
+			
+#ifdef _OPENMP
+			VtxPrimitive* popos = opos + flut[i];
+			ColPrimitive* pocol = ocol + flut[i];
+#endif
 			
 			switch(displayMode)
 			{
@@ -520,8 +558,13 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 					for (int v = 0; v < vres; ++v) {
 						const float vf = (1.0f - uf) * (v / vfres);
 						filter->eval(&pix.x, 0, numChannels, i, uf, vf, fsize, fsize, fsize, fsize);
+#ifdef _OPENMP
+						*popos++ = a + uvec + (c-a)*vf;
+						*pocol++ = pix;
+#else
 						*opos++ = a + uvec + (c-a)*vf;
 						*ocol++ = pix;
+#endif
 					}// for each vsample
 				}// for each usample
 				break;
@@ -554,8 +597,13 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 							}
 							uv_from_pos(a, b, c, p, uf, vf);
 							filter->eval(&pix.x, 0, numChannels, i, uf, vf, fsize, fsize, fsize, fsize);
+#ifdef _OPENMP
+							*popos++ = p;
+							*pocol++ = pix;
+#else							
 							*opos++ = p;
 							*ocol++ = pix;
+#endif
 						}// for each even/odd texel
 					}// for each vsample
 				}// for each usample
@@ -571,8 +619,17 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 	}
 	}// switch displayMode
 	
+
+	// in omp mode, we access the data directly, hence the points don't't move
+#ifndef _OPENMP
 	assert(opos == buf.end(VertexArray));
 	assert(ocol == buf.end(ColorArray));
+#else
+	// be very sure that the finalization code is run by the main thread
+	#pragma omp master
+#endif
+	
+	
 	
 	buf.end_access();
 	
