@@ -377,20 +377,26 @@ inline void LidarVisNode::update_point_cache(const DisplayMode mode)
 template <uint8_t format_id, typename IteratorType>
 inline void LidarVisNode::update_point_cache_with_iterator(IteratorType& it, const DisplayMode mode)
 {
+	if (!m_sysbuf.begin_access()) {
+		return;
+	}
+	
 	yalas::types::point_data_record<format_id> p;
-	VtxPrimitive*const pend = m_sysbuf.buf_end<VtxPrimitive>(VertexArray);
+	VtxPrimitive*const pend = m_sysbuf.buf_end<VtxPrimitive>();
 	if (mode == DMNoColor) {
-		for (VtxPrimitive* pit = m_sysbuf.buf_begin<VtxPrimitive>(VertexArray); pit < pend && it.read_next_point(p); ++pit) {
+		for (VtxPrimitive* pit = m_sysbuf.buf_begin<VtxPrimitive>(); pit < pend && it.read_next_point(p); ++pit) {
 			pit->init_from_point(p);
 		}
 	} else {
-		ColPrimitive*const cend = m_sysbuf.buf_end<ColPrimitive>(ColorArray);
-		ColPrimitive* cit = m_sysbuf.buf_begin<ColPrimitive>(ColorArray);
-		for (VtxPrimitive* pit = m_sysbuf.buf_begin<VtxPrimitive>(VertexArray); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
+		ColPrimitive*const cend = m_sysbuf.buf_end<ColPrimitive>();
+		ColPrimitive* cit = m_sysbuf.buf_begin<ColPrimitive>();
+		for (VtxPrimitive* pit = m_sysbuf.buf_begin<VtxPrimitive>(); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
 			pit->init_from_point(p);
 			color_point<format_id>(p, *cit, mode);
 		}
 	}
+	
+	m_sysbuf.end_access();
 }
 
 void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)

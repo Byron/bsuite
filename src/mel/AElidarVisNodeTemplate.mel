@@ -43,8 +43,8 @@ global proc AElidarVisNodeTemplate(string $nodeName)
 			editorTemplate -ann "Use a memory map, which greatly speeds up reading of point samples." 
 						-addControl "useMMap";
 		}
-		editorTemplate -ann "Cache the points on the graphics card. Costs additional memory, which might make its use prohibitive"
-						-addControl "useDisplayCache";
+		editorTemplate -ann "Cache the points in system memory or on the graphics card. Costs additional memory, which might make its use prohibitive"
+						-l "Display Caching" -addControl "displayCacheMode";
 		editorTemplate -ann "Determine the style of the points to draw. Usually this affects only the color"
 						-addControl "displayMode";
 		editorTemplate -ann "Size of the points to draw"

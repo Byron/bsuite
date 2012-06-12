@@ -102,12 +102,12 @@ inline GLArrayMemFun buffer_mode_to_array_memfun<ColorArray>()
 
 //! setup the gl state to draw the given primitive array pointer
 //! We assume the draw state has been saved in some way as it will be modified
-template <typename Primitive, BufferType type>
+template <typename Primitive>
 void setup_primitive_array(MGLFunctionTable* glf, const Primitive* pris)
 {
 	// static switch
-	glf->glEnableClientState(type);
-	(*glf.*(buffer_mode_to_array_memfun<type>()))(Primitive::field_count, data_type_to_ogl_constant<typename Primitive::field_type>(), 0, pris);
+	glf->glEnableClientState(Primitive::buffer_type);
+	(*glf.*(buffer_mode_to_array_memfun<Primitive::buffer_type>()))(Primitive::field_count, data_type_to_ogl_constant<typename Primitive::field_type>(), 0, pris);
 }
 
 

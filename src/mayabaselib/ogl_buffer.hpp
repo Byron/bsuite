@@ -30,19 +30,22 @@
 
 //! A generic primitive suitable for drawing
 //! It consists of a field type and an amount of fields
-template <typename Type, size_t num_fields>
+//! Its buffer type indicates in which buffer it will be used
+template <typename Type, size_t num_fields, BufferType type>
 struct draw_primitive
 {
-	typedef Type		field_type;
-	static const size_t	field_count = num_fields;
+	typedef Type			field_type;
+	static const size_t		field_count = num_fields;
 	
-	field_type			field[field_count];
+	field_type				field[field_count];
+	
+	static const BufferType buffer_type = type;
 };
 
 
 //! A buffer object which provides you with storage space to put your cached point clouds.
 //! This base provides an interface declaration which can be used among the different versions.
-template <BufferMode mode, typename VertexPrimitive,  typename ColorPrimitive>
+template <typename VertexPrimitive,  typename ColorPrimitive>
 class ogl_buffer
 {
 	public:
@@ -54,9 +57,7 @@ class ogl_buffer
 	typedef VertexPrimitive		vertex_primitive;
 	typedef ColorPrimitive		color_primitive;
 		
-	static const BufferMode		buffer_mode = mode;
-	
-	typedef ogl_buffer<mode, VertexPrimitive, ColorPrimitive> this_type;
+	typedef ogl_buffer<VertexPrimitive, ColorPrimitive> this_type;
 	//! @} end Public Types
 	
 	
@@ -72,26 +73,26 @@ class ogl_buffer
 	//! \note only works if is_valid() returns true
 	bool			begin_access();
 	
-	//! \return the first byte in the buffer of the given type, in the respective format T
+	//! \return the first byte in the buffer of the given primitive type
 	//! Will be 0 if the buffer is not set !
-	template <typename T>
+	template <typename Primitive>
 	inline
-	const T*		buf_begin(const BufferType) const;
+	const Primitive*		buf_begin() const;
 	
-	//! \return one past the last byte in the buffer of the given type, or 0 if the buffer is not set
-	template <typename T>
+	//! \return one past the last byte in the buffer of the primitive given type, or 0 if the buffer is not set
+	template <typename Primitive>
 	inline
-	const T*		buf_end(const BufferType) const;
-	
-	//! non-const version of the one above
-	template <typename T>
-	inline
-	T*				buf_begin(const BufferType);
+	const Primitive*		buf_end() const;
 	
 	//! non-const version of the one above
-	template <typename T>
+	template <typename Primitive>
 	inline
-	T*				buf_end(const BufferType);
+	Primitive*				buf_begin();
+	
+	//! non-const version of the one above
+	template <typename Primitive>
+	inline
+	Primitive*				buf_end();
 	
 	//! Call to end buffer access
 	void			end_access();
@@ -137,7 +138,7 @@ class ogl_buffer
 //! The system buffered version uses memory in the system's main memory and draws it using 
 //! DrawArrays. This easily speeds up drawing by a factor of two.
 template <typename VertexPrimitive, typename ColorPrimitive>
-class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, ColorPrimitive>
+class ogl_system_buffer : public ogl_buffer <VertexPrimitive, ColorPrimitive>
 {
 	VertexPrimitive*		_vtx_buf;		//!< Buffer pointer for vertex data
 	ColorPrimitive*			_col_buf;		//!< Buffer pointer for color data
@@ -157,14 +158,16 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 	
 	public:
 	
+	static const BufferMode		buffer_mode = SystemMemory;
+	
 	bool			begin_access() {
 		return is_valid();
 	}
 	
 	template <typename T>
 	inline
-	const T*		buf_begin(const BufferType type) const {
-		switch(type)
+	const T*		buf_begin() const {
+		switch(T::buffer_type)
 		{
 		case VertexArray:	return reinterpret_cast<const T*>(_vtx_buf);
 		case ColorArray:	return reinterpret_cast<const T*>(_col_buf);
@@ -174,8 +177,8 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 	
 	template <typename T>
 	inline
-	const T*		buf_end(const BufferType type) const {
-		switch(type)
+	const T*		buf_end() const {
+		switch(T::buffer_type)
 		{
 		case VertexArray:	return reinterpret_cast<const T*>(_vtx_buf + _len);
 		case ColorArray:	return reinterpret_cast<const T*>(_col_buf + _len);
@@ -185,8 +188,8 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 	
 	template <typename T>
 	inline
-	T*				buf_begin(const BufferType type) {
-		switch(type)
+	T*				buf_begin() {
+		switch(T::buffer_type)
 		{
 		case VertexArray:	return reinterpret_cast<T*>(_vtx_buf);
 		case ColorArray:	return reinterpret_cast<T*>(_col_buf);
@@ -196,8 +199,8 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 	
 	template <typename T>
 	inline
-	T*				buf_end(const BufferType type) {
-		switch(type)
+	T*				buf_end() {
+		switch(T::buffer_type)
 		{
 		case VertexArray:	return reinterpret_cast<T*>(_vtx_buf + _len);
 		case ColorArray:	return reinterpret_cast<T*>(_col_buf + _len);
@@ -224,9 +227,9 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 		glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
 		glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
 		{
-			setup_primitive_array<VertexPrimitive, VertexArray>(glf, _vtx_buf);
+			setup_primitive_array<VertexPrimitive>(glf, _vtx_buf);
 			if (_col_buf) {
-				setup_primitive_array<ColorPrimitive, ColorArray>(glf, _col_buf);
+				setup_primitive_array<ColorPrimitive>(glf, _col_buf);
 			}
 			
 			glf->glDrawArrays(MGL_POINTS, 0, _len);
@@ -294,8 +297,11 @@ class ogl_system_buffer : public ogl_buffer <SystemMemory, VertexPrimitive, Colo
 
 //! A GPU buffer which stores data directly on the GPU
 template <typename VertexPrimitive, typename ColorPrimitive>
-class ogl_gpu_buffer : public ogl_buffer<GPUMemory, VertexPrimitive, ColorPrimitive>
+class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 {
+		
+	public:
+		static const BufferMode		buffer_mode = GPUMemory;
 	
 };
 

@@ -30,8 +30,8 @@
 
 enum BufferMode
 {
-	GPUMemory = 1,		//!< Use GPU memory
-	SystemMemory = 2	//!< Use System Memory
+	SystemMemory = 1,	//!< Use System Memory
+	GPUMemory = 2		//!< Use GPU memory
 };
 
 enum BufferType

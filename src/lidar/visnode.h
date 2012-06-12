@@ -48,7 +48,7 @@ class LidarVisNode : public MPxLocatorNode
 		DMStoredColor				//!< display the stored color if possible
 	};
 	
-	struct VtxPrimitive : public draw_primitive<MGLint, 3>
+	struct VtxPrimitive : public draw_primitive<MGLint, 3, VertexArray>
 	{
 		inline
 		void	init_from_point(const yalas::types::PointDataRecord0& p) {
@@ -58,7 +58,7 @@ class LidarVisNode : public MPxLocatorNode
 		}
 	};
 	
-	typedef draw_primitive<MGLushort, 3>	ColPrimitive;
+	typedef draw_primitive<MGLushort, 3, ColorArray>		ColPrimitive;
 	
 	typedef ogl_system_buffer<VtxPrimitive, ColPrimitive>	OGLSysBuf;
 	typedef ogl_gpu_buffer<VtxPrimitive, ColPrimitive>		OGLGPUBuf;
