@@ -48,6 +48,13 @@ class LidarVisNode : public MPxLocatorNode
 		DMStoredColor				//!< display the stored color if possible
 	};
 	
+	enum CacheMode
+	{
+		CMNone = 0,
+		CMSystem = SystemMemory,
+		CMGPU = GPUMemory
+	};
+	
 	struct VtxPrimitive : public draw_primitive<MGLint, 3, VertexArray>
 	{
 		inline
@@ -83,9 +90,9 @@ class LidarVisNode : public MPxLocatorNode
 	protected:
 		void reset_output_attributes(MDataBlock &data);	//!< reset all output attributes to their initial values
 		bool renew_las_reader(const MString& filepath);	//!< initialize our reader with a new file
-		void reset_caches();							//!< clear all caches
-		void reset_draw_caches();						//!< clear draw caches only
-		void update_draw_cache(MDataBlock &data);		//!< fill in the draw cache
+		void reset_caches();								//!< clear all caches
+		void reset_draw_caches(MGLFunctionTable* glf = 0);	//!< clear draw caches only
+		void update_draw_cache(DisplayMode mode, MGLFunctionTable &glf);		//!< fill in the draw cache
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
 		
 		template <uint8_t format_id>
@@ -95,16 +102,16 @@ class LidarVisNode : public MPxLocatorNode
 		inline void color_point_with_rgb_info(const PointType& p, ColPrimitive &dc, const DisplayMode mode) const;
 		
 		template <uint8_t format_id>
-		inline void draw_point_records(MGLFunctionTable* glf, yalas::IStream& las_stream, const DisplayMode mode) const;
+		inline void draw_point_records(MGLFunctionTable& glf, yalas::IStream& las_stream, const DisplayMode mode) const;
 		
 		template <uint8_t format_id, typename IteratorType>
-		inline void draw_piont_records_with_iterator(IteratorType& it, MGLFunctionTable* glf, const DisplayMode mode) const;
+		inline void draw_point_records_with_iterator(IteratorType& it, MGLFunctionTable& glf, const DisplayMode mode) const;
 		
 		template <uint8_t format_id>
-		inline void update_point_cache(const DisplayMode mode);
+		inline void update_point_cache(const DisplayMode mode, MGLFunctionTable& glf);
 		
 		template <uint8_t format_id, typename IteratorType>
-		inline void update_point_cache_with_iterator(IteratorType& it, const DisplayMode mode);
+		inline void update_point_cache_with_iterator(IteratorType& it, const DisplayMode mode, MGLFunctionTable& glf);
 		
 	protected:
 		// Input attributes
@@ -140,6 +147,7 @@ class LidarVisNode : public MPxLocatorNode
 		MBoundingBox	m_bbox;					//!< bounding box cache
 		float			m_intensity_scale;		//!< value to scale the intensity with
 		bool			m_normalize_stored_cols;//!< if true, we will normalize stored colors which is not the case in all files !
+		bool			m_cache_needs_refresh;	//!< refresh the cache when drawing the next time
 		
 		std::auto_ptr<yalas::IStream>	m_las_stream;	//!< pointer to las reader
 		std::ifstream					m_ifstream;		//!< file for reading samples
@@ -148,7 +156,7 @@ class LidarVisNode : public MPxLocatorNode
 		MMatrix					m_compensation_column_major;	//!< column major compensation matrix for use by ogl
 		
 		OGLSysBuf				m_sysbuf;		//!< Systembased buffer for our data
-		//OGLGPUBuf				m_gpubuf;		//!< buffer directly on the graphics-card
+		OGLGPUBuf				m_gpubuf;		//!< buffer directly on the graphics-card
 		
 		ROMappedFile			m_map;			//!< may contain a memory map of our lidar file
 };

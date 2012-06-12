@@ -23,6 +23,8 @@
 //********************************************************************
 #include "mayabaselib/detail/ogl_buffer_fun.hpp"
 
+#include <cassert>
+
 
 //********************************************************************
 //**	Template Types
@@ -45,6 +47,8 @@ struct draw_primitive
 
 //! A buffer object which provides you with storage space to put your cached point clouds.
 //! This base provides an interface declaration which can be used among the different versions.
+//! \note  for now, this base class has no other effect but to document the interface.
+//! Maybe one day we make some methods virtual for more runtime-flexibility
 template <typename VertexPrimitive,  typename ColorPrimitive>
 class ogl_buffer
 {
@@ -240,7 +244,6 @@ class ogl_system_buffer : public ogl_buffer <VertexPrimitive, ColorPrimitive>
 		return glf->glGetError() == 0;
 	}
 	
-	//! Resize this instance. Its safe to pass in 0 as glf
 	inline
 	bool resize(const size_t new_size = 0) {
 		if (new_size == _len) {
@@ -296,13 +299,121 @@ class ogl_system_buffer : public ogl_buffer <VertexPrimitive, ColorPrimitive>
 };
 
 //! A GPU buffer which stores data directly on the GPU
+//! It needs a glfunction table to work, you must set before making any buffer operations
+//! Otherwise we work on a cached version of the pointer, which is assumed to remain valid until
+//! you set it back to 0
 template <typename VertexPrimitive, typename ColorPrimitive>
 class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 {
+	public:
+	static const BufferMode		buffer_mode = GPUMemory;
+	static const size_t			num_buffers = 2;
+		
+	private:
+	
+	enum BufferIndex
+	{
+		Vtx = 0,
+		Col = 1
+	};
+	
+	static const MGLuint	invalid_buf = -1;	//!< indicates the buffer is invalid
+	
+	MGLuint				_gl_buf[num_buffers];	//!< buffer with vtx primitives
+	size_t				_len;					//!< amount of primitives per buffer
+	MGLFunctionTable*	_glf;					//!< gl function table - without it, we cannot work
+	
+	private:
+	inline bool			is_valid_buf(MGLuint buf) const {
+		return buf != invalid_buf;
+	}
+	
+	public:
+		ogl_gpu_buffer()
+			: _len(0)
+			, _glf(0)
+		{
+			_gl_buf[Vtx] = _gl_buf[Col] = invalid_buf;
+		}
+		
+		~ogl_gpu_buffer()
+		{
+			resize(0);
+		}
+		
 		
 	public:
-		static const BufferMode		buffer_mode = GPUMemory;
-	
+		// ----------------------------------------
+		// Interface
+		// ----------------------------------------
+		//! \name Interface
+		//! @{
+		
+		//! Set our function table to the given value
+		//! If it changes to another one, we will release the caches in the previous context.
+		//! Thus you might end up with an empty buffer. This is preferred over just initializing
+		//! a buffer of the same size as you could not tell if the values are actually the ones you expect.
+		//! Hence you should check if your buffer is still valid after this call and possibly reinitialize it.
+		ogl_gpu_buffer&	set_glf(MGLFunctionTable* glf) {
+			if (_glf && glf != _glf) {
+				resize(0);
+			}
+			
+			_glf = glf;
+			return *this;
+		}
+		
+		//! @} end Interface
+		
+		
+		//! \note will automatically revive formerly deleted buffers !
+		inline
+		bool resize(const size_t new_size = 0) {
+			if (_len == new_size) {
+				return true;
+			}
+			
+			if (_glf == 0) {
+				return false;
+			}
+			
+			if (new_size == 0) {
+				_glf->glDeleteBuffersARB(num_buffers, _gl_buf);
+				_gl_buf[Vtx] = _gl_buf[Col] = invalid_buf;
+				
+				// for good measure, make the user reset the pointer after he set us 0
+				_glf = 0;
+			} else {
+				if (!is_valid_buf(_gl_buf[Vtx])) {
+					assert(!is_valid_buf(_gl_buf[Col]));	//!< no vtx means no color too
+					_glf->glGenBuffersARB(2, &_gl_buf[Vtx]);
+				} else if (!is_valid_buf(_gl_buf[Col])) {
+					assert(is_valid_buf(_gl_buf[Vtx]));		//!< can only have missing color buffer
+					_glf->glGenBuffersARB(1, &_gl_buf[Col]);
+				}// handle initialization
+				
+				// assure both buffers have data. Existing data will automatically be deleted.
+				_glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf[Vtx]);
+				_glf->glBufferDataARB(MGL_ARRAY_BUFFER_ARB, sizeof(VertexPrimitive) * new_size, 0, MGL_STREAM_DRAW_ARB);
+				
+				_glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf[Col]);
+				_glf->glBufferDataARB(MGL_ARRAY_BUFFER_ARB, sizeof(ColorPrimitive) * new_size, 0, MGL_STREAM_DRAW_ARB);
+				
+				if (_glf->glGetError() != 0) {
+					resize(0);
+					return false;
+				}
+			}// end handle size
+			
+			_len = new_size;
+			return is_valid();
+		}
+		
+		inline
+		bool is_valid() const {
+			return is_valid_buf(_gl_buf[0]);
+		}
+		
 };
 
 #endif // ogl_buffer_H
