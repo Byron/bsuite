@@ -22,6 +22,7 @@
 //**	Include
 //********************************************************************
 #include "mayabaselib/detail/ogl_buffer_fun.hpp"
+#include "baselib/typ.h"
 
 #include <cassert>
 
@@ -50,7 +51,7 @@ struct draw_primitive
 //! \note  for now, this base class has no other effect but to document the interface.
 //! Maybe one day we make some methods virtual for more runtime-flexibility
 template <typename VertexPrimitive,  typename ColorPrimitive>
-class ogl_buffer
+class ogl_buffer : NonCopyable
 {
 	public:
 	// ----------------------------------------
@@ -75,34 +76,22 @@ class ogl_buffer
 	//! Call this to initialize access to the data stored in the buffer !
 	//! \return true on success
 	//! \note only works if is_valid() returns true
-	bool			begin_access();
+	bool					begin_access();
 	
 	//! \return the first byte in the buffer of the given primitive type
 	//! Will be 0 if the buffer is not set !
-	template <typename Primitive>
 	inline
-	const Primitive*		buf_begin() const;
+	void*					begin(const BufferType);
 	
 	//! \return one past the last byte in the buffer of the primitive given type, or 0 if the buffer is not set
-	template <typename Primitive>
 	inline
-	const Primitive*		buf_end() const;
-	
-	//! non-const version of the one above
-	template <typename Primitive>
-	inline
-	Primitive*				buf_begin();
-	
-	//! non-const version of the one above
-	template <typename Primitive>
-	inline
-	Primitive*				buf_end();
+	void*					end(const BufferType);
 	
 	//! Call to end buffer access
-	void			end_access();
+	void					end_access();
 	
 	//! \return true if all the buffers in this instance are set and can be used !
-	bool			is_valid() const;
+	bool					is_valid() const;
 	
 	//! @} end Query Interface
 	
@@ -166,46 +155,22 @@ class ogl_system_buffer : public ogl_buffer <VertexPrimitive, ColorPrimitive>
 		return is_valid();
 	}
 	
-	template <typename T>
 	inline
-	const T*		buf_begin() const {
-		switch(T::buffer_type)
+	void*				begin(const BufferType type) {
+		switch(type)
 		{
-		case VertexArray:	return reinterpret_cast<const T*>(_vtx_buf);
-		case ColorArray:	return reinterpret_cast<const T*>(_col_buf);
+		case VertexArray:	return _vtx_buf;
+		case ColorArray:	return _col_buf;
 		default: return 0;
 		}
 	}
 	
-	template <typename T>
 	inline
-	const T*		buf_end() const {
-		switch(T::buffer_type)
+	void*				end(const BufferType type) {
+		switch(type)
 		{
-		case VertexArray:	return reinterpret_cast<const T*>(_vtx_buf + _len);
-		case ColorArray:	return reinterpret_cast<const T*>(_col_buf + _len);
-		default: return 0;
-		}
-	}
-	
-	template <typename T>
-	inline
-	T*				buf_begin() {
-		switch(T::buffer_type)
-		{
-		case VertexArray:	return reinterpret_cast<T*>(_vtx_buf);
-		case ColorArray:	return reinterpret_cast<T*>(_col_buf);
-		default: return 0;
-		}
-	}
-	
-	template <typename T>
-	inline
-	T*				buf_end() {
-		switch(T::buffer_type)
-		{
-		case VertexArray:	return reinterpret_cast<T*>(_vtx_buf + _len);
-		case ColorArray:	return reinterpret_cast<T*>(_col_buf + _len);
+		case VertexArray:	return _vtx_buf + _len;
+		case ColorArray:	return _col_buf + _len;
 		default: return 0;
 		}
 	}
@@ -218,24 +183,11 @@ class ogl_system_buffer : public ogl_buffer <VertexPrimitive, ColorPrimitive>
 	
 	inline
 	bool draw(MGLFunctionTable* glf) const {
-		if (glf == 0 || !is_valid()) {
+		if (!is_valid()) {
 			return false;
 		}
 		
-		glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
-		glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
-		{
-			setup_primitive_array<VertexPrimitive>(glf, _vtx_buf);
-			if (_col_buf) {
-				setup_primitive_array<ColorPrimitive>(glf, _col_buf);
-			}
-			
-			glf->glDrawArrays(MGL_POINTS, 0, _len);
-		}
-		glf->glPopAttrib();
-		glf->glPopClientAttrib();
-		
-		return glf->glGetError() == 0;
+		return draw_arrays<VertexPrimitive, ColorPrimitive>(glf, _vtx_buf, _col_buf, _len);
 	}
 	
 	inline
@@ -301,40 +253,38 @@ class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 {
 	public:
 	static const BufferMode		buffer_mode = GPUMemory;
-	static const size_t			num_buffers = 2;
 		
 	private:
 	
-	enum BufferIndex
-	{
-		Vtx = 0,
-		Col = 1
-	};
+	static const MGLuint invalid_buf = 0;		//!< indicates the buffer is invalid
 	
-	static const MGLuint	invalid_buf = -1;	//!< indicates the buffer is invalid
-	
-	MGLuint				_gl_buf[num_buffers];	//!< buffer with vtx primitives
-	void*				_map[num_buffers];		//!< mapped data pointers, only valid between begin and end access
+	MGLuint				_gl_buf;				//!< buffer id for one buffer, containing all data
+	void*				_map;					//!< mapped data pointers, only valid between begin and end access
 	size_t				_len;					//!< amount of primitives per buffer
 	MGLFunctionTable*	_glf;					//!< gl function table - without it, we cannot work
+	bool				_use_col;				//!< if true, we use the color part of the buffer - default true
 	
 	private:
-	
-	inline bool			is_valid_buf(MGLuint buf) const {
-		return buf != invalid_buf;
+	static size_t			col_buf_ofs_bytes(const size_t num_primitives) {
+		return sizeof(VertexPrimitive) * num_primitives;
 	}
 	
-	inline void			reset_arrays() {
-		_gl_buf[Vtx] = _gl_buf[Col] = invalid_buf;
-		_map[Vtx] = _map[Col] = 0;
+	static size_t			total_buf_size_bytes(const size_t num_primitives) {
+		return (sizeof(VertexPrimitive) + sizeof(ColorPrimitive)) * num_primitives;
+	}
+	
+	static void				unbind_gl_buffer(MGLFunctionTable* glf) {
+		glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, 0);
 	}
 	
 	public:
 		ogl_gpu_buffer()
-			: _len(0)
+			: _gl_buf(invalid_buf)
+			, _map(0)
+			, _len(0)
 			, _glf(0)
+			, _use_col(true)
 		{
-			reset_arrays();
 		}
 		
 		~ogl_gpu_buffer()
@@ -371,49 +321,57 @@ class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 				return false;
 			}
 			
-			assert(_map[Vtx] == 0);	// multiple calls to begin access ?
-			_map[Vtx] = _glf->glMapBufferARB(MGL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY);
-			if (is_valid_buf(_gl_buf[Col])) {
-				_map[Col] = _glf->glMapBufferARB(MGL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY);
-			}
+			assert(_map == 0);	// multiple calls to begin access ?
+			_glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf);
+			_map = _glf->glMapBufferARB(MGL_ARRAY_BUFFER_ARB, MGL_WRITE_ONLY_ARB);
 			
 			return _glf->glGetError() == 0;
 		}
 		
+		inline
+		void* begin(const BufferType type) {
+			switch(type)
+			{
+			case VertexArray: return _map;
+			case ColorArray: return static_cast< uint8_t*>(_map) + col_buf_ofs_bytes(_len);
+			default: return 0;
+			}
+		}
+		
+		inline
+		void* end(const BufferType type) {
+			switch(type)
+			{
+			case VertexArray: return begin(ColorArray);
+			case ColorArray: return static_cast<uint8_t*>(_map) + total_buf_size_bytes(_len);
+			default: return 0;
+			}
+		}
+		
 		void end_access() {
-			if (!_glf || !_map[Vtx]) {
+			if (!_glf || _map == 0) {
 				return;
 			}
 			
-			_glf->glUnmapBufferARB(_gl_buf[Vtx]);
-			if (is_valid_buf(_gl_buf[Col])) {
-				_glf->glUnmapBufferARB(_gl_buf[Col]);
-			}
+			// assume our buffer is still bound !
+			_glf->glUnmapBufferARB(MGL_ARRAY_BUFFER_ARB);
+			unbind_gl_buffer(_glf);
+			_map = 0;
 		}
 		
 		
 		inline
 		bool draw(MGLFunctionTable* glf) const {
-			if (glf == 0 || glf != _glf || !is_valid()) {
+			if (glf != _glf || !is_valid()) {
 				return false;
 			}
 			
-			glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
-			glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
-			{
-				glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf[Vtx]);
-				setup_primitive_array<VertexPrimitive>(glf, 0);
-				if (is_valid_buf(_gl_buf[Col])) {
-					glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf[Col]);
-					setup_primitive_array<ColorPrimitive>(glf, 0);
-				}
-				
-				glf->glDrawArrays(MGL_POINTS, 0, _len);
-			}
-			glf->glPopAttrib();
-			glf->glPopClientAttrib();
-			
-			return glf->glGetError() == 0;
+			glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf);
+			const bool res = draw_arrays<VertexPrimitive, ColorPrimitive>(  glf, 0, 
+																   _use_col ? (const uint8_t*)0 + col_buf_ofs_bytes(_len) : 0, 
+																   _len);
+			unbind_gl_buffer(glf);
+			return res;
 		}
 		
 		//! \note will automatically revive formerly deleted buffers !
@@ -423,32 +381,27 @@ class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 				return true;
 			}
 			
-			if (_glf == 0) {
+			if (_glf == 0 || _map != 0) {
 				return false;
 			}
 			
 			if (new_size == 0) {
-				_glf->glDeleteBuffersARB(num_buffers, _gl_buf);
-				reset_arrays();
+				_glf->glDeleteBuffersARB(1, &_gl_buf);
+				_gl_buf = invalid_buf;
+				_map = 0;
 				
 				// for good measure, make the user reset the pointer after he set us 0
 				_glf = 0;
 			} else {
-				if (!is_valid_buf(_gl_buf[Vtx])) {
-					assert(!is_valid_buf(_gl_buf[Col]));	//!< no vtx means no color too
-					_glf->glGenBuffersARB(2, &_gl_buf[Vtx]);
-				} else if (!is_valid_buf(_gl_buf[Col])) {
-					assert(is_valid_buf(_gl_buf[Vtx]));		//!< can only have missing color buffer
-					_glf->glGenBuffersARB(1, &_gl_buf[Col]);
-				}// handle initialization
+				if (_gl_buf == invalid_buf) {
+					_glf->glGenBuffersARB(1, &_gl_buf);
+				}
+				// revive color, its how we behave (currently)
+				_use_col = true;
 				
-				// assure both buffers have data. Existing data will automatically be deleted.
-				_glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf[Vtx]);
-				_glf->glBufferDataARB(MGL_ARRAY_BUFFER_ARB, sizeof(VertexPrimitive) * new_size, 0, MGL_STREAM_DRAW_ARB);
-				
-				_glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf[Col]);
-				_glf->glBufferDataARB(MGL_ARRAY_BUFFER_ARB, sizeof(ColorPrimitive) * new_size, 0, MGL_STREAM_DRAW_ARB);
-				
+				_glf->glBindBufferARB(MGL_ARRAY_BUFFER_ARB, _gl_buf);
+				_glf->glBufferDataARB(MGL_ARRAY_BUFFER_ARB, total_buf_size_bytes(new_size), 0, MGL_STREAM_DRAW_ARB);
+				unbind_gl_buffer(_glf);
 				if (_glf->glGetError() != 0) {
 					resize(0);
 					return false;
@@ -461,7 +414,27 @@ class ogl_gpu_buffer : public ogl_buffer<VertexPrimitive, ColorPrimitive>
 		
 		inline
 		bool is_valid() const {
-			return is_valid_buf(_gl_buf[0]);
+			return _gl_buf != invalid_buf;
+		}
+		
+		
+		bool delete_array(const BufferType type)
+		{
+			if (type != ColorArray) {
+				return false;
+			}
+			
+			_use_col = false;
+			return true;
+		}
+		
+		bool revive_array(const BufferType type) {
+			if (!is_valid() || type != ColorArray) {
+				return false;
+			}
+			
+			_use_col = true;
+			return true;
 		}
 		
 };

@@ -262,6 +262,7 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayCacheMode,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,		aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aNormalizeStoredCols, aNeedsCompute));
 	
 	return MS::kSuccess;
@@ -343,11 +344,11 @@ void LidarVisNode::update_draw_cache(Buffer &buf, DisplayMode mode, MGLFunctionT
 		mode = DMNoColor;
 	}
 	
-	m_sysbuf.resize(m_las_stream->header().num_point_records);
+	buf.resize(m_las_stream->header().num_point_records);
 	if (mode == DMNoColor ) {
-		m_sysbuf.delete_array(ColorArray);
+		buf.delete_array(ColorArray);
 	} else {
-		m_sysbuf.revive_array(ColorArray);
+		buf.revive_array(ColorArray);
 	}
 	
 	switch(fmt)
@@ -382,15 +383,16 @@ inline void LidarVisNode::update_point_cache_with_iterator(Buffer &buf, Iterator
 	}
 	
 	yalas::types::point_data_record<format_id> p;
-	VtxPrimitive*const pend = buf.buf_end<VtxPrimitive>();
+	VtxPrimitive*const pend = static_cast<VtxPrimitive*>(buf.end(VertexArray));
+	VtxPrimitive* pit = static_cast<VtxPrimitive*>(buf.begin(VertexArray));
+						
 	if (mode == DMNoColor) {
-		for (VtxPrimitive* pit = buf.buf_begin<VtxPrimitive>(); pit < pend && it.read_next_point(p); ++pit) {
+		for (; pit < pend && it.read_next_point(p); ++pit) {
 			pit->init_from_point(p);
 		}
 	} else {
-		ColPrimitive*const cend = buf.buf_end<ColPrimitive>();
-		ColPrimitive* cit = buf.buf_begin<ColPrimitive>();
-		for (VtxPrimitive* pit = buf.buf_begin<VtxPrimitive>(); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
+		ColPrimitive*const cend = static_cast<ColPrimitive*>(buf.end(ColorArray));
+		for (ColPrimitive* cit = static_cast<ColPrimitive*>(buf.begin(ColorArray)); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
 			pit->init_from_point(p);
 			color_point<format_id>(p, *cit, mode);
 		}
@@ -649,7 +651,8 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 			}
 			case CMGPU: {
 				m_sysbuf.resize(0);
-				// update_draw_cache(m_gpubuf, display_mode, *glf);
+				update_draw_cache(m_gpubuf, display_mode, *glf);
+				break;
 			}
 			case CMNone: reset_draw_caches(glf); break;
 			}// and cache mode switch

@@ -103,11 +103,37 @@ inline GLArrayMemFun buffer_mode_to_array_memfun<ColorArray>()
 //! setup the gl state to draw the given primitive array pointer
 //! We assume the draw state has been saved in some way as it will be modified
 template <typename Primitive>
-void setup_primitive_array(MGLFunctionTable* glf, const Primitive* pris)
+void setup_primitive_array(MGLFunctionTable* glf, const void* pris)
 {
 	// static switch
 	glf->glEnableClientState(Primitive::buffer_type);
 	(*glf.*(buffer_mode_to_array_memfun<Primitive::buffer_type>()))(Primitive::field_count, data_type_to_ogl_constant<typename Primitive::field_type>(), 0, pris);
+}
+
+
+//! Draw primitives. col_array is optional and may be null, in which case the color array will not be used
+//! \return true on success
+template <typename VertexPrimitive, typename ColorPrimitive>
+inline
+bool draw_arrays(MGLFunctionTable* glf, const void* vtx_array, const void* col_array, const size_t len) {
+	if (glf == 0) {
+		return false;
+	}
+	
+	glf->glPushClientAttrib(MGL_CLIENT_VERTEX_ARRAY_BIT);
+	glf->glPushAttrib(MGL_ALL_ATTRIB_BITS);
+	{
+		setup_primitive_array<VertexPrimitive>(glf, vtx_array);
+		if (col_array) {
+			setup_primitive_array<ColorPrimitive>(glf, col_array);
+		}
+		
+		glf->glDrawArrays(MGL_POINTS, 0, len);
+	}
+	glf->glPopAttrib();
+	glf->glPopClientAttrib();
+	
+	return glf->glGetError() == 0;
 }
 
 
