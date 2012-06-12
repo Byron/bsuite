@@ -364,41 +364,33 @@ void LidarVisNode::update_draw_cache(MDataBlock &data)
 template <uint8_t format_id>
 inline void LidarVisNode::update_point_cache(const DisplayMode mode)
 {
-	yalas::types::point_data_record<format_id> p;
-	
 	if (m_map.is_mapped()) {
 		const yalas::types::Header13& hdr = m_las_stream->header();
 		yalas::MemoryIterator it(m_map.mem_at_ofs<uint8_t>(hdr.offset_to_point_data), m_map.mem_end<uint8_t>(), &hdr.x_offset, &hdr.x_scale);
 		
-		const PosCache::iterator pend = m_pos_cache.end();
-		if (mode == DMNoColor) {
-			for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && it.read_next_point(p); ++pit) {
-				pit->init_from_point(p);
-			}
-		} else {
-			const ColCache::iterator cend = m_col_cache.end();
-			ColCache::iterator cit = m_col_cache.begin();
-			for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
-				pit->init_from_point(p);
-				color_point<format_id>(p, *cit, mode);
-			}
-		}
-		
+		update_point_cache_with_iterator<format_id>(it, mode);
 	} else {
-		const PosCache::iterator pend = m_pos_cache.end();
-		if (mode == DMNoColor) {
-			for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && m_las_stream->read_next_point(p) == yalas::IStream::Success; ++pit) {
-				pit->init_from_point(p);
-			}
-		} else {
-			const ColCache::iterator cend = m_col_cache.end();
-			ColCache::iterator cit = m_col_cache.begin();
-			for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && m_las_stream->read_next_point(p) == yalas::IStream::Success; ++pit, ++cit) {
-				pit->init_from_point(p);
-				color_point<format_id>(p, *cit, mode);
-			}
-		}
+		update_point_cache_with_iterator<format_id>(*m_las_stream, mode);
 	}// END handle mmap
+}
+
+template <uint8_t format_id, typename IteratorType>
+inline void LidarVisNode::update_point_cache_with_iterator(IteratorType& it, const DisplayMode mode)
+{
+	yalas::types::point_data_record<format_id> p;
+	const PosCache::iterator pend = m_pos_cache.end();
+	if (mode == DMNoColor) {
+		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && it.read_next_point(p); ++pit) {
+			pit->init_from_point(p);
+		}
+	} else {
+		const ColCache::iterator cend = m_col_cache.end();
+		ColCache::iterator cit = m_col_cache.begin();
+		for (PosCache::iterator pit = m_pos_cache.begin(); pit < pend && cit < cend && it.read_next_point(p); ++pit, ++cit) {
+			pit->init_from_point(p);
+			color_point<format_id>(p, *cit, mode);
+		}
+	}
 }
 
 void LidarVisNode::update_compensation_matrix_and_bbox(bool translateToOrigin)
@@ -707,38 +699,32 @@ finish_drawing:
 template <uint8_t format_id>
 void LidarVisNode::draw_point_records(MGLFunctionTable* glf, yalas::IStream& las_stream, const DisplayMode mode) const
 {
-	DrawCol dc;
-	yalas::types::point_data_record<format_id> p;
-	
 	if (m_map.is_mapped()) {
 		const yalas::types::Header13& hdr = las_stream.header();
 		yalas::MemoryIterator it(m_map.mem_at_ofs<uint8_t>(hdr.offset_to_point_data), m_map.mem_end<uint8_t>(), &hdr.x_offset, &hdr.x_scale);
 		
-		if (mode == DMNoColor) {
-			while(it.read_next_point(p)) {
-				glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
-			}
-		} else {
-			while (it.read_next_point(p)) {
-				color_point<format_id>(p ,dc, mode);
-				glf->glColor3usv(dc.col);
-				glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
-			}// end while iterating points
-		}
-		
+		draw_piont_records_with_iterator<format_id>(it, glf, mode);
 	} else {
-		if (mode == DMNoColor) {
-			while (las_stream.read_next_point(p) == yalas::IStream::Success) {
-				glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
-			}// end while iterating points
-		} else {
-			while (las_stream.read_next_point(p) == yalas::IStream::Success) {
-				color_point<format_id>(p ,dc, mode);
-				glf->glColor3usv(dc.col);
-				glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
-			}// end while iterating points
-		}
+		draw_piont_records_with_iterator<format_id>(las_stream, glf, mode);
 	}// END handle mmap
+}
+
+template <uint8_t format_id, typename IteratorType>
+inline void LidarVisNode::draw_piont_records_with_iterator(IteratorType& it, MGLFunctionTable* glf, const DisplayMode mode) const
+{
+	DrawCol dc;
+	yalas::types::point_data_record<format_id> p;
+	if (mode == DMNoColor) {
+		while(it.read_next_point(p)) {
+			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+		}
+	} else {
+		while (it.read_next_point(p)) {
+			color_point<format_id>(p ,dc, mode);
+			glf->glColor3usv(dc.col);
+			glf->glVertex3iv(static_cast<const MGLint*>(&p.x));
+		}// end while iterating points
+	}
 }
 
 MBoundingBox LidarVisNode::boundingBox() const

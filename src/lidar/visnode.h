@@ -89,7 +89,7 @@ class LidarVisNode : public MPxLocatorNode
 		bool renew_las_reader(const MString& filepath);	//!< initialize our reader with a new file
 		void reset_caches();							//!< clear all caches
 		void reset_draw_caches();						//!< clear draw caches only
-		void update_draw_cache(MDataBlock &data);	//!< fill in the draw cache
+		void update_draw_cache(MDataBlock &data);		//!< fill in the draw cache
 		void update_compensation_matrix_and_bbox(bool translateToOrigin);	//!< update our compensation matrix
 		
 		template <uint8_t format_id>
@@ -101,8 +101,14 @@ class LidarVisNode : public MPxLocatorNode
 		template <uint8_t format_id>
 		inline void draw_point_records(MGLFunctionTable* glf, yalas::IStream& las_stream, const DisplayMode mode) const;
 		
+		template <uint8_t format_id, typename IteratorType>
+		inline void draw_piont_records_with_iterator(IteratorType& it, MGLFunctionTable* glf, const DisplayMode mode) const;
+		
 		template <uint8_t format_id>
 		inline void update_point_cache(const DisplayMode mode);
+		
+		template <uint8_t format_id, typename IteratorType>
+		inline void update_point_cache_with_iterator(IteratorType& it, const DisplayMode mode);
 		
 	protected:
 		// Input attributes

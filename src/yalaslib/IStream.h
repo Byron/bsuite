@@ -81,9 +81,11 @@ class IStream
 		//! Read the next point record from the stream
 		//! Note that the point type you are using must match the format specified 
 		//! in the header.
+		//! \return true on success, false on end iteration.
+		//! You might want to check the status in case you had the iteration aborted because of a stream failure.
 		template <typename PointType>
 		inline
-		Status read_next_point(PointType& p)
+		bool read_next_point(PointType& p)
 		{
 			char buf[PointType::record_size];	// point format 1
 			assert(sizeof(buf) == _header.point_data_record_length);
@@ -93,14 +95,15 @@ class IStream
 			_istream.read(reinterpret_cast<char*>(&buf), sizeof(buf));
 			
 			if (_istream.eof()) {
-				return StreamFailure;
+				return false;
 			} else if (_istream.fail()) {
 				_status = StreamFailure;
+				return false;
 			} else {
 				p.init_from_raw(buf);
 				p.adjust_coordinate(&_header.x_scale,& _header.x_offset);
+				return true;
 			}
-			return _status;
 		}
 };
 
