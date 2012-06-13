@@ -148,8 +148,8 @@ MStatus LidarVisNode::initialize()
 	aDisplayMode = mfnEnum.create("displayMode", "dm");
 	mfnEnum.addField("NoColor", (short)DMNoColor);
 	mfnEnum.addField("Intensity", (short)DMIntensity);
-	mfnEnum.addField("ReturnNumber", (short)DMReturnNumber);
-	mfnEnum.addField("ReturnNumberIntensified", (short)DMReturnNumberIntensity);
+	mfnEnum.addField("Classification", (short)DMReturnNumber);
+	mfnEnum.addField("ClassificationIntensified", (short)DMReturnNumberIntensity);
 	mfnEnum.addField("StoredColor", (short)DMStoredColor);
 	
 	mfnEnum.setDefault((short)DMNoColor);
@@ -262,6 +262,7 @@ MStatus LidarVisNode::initialize()
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aLidarFileName,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayCacheMode,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aDisplayMode,		aNeedsCompute));
+	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aIntensityScale,	aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aUseMMap,			aNeedsCompute));
 	CHECK_MSTATUS_AND_RETURN_IT(attributeAffects(aNormalizeStoredCols, aNeedsCompute));
 	

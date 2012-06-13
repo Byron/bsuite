@@ -2,7 +2,41 @@
 About B-Suite
 #############
 The B-Suite (pronounced *Be Sweet*) is a conglomerate of maya plugins that I wrote because I really wanted to try something.
-The respective plugins where written with quality in mind. Additionally you will find auto-tests, code-docs and end-user docs. 
+The respective plugins where written with quality in mind. Additionally you will find auto-tests, code-docs and end-user docs.
+  
+###########
+Lidar Tools
+###########
+
+.. image:: http://old.byronimo.de/download/lidvismaya_ui.png
+    :width: 900 px
+
+The lidar visualization tools consist of a locator which efficiently reads LAS files and displays them. Various options allow you to set a tradeoff between display performance and memory consumption.
+    
+The lidar tools work for Maya 2008 to Maya 2013, on Linux and OSX.
+
+====================
+Lidar Tools Features
+====================
+
+* **Lidar LAS-File Viewport Visualization (lidarVisNode)**
+
+ * Visualize LAS files efficiently as *point cloud* in the viewport
+ 
+  * Supports LAS file format 1.3 and point formats version 0 through 5
+  
+ * Show LAS file header information 
+ * Choose from multiple colorization modes, which include
+ 
+  * *No Color* (for maximum performance)
+  * *Intensity*
+  * *Classification*
+  * *Classification with Intensity*
+  * *Stored Color*
+  
+ * Display any amount of points without the fear of *out-of-memory* issues.
+ * Speedup reading performance using *memory mapping* (currently POSIX only)
+ * Speedup display performance using *system* or *GPU* caches.
 
 ########
 PTexVis
@@ -11,24 +45,26 @@ PTexVis
 .. image:: http://old.byronimo.de/download/ptexmaya_ui.png
     :width: 900 px
 
-PTexVis is a locator which can display ptex textures are point clouds on top of the corresponding mesh. For now it is only used as research project and to obtain an understanding on how ptex works.
+PTexVis is a locator which can display ptex textures s point clouds on top of the corresponding mesh. For now it is only used as research project and to obtain an understanding on how ptex works.
 
 PTexVis works for Maya 2008 to Maya 2013, on Linux and OSX.
 
-========
-Features
-========
+================
+PTexVis Features
+================
 * **Ptexture Viewport Visualization (ptxVisNode)**
 
  * Display ptextures directly in the viewport using opengl points
  
   * 3 different sampling modes, *Texel* mode displays raw texel tiles without the need for a mesh.
   
- * Provide ptexture meta information of the loaded file
+ * Show ptexture meta information of the loaded file
+ * Fast display of large amounts of samples using *GPU Caching*. Caching in main memory is supported as well.
+ * *Multi-threaded* ptex sampling if interpolation mode is '*Point*'
  * *Limitations*
  
-  * Can currently only sample Triangle meshes when *not* only displaying pure texel samples. 
-
+  * Can currently only sample *triangle* meshes when *not* only displaying pure texel samples. 
+  
 ########
 Building
 ########
