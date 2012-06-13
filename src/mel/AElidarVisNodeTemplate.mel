@@ -1,0 +1,91 @@
+
+global proc AElidarVisNodeBrowser(string $fileAttribute)
+{
+	// We use the most primitve file browser just to be maya 2008 compatible ... 
+	string $ptxFilter = "*.las";
+	string $result = `fileDialog -directoryMask $ptxFilter -mode 0`;
+	if ($result != "") {
+		setAttr $fileAttribute -type "string" $result;
+	}
+}
+
+global proc AElidarVisNodeNameReplace(string $fileAttribute)
+{
+	connectControl -fileName lidarVisNodeFileNameField $fileAttribute;
+	button -e -c ("AElidarVisNodeBrowser \""+$fileAttribute+"\"") browser;
+}
+
+global proc AElidarNameNew(string $fileAttribute)
+{
+	setUITemplate -pst attributeEditorTemplate;
+	rowLayout -nc 3 textureNameLayout;
+	{
+		text -label "LAS File";
+		textField lidarVisNodeFileNameField;
+		symbolButton -image "navButtonBrowse.xpm" browser;
+	}
+	setParent ..;
+	setUITemplate -ppt;
+	
+	AElidarVisNodeNameReplace($fileAttribute);
+}
+
+global proc AElidarVisNodeTemplate(string $nodeName)
+{
+	editorTemplate -beginScrollLayout;
+
+	editorTemplate -beginLayout "Lidar Options" -collapse 0;
+	{
+		editorTemplate -callCustom  "AElidarNameNew" 
+									"AElidarVisNodeNameReplace" 
+									"lidarFilePath";
+		if (!`about -nt`) {
+			editorTemplate -ann "Use a memory map, which greatly speeds up reading of point samples." 
+						-addControl "useMMap";
+		}
+		editorTemplate -ann "Cache the points in system memory or on the graphics card. Costs additional memory, which might make its use prohibitive"
+						-l "Display Caching" -addControl "displayCacheMode";
+		editorTemplate -ann "Determine the style of the points to draw. Usually this affects only the color"
+						-addControl "displayMode";
+		editorTemplate -ann "Size of the points to draw"
+						-addControl "glPointSize";
+		editorTemplate -ann "Scale the Intensity by this value. Only used in 'Intensity' display mode"
+						-addControl "intensityScale";
+		editorTemplate -ann "If true, the point cloud will be moved to the origin of the locator"
+						-addControl "translateToOrigin";
+		editorTemplate -ann "If true, in StoredColors display mode, these will be normalized from 8 to 16 bit. Use it in case your colors are too dark"
+						-addControl "normalizeStoredColors";
+		
+	}
+	editorTemplate -endLayout;
+	
+	editorTemplate -beginLayout "Lidar Header Information" -collapse 0;
+	{
+		editorTemplate -ann "ID of system which created the file"
+					-l "System Identifier" -addControl "outSystemIdentifier";
+		editorTemplate -ann "ID of software which generated the file"
+					-l "Generator" -addControl "outGeneratingSoftware" ;
+		editorTemplate -ann "month and year at which the file was created"
+					-l "Creation Date" -addControl "outCreationDate" ;
+		editorTemplate -ann "The version of the file"
+					-l "Version" -addControl "outVersionString" ;
+		editorTemplate -ann "Amount of variable length records" 
+					-l "Amount of Variable Length Records" -addControl "outNumVariableRecords" ;
+		editorTemplate -ann "Amount of point records stored in the file"
+					-l "Amount of Point Records" -addControl "outNumPointRecords" ;
+		editorTemplate -ann "ID of the point data format" 
+					-l "Point Data Format ID" -addControl "outPointDataFormat" ;
+		editorTemplate -ann "Suggested scaling of the points"
+					-l "Point Scale" -addControl "outPointScale" ;
+		editorTemplate -ann "Suggested offset of the points"
+					-l "Point Offset" -addControl "outPointOffset" ;
+		editorTemplate -l "BBox Min" -addControl "outBBoxMin";
+		editorTemplate -l "BBox Max" -addControl "outBBoxMax";
+		
+	}
+	editorTemplate -endLayout;
+	
+	editorTemplate -addExtraControls;
+	editorTemplate -endScrollLayout;
+}
+

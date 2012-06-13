@@ -15,11 +15,40 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAYA_UTIL_H
-#define MAYA_UTIL_H
+#include <maya/MFnPlugin.h>
 
-class PtexCache;
+#include "visnode.h"
+#include "mayabaselib/base.h"
 
-extern PtexCache* gCache;	//!< Global static cache to be used by all facilities that need ptextures
+//! Initialize the plugin in maya
+EXPORT MStatus initializePlugin(MObject obj)
+{
+	MFnPlugin plugin(obj, "Sebastian Thiel", "0.1");
+	MStatus stat;
+	
+	stat = plugin.registerNode(LidarVisNode::typeName, LidarVisNode::typeId, 
+								LidarVisNode::creator, LidarVisNode::initialize,
+								MPxNode::kLocatorNode);
+	if (stat.error()){
+		stat.perror("register lidar visualization node");
+		return stat;
+	}
 
-#endif // MAYA_UTIL_H
+	return stat;
+}
+
+//! Deinitialize the plugin from maya
+EXPORT MStatus uninitializePlugin(MObject obj)
+{
+	MFnPlugin plugin(obj);
+	MStatus stat;
+
+	stat = plugin.deregisterNode(LidarVisNode::typeId);
+	if (stat.error()){
+		stat.perror("deregister LidarVisNode");
+		return stat;
+	}
+	
+	return stat;
+}
+

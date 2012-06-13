@@ -15,11 +15,25 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAYA_UTIL_H
-#define MAYA_UTIL_H
+#include <maya/MFnAttribute.h>
+#include <maya/MFileObject.h>
 
-class PtexCache;
+#include "base.h"
 
-extern PtexCache* gCache;	//!< Global static cache to be used by all facilities that need ptextures
+//********************************************************************
+//**	Utilities
+//********************************************************************
 
-#endif // MAYA_UTIL_H
+void setup_as_output(MFnAttribute &attr)
+{
+	attr.setStorable(false);
+	attr.setWritable(false);
+}
+
+
+MString resolved_filepath(const MString& filepath)
+{
+	MFileObject fobj;
+	fobj.setRawFullName(filepath);
+	return fobj.resolvedFullName();	
+}

@@ -1,7 +1,7 @@
 
 from util import *
 
-class TestMain(TestPtexVisNodeBase):
+class TestPtex(TestPtexVisNodeBase):
 	
 	def test_main(self):
 		n, m = self.setupScene('triangle')

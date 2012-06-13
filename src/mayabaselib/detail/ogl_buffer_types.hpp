@@ -15,11 +15,29 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAYA_UTIL_H
-#define MAYA_UTIL_H
+#ifndef OGL_BUFFER_TYPES_HPP
+#define OGL_BUFFER_TYPES_HPP
 
-class PtexCache;
+//********************************************************************
+//**	Include
+//********************************************************************
+#include <mayabaselib/ogl_headers.h>
+#include <stdlib.h>
 
-extern PtexCache* gCache;	//!< Global static cache to be used by all facilities that need ptextures
+//********************************************************************
+//**	Enumerations
+//********************************************************************
 
-#endif // MAYA_UTIL_H
+enum BufferMode
+{
+	SystemMemory = 1,	//!< Use System Memory
+	GPUMemory = 2		//!< Use GPU memory
+};
+
+enum BufferType
+{
+	VertexArray = MGL_VERTEX_ARRAY,	//!< Id for the vertex array
+	ColorArray = MGL_COLOR_ARRAY	//!< Id for the color array
+};
+
+#endif // OGL_BUFFER_TYPES_HPP

@@ -35,8 +35,12 @@ if(WAS_SUCCESSFUL)
 					LINK_LIBRARIES
 						Ptex
 						z
+					LINK_MAYA_LIBRARIES
+						mayabase
 					LIBRARY_DIRS
 						${PTEX_LIBRARY_DIR}
 					WITH_TEST
+					WITHOUT_EXCEPTIONS
+					WITH_OPENMP
 					)
 endif()

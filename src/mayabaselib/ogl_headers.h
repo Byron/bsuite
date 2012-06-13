@@ -15,11 +15,15 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAYA_UTIL_H
-#define MAYA_UTIL_H
 
-class PtexCache;
+#ifndef OGL_HEADERS_H
+#define OGL_HEADERS_H
 
-extern PtexCache* gCache;	//!< Global static cache to be used by all facilities that need ptextures
+// Fix unholy c++ incompatibility - typedefs to void are not allowed in gcc greater 4.1.2
+#include <maya/MGLdefinitions.h>
+#define MGLvoid void
+#include <maya/MGLFunctionTable.h>
+#undef MGLvoid
+#include <maya/MHardwareRenderer.h>
 
-#endif // MAYA_UTIL_H
+#endif // OGL_HEADERS_H

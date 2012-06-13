@@ -15,11 +15,36 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MAYA_UTIL_H
-#define MAYA_UTIL_H
+#ifndef BSUITE_BASE_H
+#define BSUITE_BASE_H
 
-class PtexCache;
+//********************************************************************
+//**	Includes
+//********************************************************************
+#include <maya/MString.h>
 
-extern PtexCache* gCache;	//!< Global static cache to be used by all facilities that need ptextures
+//********************************************************************
+//**	Forward Declarations
+//********************************************************************
+class MFnAttribute;
 
-#endif // MAYA_UTIL_H
+//********************************************************************
+//**	Macros
+//********************************************************************
+
+#ifdef WIN32
+	#define EXPORT __declspec( dllexport )
+#else
+	#define EXPORT extern "C" __attribute__ ((visibility("default")))
+#endif
+
+
+//********************************************************************
+//**	Utilities
+//********************************************************************
+
+MString resolved_filepath(const MString& filepath);
+
+void setup_as_output(MFnAttribute& attr);
+
+#endif // BSUITE_BASE_H

@@ -14,12 +14,48 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef YALAS_ITER_H
+#define YALAS_ITER_H
 
-#ifndef MAYA_UTIL_H
-#define MAYA_UTIL_H
+#include <baselib/typ.h>
 
-class PtexCache;
+namespace yalas
+{
 
-extern PtexCache* gCache;	//!< Global static cache to be used by all facilities that need ptextures
+//! A utility iterator which can be utilized in while loops to iterate over 
+//! raw uncompressed memory to read points
+//! \tparam PointType type of point to use. It must be one of the point types defined in types.h
+class MemoryIterator
+{
+	const uint8_t*	_cur;		//!< Current memory pointer
+	const uint8_t*	_end;		//!< 
+	const double*	_ofs;
+	const double*	_scale;
+	
+	
+	public:
+	inline
+	MemoryIterator(const uint8_t* beg, const uint8_t* end, const double* ofs, const double* scale)
+		: _cur(beg)
+		, _end(end)
+		, _ofs(ofs)
+		, _scale(scale)
+	{}
+	
+	
+	template <typename PointType>
+	inline
+	bool read_next_point(PointType& p) {
+		if (_cur < _end) {
+			p.init_from_raw(_cur);
+			p.adjust_coordinate(_scale, _ofs);
+			_cur += PointType::record_size;
+			return true;
+		}
+		return false;
+	}
+};
 
-#endif // MAYA_UTIL_H
+}// end namespace yalas
+
+#endif // YALAS_ITER_H
