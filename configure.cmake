@@ -48,7 +48,9 @@ if(UNIX)
 		
 	# make sure we see everything! Don't export anything by default
 	# for now, without -pedantic, as it prevents compilation of maya thanks to 'extra ;'  - don't know how to disable this
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fPIC -Wall -Wno-long-long -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-comment -Wcast-qual")
+	# Also, the architecture is hardcoded, this is a problem for older maya versions which where 32 bit on osx
+	# TODO: put the arch in the config, but make sure its correct on osx for maya plugins automatically
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -fvisibility=hidden -Wall -Wno-long-long -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-comment -Wcast-qual")
 endif() #unix
 
 if(${CMAKE_BUILD_TYPE} MATCHES Debug OR ${CMAKE_BUILD_TYPE} MATCHES Profile)
@@ -82,7 +84,7 @@ set(CUSTOM_DEFINITIONS -DREQUIRE_IOSTREAM -D_BOOL)
 if(UNIX)
 	if(APPLE)
 		set (MAYA_INSTALL_BASE_DEFAULT /Applications/Autodesk)
-		list(APPEND CUSTOM_DEFINITIONS -DOSMac_)
+		list(APPEND CUSTOM_DEFINITIONS -DOSMac_ -DOSMacOSX_ -DOSMac_MachO_)
 	else()
 		set (MAYA_INSTALL_BASE_DEFAULT /usr/autodesk)
 		list(APPEND CUSTOM_DEFINITIONS -DLINUX)

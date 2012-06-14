@@ -772,7 +772,7 @@ void PtexVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplayStyl
 	
 	if (res == false && m_error.length() == 0) {
 		m_error = "Display of samples failed, GL error code: ";
-		m_error += glf->glGetError();
+		m_error += (int)glf->glGetError();
 	} else if (res) {
 		m_error.clear();
 	}
