@@ -420,6 +420,11 @@ function(add_maya_project)
 		
 		if (PROJECT_WITH_OPENMP AND OPENMP_FOUND)
 			append_to_target_property(${PROJECT_ID} COMPILE_FLAGS "${OpenMP_CXX_FLAGS}" YES)
+			
+			# for now, on osx, we have to link the omp library with it. Lets try to 
+			if(APPLE)
+				append_to_target_property(${PROJECT_ID} LINK_FLAGS "-lgomp" YES)
+			endif()
 		endif()
 		
 		target_link_libraries(${PROJECT_ID} 
