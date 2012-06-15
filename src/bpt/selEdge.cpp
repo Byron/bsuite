@@ -100,13 +100,13 @@ void	selEdge::setSinglePlane(int richtungsIndex, MDoubleArray inPlane)
 }
 
 
-//müssen checken, ob ihre nachbarn on border sind: in diesem fall könnten sie nämlich auch unselected sein, 
+//muessen checken, ob ihre nachbarn on border sind: in diesem fall kuennten sie nuemlich auch unselected sein, 
 //was besonderes vorgehen erfordert
 //-------------------------------------------------------
 edge*	selEdge::findNextSelEdge(edge* lastEdge)
 //-------------------------------------------------------
 {
-//selEdges geben einfach ihren zeiger zurück, da genau dieser das gewünschte resultat ist
+//selEdges geben einfach ihren zeiger zurueck, da genau dieser das gewuenschte resultat ist
 
 	return this;
 }
@@ -132,7 +132,7 @@ MDoubleArray selEdge::getGerade(bool displace, const edge* requester, bool useUI
 					INVIS(cout<<"Habe richtung angepasst! Sie ist jetzt "<<a<<" mit face "<<faceIDs[a]<<endl; )
 				}
 
-				//wingedVtxCheck muss nicht vorgenommen werden, da ja lle plane/geradenSlots gefüllt sind
+				//wingedVtxCheck muss nicht vorgenommen werden, da ja lle plane/geradenSlots gefuellt sind
 				MVector normal;
 				normal.x = plane[a][3];normal.y = plane[a][4];normal.z = plane[a][5];
 				
@@ -152,7 +152,7 @@ MDoubleArray selEdge::getGerade(bool displace, const edge* requester, bool useUI
 				}
 				
 
-				//richtungsvektor hinzufügen
+				//richtungsvektor hinzufuegen
 				result[3] = gerade[3];result[4] = gerade[4];result[5] = gerade[5];
 				
 				
@@ -206,7 +206,7 @@ MPoint		selEdge::intersect(bool isEdgeDisplaced,bool displacePlane,edge* nachbar
 	}
 	else
 	{	//wenn edge nicht verschoben ist, muss plane folglich verschoben sein, da andernfalls der gemeinsame punkt
-		//der kanten gefunden werden würde (->unfug)
+		//der kanten gefunden werden wuerde (->unfug)
 
 		tmp = nachbar->getNewGeradenVtx(this);
 		
@@ -256,9 +256,9 @@ int		selEdge::intersect(bool isEdgeDisplaced,bool displacePlane,edge* nachbar, b
 //------------------------------------------------------------------------------------------------------------------------------
 {
 	//diese Proc geht davon aus, dass der edgeNachbar selected ist. Dies muss vor aufruf sichergestellt werden
-	//ansatz: nachbar gibt entlang der planeNormale * edge::maxLength verschobene gerade zurück, die dann mit der ebenfalls
+	//ansatz: nachbar gibt entlang der planeNormale * edge::maxLength verschobene gerade zurueck, die dann mit der ebenfalls
 	//verschobenen plane dieser selEdge intersected wird
-	//der neue Vertex wird automatisch erstellt falls nötig und die neue ID wird zurückgegeben
+	//der neue Vertex wird automatisch erstellt falls nuetig und die neue ID wird zurueckgegeben
 	//plane muss erst noch verschoben werden und in Koordinatenform umgeformt werden wenn displacePlane = true
 
 
@@ -277,7 +277,7 @@ int		selEdge::intersect(bool isEdgeDisplaced,bool displacePlane,edge* nachbar, b
 				ng = (isNurEinNachbar)?nachbar->getGerade(isEdgeDisplaced,this,true,uID[side*2+dir]):nachbar->getGerade(isEdgeDisplaced,this); //ng = nachbarsGerade
 				
 			}
-			else //derartige Vtx werden niemals gemittelt, da eh das selbe ergebnis rauskäme (im IdealFalle ;) )
+			else //derartige Vtx werden niemals gemittelt, da eh das selbe ergebnis rauskueme (im IdealFalle ;) )
 				return tmp;
 		}
 		else
@@ -286,7 +286,7 @@ int		selEdge::intersect(bool isEdgeDisplaced,bool displacePlane,edge* nachbar, b
 			
 			tmp = edgeVtx[side];	
 
-			//auf jeden Fall nen intersection Vtx erstellen für spätere Mittelung
+			//auf jeden Fall nen intersection Vtx erstellen fuer spuetere Mittelung
 			
 			ng = nachbar->getGerade(isEdgeDisplaced,this); 
 			
@@ -294,7 +294,7 @@ int		selEdge::intersect(bool isEdgeDisplaced,bool displacePlane,edge* nachbar, b
 	}
 	else
 	{	//wenn edge nicht verschoben ist, muss plane folglich verschoben sein, da andernfalls der gemeinsame punkt
-		//der kanten gefunden werden würde (->unfug)
+		//der kanten gefunden werden wuerde (->unfug)
 
 		tmp = nachbar->getNewGeradenVtx(this);
 		
@@ -351,7 +351,7 @@ int		selEdge::intersect(bool isEdgeDisplaced,bool displacePlane,edge* nachbar, b
 		creator->setVtxPoint(tmp, tmpPos);
 	
 		
-		//jetzt noch den vorhandenen, jedoch genittelten punkt zurückgeben
+		//jetzt noch den vorhandenen, jedoch genittelten punkt zurueckgeben
 		return tmp;
 	}
 
@@ -443,10 +443,10 @@ int		selEdge::getNewGeradenVtx(const edge* requester)
 void	selEdge::setUIDs(MIntArray& IDs)
 //--------------------------------------------------
 {
-	//IDs muss immer länge von 4 haben!
+	//IDs muss immer luenge von 4 haben!
 	for(int i = 0; i < 4; i++)
 	{
-		if(IDs[i] != -1)	//dienst als flag, um auch einzelne UIDS (in besonderen fällen) mit dieser methode setzen Žzu können ohne vorhandene zu überschreiben
+		if(IDs[i] != -1)	//dienst als flag, um auch einzelne UIDS (in besonderen fuellen) mit dieser methode setzen uezu kuennen ohne vorhandene zu ueberschreiben
 		{
 			uID[i] = IDs[i];
 		}
@@ -482,7 +482,7 @@ bool	selEdge::isParallel(double threshold, edge* nachbar,double& value, int rich
 		//checken, ob faces in zwei richtungen parallel sind oder nur in einer
 		MIntArray nFaces = nachbar->getFaces();
 		nRichtung = nachbar->getValidRichtung(uniqueID);
-		//entsprechende richtung fürs nFace holen
+		//entsprechende richtung fuers nFace holen
 		//solche edges werden immer biDirektional bearbeitet
 	}
 
@@ -508,10 +508,10 @@ bool	selEdge::isParallel(double threshold, edge* nachbar,double& value, int rich
 		normal += (*nNormals)[nRichtung];
 	}
 
-	MIntArray allVtx = nachbar->getVtx(); //bei borderEdges mit wingedVtx führt dieses Verhalten dazu, das die vektoren falsch eingestellt werden
-											//man sollte hier mit wingedVtx arbeiten um gültige Vektoren zu erhalten.
+	MIntArray allVtx = nachbar->getVtx(); //bei borderEdges mit wingedVtx fuehrt dieses Verhalten dazu, das die vektoren falsch eingestellt werden
+											//man sollte hier mit wingedVtx arbeiten um gueltige Vektoren zu erhalten.
 	
-	//übereinstimmenden alle Vtx in reihenfolge eintragen : left - center - right
+	//uebereinstimmenden alle Vtx in reihenfolge eintragen : left - center - right
 	int i;
 	for(i = 0; i < 2; i++)
 	{
@@ -522,7 +522,7 @@ bool	selEdge::isParallel(double threshold, edge* nachbar,double& value, int rich
 				if(i == 1)
 					allVtx.append(vtxIDs[1-a]);		
 				else
-					allVtx.insert(vtxIDs[1-a],0); //dann hat dieses array unter Umständen einen Vtx zu viel drauf, was aber 
+					allVtx.insert(vtxIDs[1-a],0); //dann hat dieses array unter Umstuenden einen Vtx zu viel drauf, was aber 
 												//nix macht, da nur die ersten 3 in der richtigen reihenfolge wichtig sind
 				
 				break;
@@ -613,8 +613,8 @@ MPoint		selEdge::getDisplacePoint(int startID, edge* otherEdge)
 MIntArray	selEdge::checkNewFaceIntegrity(MIntArray& newFaces)
 //--------------------------------------------------------------
 {
-	//Da es immernoch zu fehlern bei den NewID kommen kann, sollte diese Procedur zu debugzwecken darüber 
-	//aufklären und den fehler beheben
+	//Da es immernoch zu fehlern bei den NewID kommen kann, sollte diese Procedur zu debugzwecken darueber 
+	//aufklueren und den fehler beheben
 	int lastID = -1;
 	int currentID;
 	for(unsigned int i = 0; i < newFaces.length();i++)
@@ -667,7 +667,7 @@ void	selEdge::engageBevel(int connectEnds, int triangulateEnds, bool isSC)
 
 
 
-	//zuerst prüfen, ob bereits faceData vorhanden ist, oder noch erstellt werden muss
+	//zuerst pruefen, ob bereits faceData vorhanden ist, oder noch erstellt werden muss
 
 	
 	for(dir = 0; dir < faceIDs.length(); dir++)
@@ -675,14 +675,14 @@ void	selEdge::engageBevel(int connectEnds, int triangulateEnds, bool isSC)
 		//ist faceData in dieser Richtung vorhanden?
 		if( faceData[dir] == 0)
 		{//nein, also neues Face erstellen
-			//MERKE: Es kann dazu kommen, dass eine FaceEinheit mehrmals für ein und dieselbe FaceID erstellt wird. Dies macht allerdings nichts!
-			//InitFaceData sorgt auch dafür, dass die Angrenzenden SelEdges nen Ptr zur faceData erhalten
+			//MERKE: Es kann dazu kommen, dass eine FaceEinheit mehrmals fuer ein und dieselbe FaceID erstellt wird. Dies macht allerdings nichts!
+			//InitFaceData sorgt auch dafuer, dass die Angrenzenden SelEdges nen Ptr zur faceData erhalten
 			initFaceData();
 			
 		}
 	}
 
-	//jetzt die Seiten prüfen: Wenn auf einer Seite in jede Richtung 2 unselectedEdges sind, dann muss geprüft werden, ob sich diese eine FaceData einheit teilen müssen
+	//jetzt die Seiten pruefen: Wenn auf einer Seite in jede Richtung 2 unselectedEdges sind, dann muss geprueft werden, ob sich diese eine FaceData einheit teilen muessen
 	//(damit die connectEnds methode noch richtig funktioniert)
 	if(faceIDs.length() > 1)
 	{//nachbarn sind jetzt auf jeden Fall definiert
@@ -699,7 +699,7 @@ void	selEdge::engageBevel(int connectEnds, int triangulateEnds, bool isSC)
 					for(i = 0; i < 2; i++)	//man kann hier definitiv davon ausgehen, dass die nselEdge 2 faces hat
 					{
 						if(nFaces[i] == match[0])
-						{//jetzt für dieses Seite eine faceData einheit erstellen - diese wurde garantiert noch nicht erzeugt
+						{//jetzt fuer dieses Seite eine faceData einheit erstellen - diese wurde garantiert noch nicht erzeugt
 							nachbarn[side][0]->initFaceData(i);
 							break;
 						}
@@ -721,11 +721,10 @@ void	selEdge::engageBevel(int connectEnds, int triangulateEnds, bool isSC)
 	clean = true;
 	
 	double value = 0.0;
-	INVIS(printArray(MIntArray(uID,4)," = uIDs");)
 
 	//jetzt pro seite pro richtung alles abarbeiten, unterscheiden zwischen wingend und nonwingend Edge
-	bool nurEinNachbar[2] = {false,false}; //beeinflusst das spätere verhalten bei erstellung der faces
-	bool onBorder[4] = {false,false,false,false}; //für spätere faces wichtig
+	bool nurEinNachbar[2] = {false,false}; //beeinflusst das spuetere verhalten bei erstellung der faces
+	bool onBorder[4] = {false,false,false,false}; //fuer spuetere faces wichtig
 	bool emergencyStop[2] = {false,false};	//pro Richtung
 	//pro seite
 
@@ -735,18 +734,18 @@ void	selEdge::engageBevel(int connectEnds, int triangulateEnds, bool isSC)
 	int refFaces[2] = {-1,-1}; //-1 ist flag;
 	int refDirs[2] = {0,0};
 
-	MPoint tmpPos;	//als tempvariable - n�tig, damit Linux richtig funzt - MERKE: Referenzen d�rfen in Linux KEINE tempor�re Variable sein!
+	MPoint tmpPos;	//als tempvariable - noetig, damit Linux richtig funzt - MERKE: Referenzen doerfen in Linux KEINE temporoere Variable sein!
 	MVector tmpVec;
 
 
 	bool	newVtxExists = false;		//flag: Wenn NewVtxX bereits durch andere Edge gesetzt wurde, ist er true
 	bool	edgeVtxExists = false;		//flag: Wenn edgeVtxX bereits durch andere Edge gesetzt wurde, ist er true
 
-	int origConnectEnds = connectEnds;	//wenn connectEnds deaktiviert wird (weil die refFaces übereinstimmen, geschieht dies pro seite. Also muss pro seite der oriinalzustand wiederhergestellt werden
+	int origConnectEnds = connectEnds;	//wenn connectEnds deaktiviert wird (weil die refFaces uebereinstimmen, geschieht dies pro seite. Also muss pro seite der oriinalzustand wiederhergestellt werden
 	
 
 
-	bool hitsBorder;			//der �u�erst wichtig ist f�r ChamferMode und edges, die direkt oder indirekt mit borderEdges verbunden sind
+	bool hitsBorder;			//der oeuoeerst wichtig ist foer ChamferMode und edges, die direkt oder indirekt mit borderEdges verbunden sind
 
 
 	for(side = 0; side < 2; side++)
@@ -759,7 +758,7 @@ void	selEdge::engageBevel(int connectEnds, int triangulateEnds, bool isSC)
 
 		emergencyStop[0] = emergencyStop[1] = false;
 		
-		//im nurEinNachbar fall ist Chamfer wie SolidChamfer, im Grunde ist f�r CHAMFER aber egal - es funzt im nurEin Nachbar modus genauso wie ohne den Modus
+		//im nurEinNachbar fall ist Chamfer wie SolidChamfer, im Grunde ist foer CHAMFER aber egal - es funzt im nurEin Nachbar modus genauso wie ohne den Modus
 		nurEinNachbar[side] =		(faceIDs.length() == 1 && nachbarn[side][0]->isSelected())
 							||	nachbarn[side][0] == nachbarn[side][1];
 							
@@ -793,11 +792,11 @@ void	selEdge::engageBevel(int connectEnds, int triangulateEnds, bool isSC)
 
 				
 
-				if(nSelNachbarn[side][dir] != 0 && onlyOneNSelNachbar[side*2+dir] && nachbarn[side][dir]->isSelected() )	//es kommt in seltenen Situationen vor, dass der nachbar nicht gew�hlt ist - dann muss ein extrapfad gegangen werden
+				if(nSelNachbarn[side][dir] != 0 && onlyOneNSelNachbar[side*2+dir] && nachbarn[side][dir]->isSelected() )	//es kommt in seltenen Situationen vor, dass der nachbar nicht gewoehlt ist - dann muss ein extrapfad gegangen werden
 				{
 				//	double arcValue =  get3dArcRatio(nSelNachbarn[side][dir], side);
 
-					//hier immer intersecten, wenn möglich
+					//hier immer intersecten, wenn mueglich
 				//	if( fabs(arcValue - (1 - value)) < 0.75)
 				//	{
 						MPRINT("BEARBEITE PARALLELE EDGES , ES GIBT NUR INEN NACHBARN, VERWENDE NSELEDGE")
@@ -870,20 +869,20 @@ finishIt:
 
 
 
-				//jetzt die nachbarfaces anpassen, welche über diese selEdge nicht erreichbar sind
+				//jetzt die nachbarfaces anpassen, welche ueber diese selEdge nicht erreichbar sind
 				
-				if(newVtxExists)	//kommt er hier überhaupt je rein??
-				{//vtx hat bereits existiert, also muss die nSelEdge gelöscht werden, falls vorhanden
-					//wenn man dies nicht machen würde, würde das entsprechende Face doppelt verändert werden, was nun wirklich nicht sein muss .)
+				if(newVtxExists)	//kommt er hier ueberhaupt je rein??
+				{//vtx hat bereits existiert, also muss die nSelEdge geluescht werden, falls vorhanden
+					//wenn man dies nicht machen wuerde, wuerde das entsprechende Face doppelt veruendert werden, was nun wirklich nicht sein muss .)
 					/*
-					//auch wenn der Vtx schon existierte, muss er noch mal hinzugefügt werden, wenn dieses Face nicht mit nachbarn geteilt wird
+					//auch wenn der Vtx schon existierte, muss er noch mal hinzugefuegt werden, wenn dieses Face nicht mit nachbarn geteilt wird
 					MIntArray nFaces = nachbarn[side][dir]->getFaces();
 					bool doesNotShareFace = ((creator->helper.matchArray(faceIDs, nFaces).length() == 1) ? false : true);
 					
 					
 					
 					if(doesNotShareFace)
-					{//Sie teilen kein Face, also Vtx hinzufügen
+					{//Sie teilen kein Face, also Vtx hinzufuegen
 					//	addVtxChange(newVtx[side*2+dir], nachbarn[side][dir]);	->das muss nicht gemacht werden, weil dies definitiv schon gemacht wurde von der edge, die den Vtx erzeugt hat
 						
 						if(nSelNachbarn[side][dir] != 0)
@@ -968,8 +967,8 @@ finishIt:
 				//sel oder nSel?
 				edge* nEdge = nachbarn[side][dir]; //nEdge == nachbarEdge
 				isParallel(0.015,nEdge,value);
-				//ich habe das so gemacht, damit ich notfalls separate kontrolle über den Threshold von nurEinNachbarEdges und
-				// allen anderen habe ... dies eventuell noch ändern
+				//ich habe das so gemacht, damit ich notfalls separate kontrolle ueber den Threshold von nurEinNachbarEdges und
+				// allen anderen habe ... dies eventuell noch uendern
 				int ngVtx = -1;	//==nachbargeradenVtxID (der Vtx, der auf der edge des nacbarn liegt
 				
 				
@@ -986,7 +985,7 @@ finishIt:
 							if(!newVtxExists)
 							{
 								if(nSelNachbarn[side][dir] != 0 && onlyOneNSelNachbar[side*2+dir])
-								{//nach möglichkeit mit nem nSelNachbarn intersecten
+								{//nach mueglichkeit mit nem nSelNachbarn intersecten
 									double arcValue =  get3dArcRatio(nSelNachbarn[side][dir], side);
 									
 									if( fabs(arcValue - (1 - value)) < 0.75)
@@ -1144,7 +1143,7 @@ finishIt:
 										
 								}
 
-								//Vtx hinzufügen
+								//Vtx hinzufuegen
 								addVtxChange(newVtx[side*2+dir], nachbarn[side][dir]);
 
 						
@@ -1152,11 +1151,11 @@ finishIt:
 						
 
 
-							//EDGEVTX SIND NUR FÜR SC
+							//EDGEVTX SIND NUR FueR SC
 							if(isSC)
 							{
 								//wenn nachbar unter einem gewissen treshold werden die neuen Vtx auf der edge durch displacement erzeugt anstatt durch intersection
-								//, dies hat einen ähnlichen effekt wie die Rekursion, ist aber verständlicher, leichter und weniger fehleranfällig
+								//, dies hat einen uehnlichen effekt wie die Rekursion, ist aber verstuendlicher, leichter und weniger fehleranfuellig
 								if(value < 0.5)
 									//if(true)
 								{//punkte durch displacement
@@ -1189,7 +1188,7 @@ finishIt:
 									
 									//EDGEVTX
 									tmp = edgeVtx[side];
-									//dasselbe nochmal für den edgeVtx
+									//dasselbe nochmal fuer den edgeVtx
 									pos = getDisplacePoint(vtxIDs[side], this);
 									
 									
@@ -1212,7 +1211,7 @@ finishIt:
 								}
 								else
 								{//punkte durch intersection
-									bool tmpVar = (nEdge->getNewGeradenVtx(this) == -1) ? false : true;	//wird für insert edgeVtx verwendet
+									bool tmpVar = (nEdge->getNewGeradenVtx(this) == -1) ? false : true;	//wird fuer insert edgeVtx verwendet
 									
 									ngVtx = intersect(false,true,nachbarn[side][dir]);
 									
@@ -1234,7 +1233,7 @@ finishIt:
 
 
 						
-						//neue Vtx nur setzen, wenn nachbar noch nicht dran war, wobei es auch egal wäre, wenn er schon dran war -> es bringt höchstens etwas performance
+						//neue Vtx nur setzen, wenn nachbar noch nicht dran war, wobei es auch egal wuere, wenn er schon dran war -> es bringt huechstens etwas performance
 						if(  !(nachbarn[side][dir]->isClean())  )
 						{
 							int t[] = {newVtx[side*2+dir],ngVtx};
@@ -1270,14 +1269,14 @@ finishIt:
 						}
 						else
 						{
-							//MERKE:Bei unselEdges werden die newVtxIDs wie endEdges betrachtet und entsprechend in die faceData eingefügt
+							//MERKE:Bei unselEdges werden die newVtxIDs wie endEdges betrachtet und entsprechend in die faceData eingefuegt
 							//es muss eine angepasste prozedur her, die mit nSelEdges umgehen kann
 
 							
 							MPRINT("BEARBEITE NORMALE UNSELECTED EDGE ON BORDER")
 							
-							//in diesem Fall ist es egal, wieviele Faces diese edge hat - darum wird sich später gekümmert, alls methoden die hier
-							//gerufen werden können damit umgehen
+							//in diesem Fall ist es egal, wieviele Faces diese edge hat - darum wird sich spueter gekuemmert, alls methoden die hier
+							//gerufen werden kuennen damit umgehen
 
 							onBorder[side*2+dir] = true;	//damit kein versuch gestartet wird, smallFaces zu erstellen
 							
@@ -1300,7 +1299,7 @@ finishIt:
 
 						}
 
-						//nun die abschlussarbeiten durchführen - allerdings nur, wenn unSeledge NICHT auf border liegt
+						//nun die abschlussarbeiten durchfuehren - allerdings nur, wenn unSeledge NICHT auf border liegt
 						
 						//if(faceIDs.length() > 1)
 						if(faces.length() > 1)
@@ -1341,7 +1340,7 @@ finishIt:
 
 
 
-			int myCe = connectEnds;	//damit ich den Wert von CE ändern kann, ohne dass connectEnds für die gesamte edge ausgeschaltet wird
+			int myCe = connectEnds;	//damit ich den Wert von CE uendern kann, ohne dass connectEnds fuer die gesamte edge ausgeschaltet wird
 			//nur diese Variable wird verwendet
 			if(refFaces[0] != -1 && (refFaces[0] == refFaces[1]) )
 			{//die RefFaces sind gleich, was bedeutet, dass man nichts machen kann
@@ -1354,7 +1353,7 @@ finishIt:
 			if( !(emergencyStop[0] | emergencyStop[1]) )
 			{
 				if(isSC &&!triangulateEnds && myCe && refFaces[0] != -1 && refFaces[1] != -1 )
-				{//jetzt alles Vorbeiten - MERKE:er landet hier nur, wenn auch wirklich 2 Faces vorhanden sind - ansonsten würde er hier nicht hinkommen
+				{//jetzt alles Vorbeiten - MERKE:er landet hier nur, wenn auch wirklich 2 Faces vorhanden sind - ansonsten wuerde er hier nicht hinkommen
 					//zuerst die 2 Ptr zu den passenden Faces holen , welche von nSelEdges verwaltet werden
 					edgeFaceData* twoFacePtrs[2];
 					edgeFaceData* tmpData[2];
@@ -1376,8 +1375,8 @@ finishIt:
 
 				}
 				else
-				{//ES GIBT HIER KEINE BESONDERHEITEN FÜR CHAMFER; UM DIE MAN SICH SPÄTER NICHT kÜMMERN WÜRDE
-					//für chamfer kann es vorkommen, das newID == vtxID ist - derartige Fälle werden ausgeschlossen später von insertVtx und von changeEndFace
+				{//ES GIBT HIER KEINE BESONDERHEITEN FueR CHAMFER; UM DIE MAN SICH SPueTER NICHT kueMMERN WueRDE
+					//fuer chamfer kann es vorkommen, das newID == vtxID ist - derartige Fuelle werden ausgeschlossen spueter von insertVtx und von changeEndFace
 
 					//also x* die StandardMethode aufrufen;
 					int newIDs[2] = {-1,-1};
@@ -1393,7 +1392,7 @@ finishIt:
 						{						
 							continue;
 						}
-							//als FaceData muss das gegnübrliegende Face der unSelEdge gegeben werden - diese hat auf jeden Fall 2 faces
+							//als FaceData muss das gegnuebrliegende Face der unSelEdge gegeben werden - diese hat auf jeden Fall 2 faces
 							edgeFaceData* nFaceData[2];
 							nachbarn[side][g]->getFaceData(nFaceData[0],nFaceData[1]);
 
@@ -1418,8 +1417,6 @@ finishIt:
 
 	//beim erstellen der faces achten auf:  onBorder und "nurEinNachbar"
 	//alles pro Seite, pro Face
-	INVIS(printArray(MIntArray(newVtx,4)," = newVtx");)
-	INVIS(printArray(MIntArray(edgeVtx,2)," = edgeVtx");)
 
 	
 	//directions holen
@@ -1437,7 +1434,7 @@ finishIt:
 	
 	
 
-	MIntArray checkedIDs;	//tempVariable, weil unter Linux keine tempor�ren variablen (z.B R�ckgabewerte einer Funktion) unterst�tzt werden, wenn diese als referenz �bergeben werden sollen
+	MIntArray checkedIDs;	//tempVariable, weil unter Linux keine temporoeren variablen (z.B Roeckgabewerte einer Funktion) unterstoetzt werden, wenn diese als referenz oebergeben werden sollen
 
 	
 	if(isSC)
@@ -1488,7 +1485,7 @@ finishIt:
 			
 			
 
-			//normalSlide/slide für die edgeVtx,vtx
+			//normalSlide/slide fuer die edgeVtx,vtx
 			if(edgeVtx[side] != vtxIDs[side] && edgeVtx[side] != -1)
 			{
 				creator->addNormalSlide(vtxIDs[side]);
@@ -1509,7 +1506,7 @@ finishIt:
 					{
 						creator->addSlide(vtxIDs[side],newVtx[side*2+dir]);
 						
-						INVIS(cout<<"SmallFace für seite "<<vtxIDs[side]<<" und richtung "<<faceIDs[dir]<<endl;)
+						INVIS(cout<<"SmallFace fuer seite "<<vtxIDs[side]<<" und richtung "<<faceIDs[dir]<<endl;)
 							//kleine Faces erstellen
 						newFaceIDs[0] = edgeVtx[side];
 						newFaceIDs[1] = vtxIDs[side];
@@ -1520,9 +1517,9 @@ finishIt:
 						
 						
 						//man muss bedenken, dass dieses Face nicht erstellt werden kann, wenn die UVs der Faces nicht geteilt sind  
-						//Man muss also triangulieren, wenn die UV des newVtx in mindestens einem UVSet nicht mit der UV aus einem anderen UVSet übereinstimmt
+						//Man muss also triangulieren, wenn die UV des newVtx in mindestens einem UVSet nicht mit der UV aus einem anderen UVSet uebereinstimmt
 						if(! creator->helper.isOnArray(faceIDs[dir], nachbarn[side][dir]->getFaces()) )
-						{//dieses Face wird nicht mit dem anderen Face geteilt - jetzt genauer prüfen, ob die UVs der newVtx irgendwo ungleich sind
+						{//dieses Face wird nicht mit dem anderen Face geteilt - jetzt genauer pruefen, ob die UVs der newVtx irgendwo ungleich sind
 							int seite, richtung;
 							nachbarn[side][dir]->getValidRichtung(this, seite, richtung, uID[side*2+dir]);
 							
@@ -1531,7 +1528,7 @@ finishIt:
 							nachbarn[side][dir]->getFaceData(nFaces[0], nFaces[1]);
 							
 							
-							//jetzt die UVs holen und vergleichen ->Beide Faces müssen in jedem Set den edgeVtx haben, damit das klargeht
+							//jetzt die UVs holen und vergleichen ->Beide Faces muessen in jedem Set den edgeVtx haben, damit das klargeht
 							MIntArray newUVs[2] = {	faceData[dir]->getEdgeVtxUVs(newFaceIDs[2]), 
 								nFaces[richtung]->getEdgeVtxUVs(newFaceIDs[2])	};	//pro face
 							
@@ -1554,7 +1551,7 @@ finishIt:
 									triangle[1][2] = newFaceIDs[1];
 									
 									
-									if(side)	//die kleinen Faces sind auch noich abhängig von der Seite - diese ifKonstruktion bezieht sie mit ein
+									if(side)	//die kleinen Faces sind auch noich abhuengig von der Seite - diese ifKonstruktion bezieht sie mit ein
 									{
 										if(isFlipped[dir])
 										{
@@ -1588,7 +1585,7 @@ finishIt:
 						}
 						
 						
-						if(side)	//die kleinen Faces sind auch noich abhängig von der Seite - diese ifKonstruktion bezieht sie mit ein
+						if(side)	//die kleinen Faces sind auch noich abhuengig von der Seite - diese ifKonstruktion bezieht sie mit ein
 						{
 							if(isFlipped[dir])
 							{
@@ -1620,7 +1617,7 @@ endIt:;
 				}//if(onBorder[side*2+dir] + nurEinNachbar[side] == 0) ENDE
 				else if( !(nachbarn[side][dir]->isClean()) )
 				{
-					//wenn nachbar aber unselected, dann auf jeden fall hinzufügen
+					//wenn nachbar aber unselected, dann auf jeden fall hinzufuegen
 				
 					creator->addSlide(vtxIDs[side],newVtx[side*2+dir]);
 				}
@@ -1638,7 +1635,7 @@ endIt:;
 	else
 	{//CHAMFER FaceMode
 		
-		//zuerst mal dafür sorgen, das alle newVtx korrekt sind:
+		//zuerst mal dafuer sorgen, das alle newVtx korrekt sind:
 		//bei borderEdges kann es dazu kommen, dass mindestens einer der newVtx nicht gesetzt ist. Diesen Fall hier behandeln
 		if(faceIDs.length() == 1)
 		{//hiervor wird side/dir immer entsprechend gesetzt, damit die FixNewVtxUVProzedur af den Vtx der anderen Seite Zugreifen kann
@@ -1655,7 +1652,7 @@ endIt:;
 		//nun die aktuellen positionen holen und speichern
 		MPoint newPos[4];
 
-		//man könnte die sache ein wenig beschleunigen, wenn man newPos als elementVariable anlegt und beim setNewVtx(...) dafür sorgt, 
+		//man kuennte die sache ein wenig beschleunigen, wenn man newPos als elementVariable anlegt und beim setNewVtx(...) dafuer sorgt, 
 		//dass auch i positionen aktualisiert werden
 		newPos[0] = (newVtx[0] <= creator->getInitialVtxCount()) ? creator->getSlideStartPoint(newVtx[0]) : creator->getVtxPoint(newVtx[0]);
 		newPos[1] = (newVtx[1] <= creator->getInitialVtxCount()) ? creator->getSlideStartPoint(newVtx[1]) : creator->getVtxPoint(newVtx[1]);
@@ -1663,23 +1660,23 @@ endIt:;
 		newPos[3] = (newVtx[3] <= creator->getInitialVtxCount()) ? creator->getSlideStartPoint(newVtx[3]) : creator->getVtxPoint(newVtx[3]);
 
 
-		//jetzt alle newVtx auf ihre korrekten Positionen setzen: NewVtx, die eigentlich schon vorhanden sind, müssen erst noch an ihre neue Position gesetzt werden
-		//dies ist bei wirklich neu erstellten newVtx nicht nötig, allerdings unterscheide ich hier nicht, da dies sicherlich mehr kosten würde als
+		//jetzt alle newVtx auf ihre korrekten Positionen setzen: NewVtx, die eigentlich schon vorhanden sind, muessen erst noch an ihre neue Position gesetzt werden
+		//dies ist bei wirklich neu erstellten newVtx nicht nuetig, allerdings unterscheide ich hier nicht, da dies sicherlich mehr kosten wuerde als
 		//einfach alle newVtx zu setzen
 		
 
-		//jetzt muss zuersteinmal überprüft werden, ob die UVs an den vtxIDs der edge für beide Faces übereinstimmen, wenn es denn 2 gibt
+		//jetzt muss zuersteinmal ueberprueft werden, ob die UVs an den vtxIDs der edge fuer beide Faces uebereinstimmen, wenn es denn 2 gibt
 		if(faceIDs.length() == 2)
 		{
 			bool areConnected = true;
 			UINT i;
-			//nur wenn eines der beiden Faces überhaupt UVs hat, anfangen
+			//nur wenn eines der beiden Faces ueberhaupt UVs hat, anfangen
 			MIntArray vtxUVs[2][2];
 			if( faceData[0]->hasUVs() || faceData[1]->hasUVs() )
 			{
 
 				areConnected =		!(	doUVsDiffer(vtxIDs[0], faceData[0], faceData[1], &vtxUVs[0][0], &vtxUVs[0][1])
-								|	/*das andere CheckUVs muss auf jeden Fll ausgef�hrt werden */
+								|	/*das andere CheckUVs muss auf jeden Fll ausgefoehrt werden */
 										doUVsDiffer(vtxIDs[1], faceData[0], faceData[1], &vtxUVs[1][0], &vtxUVs[1][1]) );
 			}					
 
@@ -1692,7 +1689,7 @@ endIt:;
 			}
 			else
 			{//die UVs sind getrennt. Das bedeutet, dass man neue edgeVtx erstellen muss, welche mittig zwischen den newVtx einer Seite liegen.
-				//dann wird je richtung ein einzelnes Face erstellt. Die Später folgende RecreateSmallFaces methode kann damit umgehen
+				//dann wird je richtung ein einzelnes Face erstellt. Die Spueter folgende RecreateSmallFaces methode kann damit umgehen
 
 				
 
@@ -1700,7 +1697,7 @@ endIt:;
 				
 				
 				//MIntArray	origUVs;	//IDs der originalUVs von vtxIDs ->die OrigUVs sind noch immer in vtxUVs[2][2] gepeichert - wiederverwertung
-				MIntArray newUVs[2];	//hält die neu erzeugten UVs für den edgeVtx (pro Face)- es sind hier die originalUVs von der entsprechenden vtxID
+				MIntArray newUVs[2];	//huelt die neu erzeugten UVs fuer den edgeVtx (pro Face)- es sind hier die originalUVs von der entsprechenden vtxID
 				MFloatArray newUVPos;	//Positionen er IDs
 
 				MPoint start,end, edgePoint;
@@ -1710,11 +1707,11 @@ endIt:;
 				for(i = 0; i < 2; i++)
 				{
 					if(edgeVtx[i] > -1)
-					{//der edgeVtx wurde bereits erzeugt, als er beantragt wurde von einer anderen Edge -> für diese Seite abbrechen
+					{//der edgeVtx wurde bereits erzeugt, als er beantragt wurde von einer anderen Edge -> fuer diese Seite abbrechen
 						continue;
 					}//ansonsten 
 					
-					//checken, ob der Nachbar vielleicht edgeVtx für einen hat, aber nur wenn er schon evaluiert hat (da er andernfalls sowieso diesen nachbarn hier fragen wird)
+					//checken, ob der Nachbar vielleicht edgeVtx fuer einen hat, aber nur wenn er schon evaluiert hat (da er andernfalls sowieso diesen nachbarn hier fragen wird)
 					if( nachbarn[i][0]->isClean() & nurEinNachbar[i] )
 					{
 						edgeVtx[i] = nachbarn[i][0]->C_checkForEdgeVtx(this, uID[i*2], true, MPoint(), MPoint()/*points sind egal*/);
@@ -1728,7 +1725,7 @@ endIt:;
 						edgeVtx[i] = creator->newVtx( newPos[i*2] + 0.5*(newPos[i*2+1] - newPos[i*2]));
 	
 
-						//jetzt muss auch noch der Slide hinzugefügt werden - quasi nicht zur Seite sondern nach oben (richtung vtxIDs) und nach unten
+						//jetzt muss auch noch der Slide hinzugefuegt werden - quasi nicht zur Seite sondern nach oben (richtung vtxIDs) und nach unten
 						//aber nur, wenn der vtx wirklich gerade ers erzeugt wurde
 						edge::creator->addSlideAndNormal(vtxIDs[i], edgeVtx[i], faceIDs);	
 					}
@@ -1736,10 +1733,10 @@ endIt:;
 					
 					
 
-					//jetzt müssen die neuen edgeVtx noch passend in die Faces eingefügt werden - einfach an die Position der VtxID[side] packen
+					//jetzt muessen die neuen edgeVtx noch passend in die Faces eingefuegt werden - einfach an die Position der VtxID[side] packen
 					//in beide Faces - es spielt hier keine Rolle, ob das nun korrekt ist, da daraus ja direkt kein Face erzeugt wird
 
-					//man müsste eigentich doch darauf achten, in welcher richtung man dne Vtx einfügt, damit die normalen ordentlich aktualisiert werden können
+					//man muesste eigentich doch darauf achten, in welcher richtung man dne Vtx einfuegt, damit die normalen ordentlich aktualisiert werden kuennen
 					faceData[0]->insertEdgeVtx(vtxIDs[i], edgeVtx[i], (isFlipped[0]) ? ( (i == 0) ? false : true) : ((i == 0) ? true : false) ) ;
 					faceData[1]->insertEdgeVtx(vtxIDs[i], edgeVtx[i], (isFlipped[1]) ? ( (i == 0) ? false : true) : ((i == 0) ? true : false));
 					
@@ -1757,13 +1754,13 @@ endIt:;
 
 					for(UINT a = 0; a < 2; a++)
 					{
-						//Diese müssen für den Fall dass:
+						//Diese muessen fuer den Fall dass:
 						//	a)Nur Ein nachbar existiert und beide edges kein Face teilen einfach nur am ort der vtxIDs erstellt werden
-						// b) ansonsten müssen neue UVs mit slide gemacht werden, mit neuen UVPositionen die zwischen denen 
+						// b) ansonsten muessen neue UVs mit slide gemacht werden, mit neuen UVPositionen die zwischen denen 
 
-						//immer neue UV erzeugen. Man muss dann nur testen, ob beide faces die neu ertellten UVs teilen können	
+						//immer neue UV erzeugen. Man muss dann nur testen, ob beide faces die neu ertellten UVs teilen kuennen	
 						
-//!!!!!						//pro UVSet vorgehen! Das heisst, letztenlich müsste man tatsächlich ein sharedArray erstellen - Das muss mich aber erst kümmern, 
+//!!!!!						//pro UVSet vorgehen! Das heisst, letztenlich muesste man tatsuechlich ein sharedArray erstellen - Das muss mich aber erst kuemmern, 
 							//wenn ich auch wirklich mehrere UVSets schreiben kann ins mesh
 
 							//wenn es sich um einen neuen newVtx handelt und die UVs sich unterscheiden, dann kann man getrost die UVs des origVtx dem edgVtx zuordnen
@@ -1782,10 +1779,10 @@ endIt:;
 								creator->getUVPositions(vtxUVs[i][a], newUVPos);
 								newUVs[a] = edge::creator->createUVs(vtxUVs[i][a], newUVPos);
 								*/
-								//die Lösung ist, dass man den nächstgelegenen Punkt des edgeVtx auf der gegenwärtigen edge finden muss.
-								//Die Länge dieses Vektors steht in dem Verhältnis r zur gesamtlänge der edge.
-								//dieses Verhältnis muss man dann auf die UVs übertragen und erhält so den UVPunkt,
-								//Nachteil: Diser XYZ closest point wird immer nur auf der edge liegen, obwohl er manchmal auch außerhalb liegen müsste.
+								//die Luesung ist, dass man den nuechstgelegenen Punkt des edgeVtx auf der gegenwuertigen edge finden muss.
+								//Die Luenge dieses Vektors steht in dem Verhueltnis r zur gesamtluenge der edge.
+								//dieses Verhueltnis muss man dann auf die UVs uebertragen und erhuelt so den UVPunkt,
+								//Nachteil: Diser XYZ closest point wird immer nur auf der edge liegen, obwohl er manchmal auch auueerhalb liegen muesste.
 								
 
 								//jetzt die UVsPositionen holen von den bereits vorhandenen Vertizen
@@ -1815,17 +1812,17 @@ endIt:;
 
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-						//außerdem muss noch darauf geachtet werden, dass eventuelle unsel Edges ja jetzt mit dem edgeVtx verbinden müssen.
-						//Dies ist allerdings momentan kaum machbar, da keine Ptr zu den entsprechenden edges vorhanden sind - es könnte allerhöchstens von den endStücken 
+						//auueerdem muss noch darauf geachtet werden, dass eventuelle unsel Edges ja jetzt mit dem edgeVtx verbinden muessen.
+						//Dies ist allerdings momentan kaum machbar, da keine Ptr zu den entsprechenden edges vorhanden sind - es kuennte allerhuechstens von den endStuecken 
 						//gemacht werden 
-						//->Hmm, hat sich das nach den j�ngsten �nderungen erledigt? Mal sehen ...
+						//->Hmm, hat sich das nach den joengsten oenderungen erledigt? Mal sehen ...
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 					}
 					
 				}
 				
-				//man darf hier natürlich nicht davon ausgehen, dass für diese Edge auch tatsächlich Endstücken existieren
+				//man darf hier natuerlich nicht davon ausgehen, dass fuer diese Edge auch tatsuechlich Endstuecken existieren
 				if(edge::endFacePtrs.size() > 0)
 				{			
 					std::list<endFaceData*>::iterator endIter; 
@@ -1838,14 +1835,14 @@ endIt:;
 					for(i = 0; i < 2; i++)
 					{
 						//man muss bedenken, dass
-						//die endFaces mit falschen newVtx informationen gefüttert wurden, welches jetzt nicht mehr zutreffend sind
+						//die endFaces mit falschen newVtx informationen gefuettert wurden, welches jetzt nicht mehr zutreffend sind
 						//deshalb muss die betroffene endFaceData gefunden und aktualisiert werden
 						
-						//suchen nach den VtxIDs -> das Wissen, dass die betreffenden Faces zuletzt hinzugefügt wurden hilft, das ganz fix zu machen
+						//suchen nach den VtxIDs -> das Wissen, dass die betreffenden Faces zuletzt hinzugefuegt wurden hilft, das ganz fix zu machen
 						//mit der Suche beginnen muss man also von hinten
 						
 
-						//hat diese Seite überhaupt ne borderEdge?
+						//hat diese Seite ueberhaupt ne borderEdge?
 						if( nachbarn[i][0]->isSelected() || nachbarn[i][1]->isSelected())	//es gibt hier auf jeden Fall 2 faces, so dass man nicht noch auf 0Ptr checkeb muss
 							//diese Seite hat mindestens eine Selected edge, also kann es keine endseite mehr sein und man muss nicht erst suchen in endFaceData
 							continue;
@@ -1859,13 +1856,13 @@ endIt:;
 							endIter--;
 								
 							
-							//jetzt noch den edgeVtx fachgerecht in die FaceData einfügen - faceDir im endFaceobject als info nehmen
+							//jetzt noch den edgeVtx fachgerecht in die FaceData einfuegen - faceDir im endFaceobject als info nehmen
 							eTmp[0] = (*endIter)->faceData[0];
 							eTmp[1] = (*endIter)->faceData[1];
 
 
-							//wenn das branding nicht mit der eigenen ID übereinstimmt, ist es nicht das eigene Face
-							//außerdem darf das eigene Face nicht mehrmals verändert werden, also nur unbehandelte faces bearbeiten
+							//wenn das branding nicht mit der eigenen ID uebereinstimmt, ist es nicht das eigene Face
+							//auueerdem darf das eigene Face nicht mehrmals veruendert werden, also nur unbehandelte faces bearbeiten
 							if((*endIter)->branding != id || (*endIter)->origVtx != vtxIDs[i])
 								continue;
 							
@@ -1874,18 +1871,18 @@ endIt:;
 							//bool onlyOneFace = false;
 							if( eTmp[1] != 0 && (eTmp[1]->id == eTmp[0]->id) )
 							{
-								//a = ((*endIter)->newVtx[0] > creator->getInitialVtxCount()) ? 1 : 0 ;	//die Richtung w�hlen, in der der alte Vtx ist
+								//a = ((*endIter)->newVtx[0] > creator->getInitialVtxCount()) ? 1 : 0 ;	//die Richtung woehlen, in der der alte Vtx ist
 								//max = a+1;	//damit die Schleife auch wirklich nur einmal durchlaufen wird
 								max = 1;
 							}
 							
-							//	ansonsten muss man checken, ob die beiden Faces zusammenh�ngen. Tun sie es nicht bedeutet das, dass auch die endfaces
-							//	aufgesplittet werden. In diesem Fall liegen also weitere Faces zwischen den endFaces, die auch auf den edgeVtx angepasst weden m�ssen
+							//	ansonsten muss man checken, ob die beiden Faces zusammenhoengen. Tun sie es nicht bedeutet das, dass auch die endfaces
+							//	aufgesplittet werden. In diesem Fall liegen also weitere Faces zwischen den endFaces, die auch auf den edgeVtx angepasst weden moessen
 							
-							//	Am einfachsten w�re es, wenn man einfach sp�ter jedes Vorkommen des origVtx mit dem edgeVtx vertauschen w�rde und umgekehrt
-							//	->Liste erstellen, die mitgef�hrt wird
+							//	Am einfachsten woere es, wenn man einfach spoeter jedes Vorkommen des origVtx mit dem edgeVtx vertauschen woerde und umgekehrt
+							//	->Liste erstellen, die mitgefoehrt wird
 							
-							MIntArray faceVtxIDs[2];	//zwischenspeicher f�r faceVtxIDs
+							MIntArray faceVtxIDs[2];	//zwischenspeicher foer faceVtxIDs
 
 							for(UINT a = 0; a < max; a++)
 							{
@@ -1893,14 +1890,14 @@ endIt:;
 								if(eTmp[a] == 0)	//das Face muss nicht zangsweise besetzt sein (z.B bei borderEdges) 
 									continue;
 								/*else
-								{//also ist das Face korrekt - demnach m�ssen jetzt ertmal die faceVtx geholt werden
+								{//also ist das Face korrekt - demnach moessen jetzt ertmal die faceVtx geholt werden
 									creator->getFaceVtxIDs(eTmp[a]->id, faceVtxIDs[a]);
 								}*/
 								
-								changed = true;	//damit man aus dem endFaceListLooo austeigen kann - das Face wurde ja bereits gefunden und geändert
+								changed = true;	//damit man aus dem endFaceListLooo austeigen kann - das Face wurde ja bereits gefunden und geuendert
 
-								(*endIter)->origVtx = edgeVtx[i];	//der Wert wird jetzt zwar doppelt verändert - oben darf das noch nicht gemacht werden
-								//-> es darf hier nur was verändert werden, wenn es sich garantiert um das richtige Face handelt
+								(*endIter)->origVtx = edgeVtx[i];	//der Wert wird jetzt zwar doppelt veruendert - oben darf das noch nicht gemacht werden
+								//-> es darf hier nur was veruendert werden, wenn es sich garantiert um das richtige Face handelt
 								
 								//die UVS zuerst bearbeiten (damit man die UVs der vtxIDs noch findet)
 								
@@ -1908,7 +1905,7 @@ endIt:;
 								{//in diesem Fall muss die neue UV auch einen Slide erhalten. Dazu die UVs der neun Vtx holen der Faces und deren Positionen mitteln.
 									//daraus entsteht dann ein neuer Slide
 									if(eTmp[0]->hasUVs())
-									{//das ganze nat�rlich nur, wenn auch wirklich UVs vorhanden
+									{//das ganze natoerlich nur, wenn auch wirklich UVs vorhanden
 										
 										MIntArray newUVsTmp[2] =	{eTmp[0]->getEdgeVtxUVs((*endIter)->newVtx[0]), 
 																	 eTmp[0]->getEdgeVtxUVs((*endIter)->newVtx[1]) };
@@ -1939,7 +1936,7 @@ endIt:;
 										newUVs[a] = creator->createUVs(newUVsTmp[0], edgeUVPos);
 										
 										
-										//slide erzeugen (origUVs m�ssen extra geholt werden, da dieses Face nicht mit den faces der edge verbunden sein  muss UVm�ssig)
+										//slide erzeugen (origUVs moessen extra geholt werden, da dieses Face nicht mit den faces der edge verbunden sein  muss UVmoessig)
 										MIntArray origUVs = eTmp[0]->getEdgeVtxUVs(vtxIDs[i]);
 										MFloatArray origUVPos;
 										creator->getUVPositions(origUVs, origUVPos);
@@ -1952,8 +1949,8 @@ endIt:;
 								else
 								{
 									//OrigUVs holen und deren positionen verwenden, um ne UVs zu erzeugen
-									//hier müsste man eigenlich auch noch überprüfen, ob die UVs dieses Faces irgendwo mit denen des faces dieser Edge übereinstimmen
-									//so dass nur für die ungeteilten UVs neue UVs erstellt werden
+									//hier muesste man eigenlich auch noch ueberpruefen, ob die UVs dieses Faces irgendwo mit denen des faces dieser Edge uebereinstimmen
+									//so dass nur fuer die ungeteilten UVs neue UVs erstellt werden
 									origUVs = eTmp[a]->getEdgeVtxUVs(vtxIDs[i]);
 									
 									creator->getUVPositions(origUVs, newUVPos);
@@ -1975,15 +1972,15 @@ endIt:;
 								
 								if( (*endIter)->newVtx[a] > creator->getInitialVtxCount() )
 								{
-									//der Witz ist, dass das ganze nur funktionieren kann, wenn man das OriginalFace entsprechend verändert
+									//der Witz ist, dass das ganze nur funktionieren kann, wenn man das OriginalFace entsprechend veruendert
 									edge::creator->changeSideFace(vtxIDs[i], edgeVtx[i], eTmp[a]->id, newUVs[a]);
 								}
 								else
 								{								
 									
 									//der neue Vtx ist bereits vorhanden - die insertVtx methode des creators wird dann keinen neuen Vtx erstellen
-									//newVTx also nicht verändern
-									//allerdings muss der edgeVtx korrekt ins originalFace eingefügt werden mithilfe der insertVtx methode
+									//newVTx also nicht veruendern
+									//allerdings muss der edgeVtx korrekt ins originalFace eingefuegt werden mithilfe der insertVtx methode
 									edge::creator->insertVtx(eTmp[a], vtxIDs[i], edgeVtx[i], -(*endIter)->directions[a]);
 									
 								}
@@ -1993,17 +1990,17 @@ endIt:;
 							}//for(UINT a = 0; a < 2; a++) ENDE		
 							
 							/*
-							//jetzt schauen, ob die faces zusammenh�ngen oder nicht
+							//jetzt schauen, ob die faces zusammenhoengen oder nicht
 							if(	faceVtxIDs[0].length() && faceVtxIDs[1].length() )
 							{
 								if( creator->helper.matchArray(faceVtxIDs[0], faceVtxIDs[1]).length() == 1)
 								{
-									//sie h�ngen nur an einem Vtx zusammen - demnach m�ssen die Vtx ausgetauscht werden
+									//sie hoengen nur an einem Vtx zusammen - demnach moessen die Vtx ausgetauscht werden
 									//origVtx (vtxID) gegen den edgeVtx
 
 									
-									//Leider ist es ein wenig schwierig an die ben�tigten Faces zu kommen - man m�sste das MayaMesh verwenden um schnell an
-									//die ben�tigten Infos zu gelangen
+									//Leider ist es ein wenig schwierig an die benoetigten Faces zu kommen - man moesste das MayaMesh verwenden um schnell an
+									//die benoetigten Infos zu gelangen
 								}
 							}
 							*/
@@ -2019,7 +2016,7 @@ endIt:;
 
 				}//if(edge::endFacePtrs.size() > 0) ENDE
 
-				//das mit den veränderten endFaces geht jetzt automatisch seinen Gang - jetzt kann man einfach die Faces erstellen - 2 an der Zahl
+				//das mit den veruenderten endFaces geht jetzt automatisch seinen Gang - jetzt kann man einfach die Faces erstellen - 2 an der Zahl
 				newFaceIDs.setLength(4);
 
 				for(i = 0; i < 2; i++)
@@ -2052,7 +2049,7 @@ endIt:;
 		{
 
 CStandardFace:
-			//jetzt noch ein TmpFace erstellen, welches alle UVs enthält und alle normalen
+			//jetzt noch ein TmpFace erstellen, welches alle UVs enthuelt und alle normalen
 			//MERKE: Diese Prozedur muss checken, ob noch edgeVtx mit einzubinden sind, welche von einem nachbarn erzeugt und gesetzt wurden!
 		
 
@@ -2080,7 +2077,7 @@ CStandardFace:
 				
 
 			MIntArray tmpUVs;
-			//jetzt das offsets Array aufbauen anhand der Infos über einen Vtx
+			//jetzt das offsets Array aufbauen anhand der Infos ueber einen Vtx
 			//UVs vom ersten Vtx holen (MERKE: Auch wenn es sich um einen verschobenen Vtx handelt, wird dieser aufs VtxChange gepackt und kann somit auch gefunden werden)
 			tmpUVs = faceData[0]->getNewVtxUVs(newFaceIDs[0]);
 
@@ -2095,20 +2092,20 @@ CStandardFace:
 				count += int(tmpFace.UVRelOffsets[i]) * 4;
 			}
 
-			//jetzt muss jetzt erstmal überprüft werden, ob ein nachbar(welcher noch nicht evaluiert hat, eventuell edgeVtx erzeugen sollte, die hier
+			//jetzt muss jetzt erstmal ueberprueft werden, ob ein nachbar(welcher noch nicht evaluiert hat, eventuell edgeVtx erzeugen sollte, die hier
 			//noch zur Verwendung kommen sollen
 			
-			for(i = (2-faceIDs.length())*2; i < 2; i++)	//i = (2-faceIDs.length())*2 ->nur wenn 2 faces vorhanden (edge ist NICHT auf border), �berhaupt auf edgeVtx checken ->borderedges habn nie edgeVtx
+			for(i = (2-faceIDs.length())*2; i < 2; i++)	//i = (2-faceIDs.length())*2 ->nur wenn 2 faces vorhanden (edge ist NICHT auf border), oeberhaupt auf edgeVtx checken ->borderedges habn nie edgeVtx
 			{
 				UINT myDir = 0;	//bestimmt, von welchem Face die UVs geholt werden. Default ist 0
-				if( (edgeVtx[i] == -1) & nurEinNachbar[i] /*bedeutet auch, dass die edge auf der Seite gewählt ist ->NICHT ZWANGSWEISE*/ )	//wenn edgeVtx noch nicht gesetzt und es nur einen nachbarn gibt auf dieser Seite 
+				if( (edgeVtx[i] == -1) & nurEinNachbar[i] /*bedeutet auch, dass die edge auf der Seite gewuehlt ist ->NICHT ZWANGSWEISE*/ )	//wenn edgeVtx noch nicht gesetzt und es nur einen nachbarn gibt auf dieser Seite 
 				{
 					if(nachbarn[i][0] != 0 && nachbarn[i][0]->isSelected())
 						edgeVtx[i] = nachbarn[i][0]->C_checkForEdgeVtx(this, uID[i*2], false, newPos[i*2],newPos[i*2+1]);
 					else if(nachbarn[i][1] != 0)
-						//der andere muss gewählt sein
+						//der andere muss gewuehlt sein
 						edgeVtx[i] = nachbarn[i][1]->C_checkForEdgeVtx(this, uID[i*2], false, newPos[i*2],newPos[i*2+1]);
-					else break;	//wenn alle nacharn ungültig waren (was ja eigentlich nicht passieren sollte, abbrechen
+					else break;	//wenn alle nacharn ungueltig waren (was ja eigentlich nicht passieren sollte, abbrechen
 
 					
 					//wenn der edgeVtx gesetzt wurde muss man die entsprechenden UVs noch setzen in tmpFace
@@ -2119,15 +2116,15 @@ UVDoDiffer:
 						MIntArray origUVs;
 						origUVs = faceData[myDir]->getEdgeVtxUVs(vtxIDs[i]);
 
-						MFloatArray origUVPos;	//hält die Positionen der origUVs
+						MFloatArray origUVPos;	//huelt die Positionen der origUVs
 						edge::creator->getUVPositions(origUVs, origUVPos);
 
-						//jetzt neue UVs erzeugen für origUVs
+						//jetzt neue UVs erzeugen fuer origUVs
 						MIntArray newUVs = edge::creator->createUVs(origUVs, origUVPos);
 
-						//vor dem assignment muss natürlich der edgeVtx natürlich auch noch eingefügt werden!!!!
+						//vor dem assignment muss natuerlich der edgeVtx natuerlich auch noch eingefuegt werden!!!!
 						//tmpFace.insertEdgeVtx(vtxIDs[i], edgeVtx[i], (isFlipped[0]) ? ( (i == 0) ? false : true) : ((i == 0) ? true : false) );
-						//einfach am anfang einf�gen - pos ist egal
+						//einfach am anfang einfoegen - pos ist egal
 						tmpFace.insertEdgeVtx(tmpFace.faceVertices[0], edgeVtx[i], true);
 						//nun noch die UVs zuweisen - edgeVtx ist bereits in faceVertices des faceObjektes eingetragen worden
 						tmpFace.assignUV(edgeVtx[i], newUVs);
@@ -2138,7 +2135,7 @@ UVDoDiffer:
 					//erhalten, damit das face ordentlich ertsellt werden kann 
 					//quasi so wie oben, nur ohne neue UVs, wenn sich die Faces die UVs am origUV teilen
 						if(doUVsDiffer(vtxIDs[i], faceData[0], faceData[1]))
-						{//die UVs unterscheiden sich, also muss man die Seite herausfinden, auf der der gew�hlte nachbar ist und myDir damit setzen
+						{//die UVs unterscheiden sich, also muss man die Seite herausfinden, auf der der gewoehlte nachbar ist und myDir damit setzen
 							//an dieser stelle sollte es nur einen selNachbarn  geben von zweien
 							myDir = (nachbarn[i][0]->isSelected()) ? 0 : 1;
 							
@@ -2150,7 +2147,7 @@ UVDoDiffer:
 							origUVs = faceData[0]->getEdgeVtxUVs(vtxIDs[i]);
 							
 							
-							//einfach am anfang einf�gen - pos ist egal
+							//einfach am anfang einfoegen - pos ist egal
 							tmpFace.insertEdgeVtx(tmpFace.faceVertices[0], edgeVtx[i], true);
 							//nun noch die UVs zuweisen - edgeVtx ist bereits in faceVertices des faceObjektes eingetragen worden
 							tmpFace.assignUV(edgeVtx[i], origUVs);		
@@ -2158,7 +2155,7 @@ UVDoDiffer:
 				}
 			}
 
-			//wenn edgeVtx gültig ist, dann diesen in newFaceIDs einfügen. Er wurde bereits in tmpFace eingefügt samt UVs
+			//wenn edgeVtx gueltig ist, dann diesen in newFaceIDs einfuegen. Er wurde bereits in tmpFace eingefuegt samt UVs
 			
 			
 			//jetzt diese ersten UVs zuweisen
@@ -2175,7 +2172,7 @@ UVDoDiffer:
 			tmpFace.assignUV(newFaceIDs[3], tmpUVs);
 
 			//UVs fertig
-			//jetzt die newUVIDs nochmal ganz neu aufbauen, um keine Probleme mit den edgeVtx zu bekommen, welche ja erst jetzt bekannt sind (wenn überhaupt)
+			//jetzt die newUVIDs nochmal ganz neu aufbauen, um keine Probleme mit den edgeVtx zu bekommen, welche ja erst jetzt bekannt sind (wenn ueberhaupt)
 			newFaceIDs.clear();
 			
 			if(edgeVtx[0] > -1)
@@ -2191,14 +2188,14 @@ UVDoDiffer:
 			newFaceIDs.append(newVtx[1]);
 
 
-			//jetzt normalen bearbeiten -> es reicht, wenn man die normalen der VtxIDs (welche ja die originale für die newVtx sind), in faceData sucht und
-			//ggf hinzufügt
+			//jetzt normalen bearbeiten -> es reicht, wenn man die normalen der VtxIDs (welche ja die originale fuer die newVtx sind), in faceData sucht und
+			//ggf hinzufuegt
 			//count als locID nehmen
 			for(i = 0; i < 2; i++)
 			{//damit auf jeden Fall entsprechende NormalInformaiton gefunden wird, so vorhanden
 				if(creator->helper.getLocIndex(vtxIDs[i], faceData[0]->normalIndices, count))
 				{
-					//hier m�ssen nat�rlich die IDs der newVtx hin! Da eh nur nach mod2 eintr�gen geschaut wird sp�ter, trage ich jeweils 2 mal den entsprechenden newVtx ein
+					//hier moessen natoerlich die IDs der newVtx hin! Da eh nur nach mod2 eintroegen geschaut wird spoeter, trage ich jeweils 2 mal den entsprechenden newVtx ein
 					tmpFace.normalIndices.append(newVtx[i*2]);
 					tmpFace.normalIndices.append(newVtx[i*2]);
 
@@ -2232,7 +2229,7 @@ UVDoDiffer:
 
 
 			//jetzt den Fall behandeln, dass edge on border liegt und der eventuell neu erstellte Vtx jetzt an die angrenzende BorderEdge weitergegeben werden muss
-			//wenn die noch nicht evaluiert hat, oder dass man das von ihr erstellte Face �ndert, so dass es den echten newVtx erh�lt
+			//wenn die noch nicht evaluiert hat, oder dass man das von ihr erstellte Face oendert, so dass es den echten newVtx erhoelt
 			//wenn nur ein nachbar da ist, dann geht das automatisch klar :))
 			
 
@@ -2265,7 +2262,7 @@ void	selEdge::insertNewVtx(MPoint& inPoint, bool specialMode)
 		if(inPoint.y == -1.123456789)
 		{//wahrscheinlich muss dieser check hier nicht sein
 			newVtx[side*2+dir] = int(inPoint.x);
-			//die statische variable für die position muss ebenfalls aktualisiert werden
+			//die statische variable fuer die position muss ebenfalls aktualisiert werden
 
 			INVIS(cout<<"Vtx "<<inPoint.x<<" war bereits vorhanden. Ihm wurde newVtx["<<side*2+dir<<"] zugewiesen"<<endl;)
 		}
@@ -2280,9 +2277,9 @@ void	selEdge::insertNewVtx(MPoint& inPoint, bool specialMode)
 		}
 
 	//	if(!specialMode)
-		//	newVtx[side*2+(1-dir)] = C_fixNewVtxUV(vtxIDs[side],newVtx[side*2+dir],  faceData[0]);	//damit newVtx immer gefüllt sind, dir ist hier eh immer , aber ich
+		//	newVtx[side*2+(1-dir)] = C_fixNewVtxUV(vtxIDs[side],newVtx[side*2+dir],  faceData[0]);	//damit newVtx immer gefuellt sind, dir ist hier eh immer , aber ich
 																								//lasse das einfach mal ausgeschrieben, der Klarheit wegen
-		//ist hier nicht n�tig - wird sp�ter dann gemacht
+		//ist hier nicht noetig - wird spoeter dann gemacht
 	
 	}
 	else
@@ -2293,7 +2290,7 @@ void	selEdge::insertNewVtx(MPoint& inPoint, bool specialMode)
 			INVIS(cout<<"Vtx "<<inPoint.x<<" war bereits vorhanden. Ihm wurde newVtx["<<side*2+dir<<"] zugewiesen"<<endl;)
 			newVtx[side*2+dir] = int(inPoint.x);
 
-			//die statische variable für ie position muss ebenfalls aktualisiert werden
+			//die statische variable fuer ie position muss ebenfalls aktualisiert werden
 
 			
 		}
@@ -2302,7 +2299,7 @@ void	selEdge::insertNewVtx(MPoint& inPoint, bool specialMode)
 		
 		
 			
-			if( origVtxDoneBA.isFlagSet(vtxIDs[side]) & !specialMode ) //nur wenn der Vtx noch nicht auf der Liste ist, wird seine neue Position ins positionsArray hinzugefügt
+			if( origVtxDoneBA.isFlagSet(vtxIDs[side]) & !specialMode ) //nur wenn der Vtx noch nicht auf der Liste ist, wird seine neue Position ins positionsArray hinzugefuegt
 			{
 				
 				newVtx[side*2+dir] = vtxIDs[side];
@@ -2328,7 +2325,7 @@ void	selEdge::insertNewVtx(MPoint& inPoint, bool specialMode)
 
 			}
 
-			//um slide kümmern
+			//um slide kuemmern
 
 				creator->addSlideAndNormal(vtxIDs[side],newVtx[side*2+dir],inPoint,true);
 
@@ -2354,7 +2351,7 @@ void	selEdge::createSmallChamferFaces()
 	
 	//nachbarn[i][0] ist immer besetzt, auch bei borderEdges
 	INVIS(cout<<"Bin in Create small Faces fuer ID :: <<< "<<id<<" >>>"<<endl);
-	MPoint tmpPos;	//f�r Linux Kompatibilit�t
+	MPoint tmpPos;	//foer Linux Kompatibilitoet
 	
 	clean = false;
 
@@ -2374,7 +2371,7 @@ void	selEdge::createSmallChamferFaces()
 		smallFaceClean[i] = true;
 
 
-		UINT a = 0;		//marker f�r die richtung - sp�ter wird nur noch a oder 1-a verwendet
+		UINT a = 0;		//marker foer die richtung - spoeter wird nur noch a oder 1-a verwendet
 		centerVtx = -1;
 		newVtxIDs.clear();
 
@@ -2387,7 +2384,7 @@ void	selEdge::createSmallChamferFaces()
 
 		//zuerst einen CenterVtx holen, wenn moeglich
 		
-		//er ist also an border gesto�en - jetzt noch in die andere richtung gehen, wenn moegich
+		//er ist also an border gestooeen - jetzt noch in die andere richtung gehen, wenn moegich
 
 		if((static_cast<selEdge*>(nachbarn[i][0]))->C_queryCenterVtx(id, this, newVtxIDs, centerVtx) && nachbarn[i][1] != 0)
 		{	//in der anderen richtung suchen
@@ -2491,9 +2488,9 @@ void	selEdge::createSmallChamferFaces()
 
 			}
 
-			//wenn möglich noch den centerVtx hinzufügen
+			//wenn mueglich noch den centerVtx hinzufuegen
 			if(centerVtx > -1)
-			{//MERKE : AUF DIESE WEISE WERDEN DIE CENTERUVS EVENTEULL DOPPELT ERSTELLT - DIES BEI GELEGENHEIT AUSSCHLIE�EN
+			{//MERKE : AUF DIESE WEISE WERDEN DIE CENTERUVS EVENTEULL DOPPELT ERSTELLT - DIES BEI GELEGENHEIT AUSSCHLIEoeEN
 
 				tmpFace->insertEdgeVtx(tmpFace->faceVertices[tmpFace->faceVertices.length() -1], centerVtx, true);
 				
@@ -2501,13 +2498,13 @@ void	selEdge::createSmallChamferFaces()
 				MIntArray vtxUVs = faceData[a]->getEdgeVtxUVs(vtxIDs[i]);
 				edge::creator->getUVPositions(vtxUVs, UVPos);
 				
-				//merke - die UVs müssen auch gemittelt werden - bzw. man uss sie der prozedur mitgeben
+				//merke - die UVs muessen auch gemittelt werden - bzw. man uss sie der prozedur mitgeben
 				MIntArray tmpArray = edge::creator->createUVs(vtxUVs, UVPos);
 				tmpFace->assignUV(centerVtx, tmpArray);
 
 				
 
-				//UVSlide ... ,müsst es auch noch geben
+				//UVSlide ... ,muesst es auch noch geben
 				//creator->addUVSlide(
 			}
 
@@ -2551,13 +2548,13 @@ void		selEdge::C_dataAddVtx(edgeFaceData* fData,const edgeFaceData* nRefFace, in
 	
 	
 	UINT lid;
-	UINT l = fData->faceVertices.length(); //l and index für di UVs
+	UINT l = fData->faceVertices.length(); //l and index fuer di UVs
 	//vtx draufpacken - faceDate methoden koennen hier nicht verwendet werden, da das Face nich voll ist
 	
 	fData->faceVertices.append(thisVtx);
 
 	//jetzt die UVs anpassen
-	//-> der letzte UV muss angehängt werden - die anderen koennen eingefügt werden
+	//-> der letzte UV muss angehuengt werden - die anderen koennen eingefuegt werden
 	//NEUE UVS SOFORT EINFUEGEN
 	MIntArray newUVs;
 
@@ -2575,7 +2572,7 @@ void		selEdge::C_dataAddVtx(edgeFaceData* fData,const edgeFaceData* nRefFace, in
 		fData->UVIndices.append(newUVs[creator->numUVSets - 1]);
 
 
-	//und nun die restlichen UVs einf�gen. Dies muss so gemacht werden, weil man .insert nur innerhalb des Arrays nehmen kann, ansonsten muss append verwendet werden
+	//und nun die restlichen UVs einfoegen. Dies muss so gemacht werden, weil man .insert nur innerhalb des Arrays nehmen kann, ansonsten muss append verwendet werden
 	UINT indexChange = 0;	//als offsetMarker
 	for(UINT i = 0; i < creator->numUVSets - 1;i++)
 	{
@@ -2593,7 +2590,7 @@ void		selEdge::C_dataAddVtx(edgeFaceData* fData,const edgeFaceData* nRefFace, in
 	if(isNew)
 	{
 		if(creator->helper.getLocIndex(thisVtx, nRefFace->vtxChange, lid))
-		{//der dazugehörige vtx kann jetzt im normalindices array gesucht werden
+		{//der dazugehuerige vtx kann jetzt im normalindices array gesucht werden
 			if(creator->helper.isOnArray(nRefFace->vtxChange[lid-1], nRefFace->normalIndices))
 			{
 				fData->normalIndices.append(thisVtx);
@@ -2606,7 +2603,7 @@ void		selEdge::C_dataAddVtx(edgeFaceData* fData,const edgeFaceData* nRefFace, in
 	{
 		if(creator->helper.isOnArray(thisVtx, nRefFace->normalIndices))
 		{
-			//vtxIds hinzufügen - einfach 2 mal den selben Vtx, um die edge garantiert hart zu machen
+			//vtxIds hinzufuegen - einfach 2 mal den selben Vtx, um die edge garantiert hart zu machen
 			fData->normalIndices.append(thisVtx);
 			fData->normalIndices.append(thisVtx);
 		}
@@ -2620,7 +2617,7 @@ void		selEdge::C_initFaceData(edgeFaceData* thisFace, int thisVtx, edgeFaceData*
 //--------------------------------------------------------------------------------------------------------------
 {
 
-	//im Untrschid zu der prozedur hierüber kommt diese methode damit klar, dass das face vllig leer ist
+	//im Untrschid zu der prozedur hierueber kommt diese methode damit klar, dass das face vllig leer ist
 	
 	//edgeVtx hinzu
 	thisFace->faceVertices.append(thisVtx);
@@ -2638,7 +2635,7 @@ void		selEdge::C_initFaceData(edgeFaceData* thisFace, int thisVtx, edgeFaceData*
 	
 	
 	
-	//jetzt die UVIDs setzen für thisVtx
+	//jetzt die UVIDs setzen fuer thisVtx
 	if(isNew)
 		thisFace->UVIndices = refFace->getNewVtxUVs(thisVtx);	//thisVtx ist in diesem Fall der newVtx
 	else
@@ -2660,7 +2657,7 @@ void		selEdge::C_initFaceData(edgeFaceData* thisFace, int thisVtx, edgeFaceData*
 	{
 		UINT lid;
 		if(edge::creator->helper.getLocIndex(thisVtx,refFace->vtxChange, lid))
-		{//der dazugehörige vtx kann jetzt im normalindices array gesucht werden
+		{//der dazugehuerige vtx kann jetzt im normalindices array gesucht werden
 			if(creator->helper.isOnArray(refFace->vtxChange[lid-1], refFace->normalIndices))
 			{
 				thisFace->normalIndices.append(thisVtx);
@@ -2673,7 +2670,7 @@ void		selEdge::C_initFaceData(edgeFaceData* thisFace, int thisVtx, edgeFaceData*
 	{
 		if(creator->helper.isOnArray(thisVtx, refFace->normalIndices))
 		{
-			//vtxIds hinzufügen - einfach 2 mal den selben Vtx, um die edge garantiert hart zu machen
+			//vtxIds hinzufuegen - einfach 2 mal den selben Vtx, um die edge garantiert hart zu machen
 			thisFace->normalIndices.append(thisVtx);
 			thisFace->normalIndices.append(thisVtx);
 		}
@@ -2687,11 +2684,11 @@ void		selEdge::C_initFaceData(edgeFaceData* thisFace, int thisVtx, edgeFaceData*
 UINT		selEdge::C_addVtx(int requesterID,const selEdge* requester, edgeFaceData* fData, int& centerVtx, bool needsEdgeVtx)
 //--------------------------------------------------------------------------------------------------------------
 {
-	//true wird zurückgegeben, wenn eine Borderedge getroffen wurde - in diesem Fall muss dann noch in die andere richtung gesucht werden
+	//true wird zurueckgegeben, wenn eine Borderedge getroffen wurde - in diesem Fall muss dann noch in die andere richtung gesucht werden
 	//vom requester, nachdem das face umgekehrt wurde
 
 	//abbruch, wenn diese edge schon dran war
-	//NEIN - Mit clean d�rfen diese Sekundaeredges nicht arbeiten - allerdings m�ssen sie sich clean setzen., damit dasselbe face nicht zweimal evaluiert wird
+	//NEIN - Mit clean doerfen diese Sekundaeredges nicht arbeiten - allerdings moessen sie sich clean setzen., damit dasselbe face nicht zweimal evaluiert wird
 //	if(!clean)
 	//	return 0;
 
@@ -2706,11 +2703,11 @@ UINT		selEdge::C_addVtx(int requesterID,const selEdge* requester, edgeFaceData* 
 
 
 	if(id == requesterID)
-	{//von diesem Face ging alles aus, also allerhöchstens noch einen edgeVtx draufpacken, wenn möglich
+	{//von diesem Face ging alles aus, also allerhuechstens noch einen edgeVtx draufpacken, wenn mueglich
 		//der newVtx dieser Seite ist bereits drauf - aber nur, wenn der requester NICHT die requesteredge ist
 
-		//diese Stelle kann acuh zu problemen führen, weil für den Fall, das nur der reqzester einen edgevtx hat
-		//dieser dann doppelt hinzugefügt würde -> dies ist durch den erweiterten check ausgeschlossen
+		//diese Stelle kann acuh zu problemen fuehren, weil fuer den Fall, das nur der reqzester einen edgevtx hat
+		//dieser dann doppelt hinzugefuegt wuerde -> dies ist durch den erweiterten check ausgeschlossen
 
 /*
 		if(edgeVtx[s] > -1 && requester != this)
@@ -2719,7 +2716,7 @@ UINT		selEdge::C_addVtx(int requesterID,const selEdge* requester, edgeFaceData* 
 
 			C_dataAddVtx(fData, faceData[r], edgeVtx[s], false);
 			
-			//hier wird 2 zurückgegeben, damit der requester weiß, dass er nicht noch  in die andere richtung suchen muss
+			//hier wird 2 zurueckgegeben, damit der requester weiue, dass er nicht noch  in die andere richtung suchen muss
 			return 2;
 		}
 */
@@ -2739,10 +2736,10 @@ UINT		selEdge::C_addVtx(int requesterID,const selEdge* requester, edgeFaceData* 
 	
 	bool UVsDiffer;
 
-	//Wenn ein edgeVtx ben�tigt wird, aber wir keinen haben, dann blockieren wir und machen unser eigenes Face
+	//Wenn ein edgeVtx benoetigt wird, aber wir keinen haben, dann blockieren wir und machen unser eigenes Face
 	if(needsEdgeVtx & (edgeVtx[s] == -1 ))
 	{
-		//wir haben keinen edgeVtx, braeuchten aber einen - also einfach ein eigenes Face erstellen und das alte unver�ndert zurueckgeben
+		//wir haben keinen edgeVtx, braeuchten aber einen - also einfach ein eigenes Face erstellen und das alte unveroendert zurueckgeben
 		
 		edgeFaceData* tmpFace = new edgeFaceData(0);
 		
@@ -2754,7 +2751,7 @@ UINT		selEdge::C_addVtx(int requesterID,const selEdge* requester, edgeFaceData* 
 		if(nachbarn[s][1-r]->isSelected())
 			(static_cast<selEdge*>(nachbarn[s][1-r]))->C_addVtx(requesterID, this, tmpFace, centerVtx, needsEdgeVtx);
 
-		//und jetzt noch der CenterVtx - sonst ist das Face ung�ltig. Es gibt hier auf jeden Fall einen, 
+		//und jetzt noch der CenterVtx - sonst ist das Face ungoeltig. Es gibt hier auf jeden Fall einen, 
 		//weil der needEdgeVtx Flag nur aktiviert wird, wenn auch centerVtx vorhanden ist 
 		tmpFace->insertEdgeVtx(tmpFace->faceVertices[tmpFace->faceVertices.length() -1], centerVtx, true);
 		
@@ -2783,7 +2780,7 @@ UINT		selEdge::C_addVtx(int requesterID,const selEdge* requester, edgeFaceData* 
 
 	MIntArray tmpArray;	//wegen Linux
 
-	//man muss hier auch checken, ob die UVs am gemeinsamen newVtx zusammenh�ngen - er ist der letzte, welcher zum inFace hinzugef�gt wurde
+	//man muss hier auch checken, ob die UVs am gemeinsamen newVtx zusammenhoengen - er ist der letzte, welcher zum inFace hinzugefoegt wurde
 	MIntArray lastVtxUVs = fData->getEdgeVtxUVs(fData->faceVertices[fData->faceVertices.length() -1]);
 //	INVIS(creator->helper.printArray(lastVtxUVs, " = LASTVTX UVS!!!!!!!!!!!!!!!"));
 //	INVIS(creator->helper.printArray(faceData[r]->getNewVtxUVs(newVtx[s*2+r]), " = NEWVTX OTHERFACE UVS!!!!!!!!!!!!!!!!!"));
@@ -2791,15 +2788,15 @@ UINT		selEdge::C_addVtx(int requesterID,const selEdge* requester, edgeFaceData* 
 
 
 
-	//jetzt �berpr�fen, ob bereits ein centerVtx vorhanden ist - die eigentliche prozedur erstellt nur einen, wenn ein edgeVtx vorhanden ist
+	//jetzt oeberproefen, ob bereits ein centerVtx vorhanden ist - die eigentliche prozedur erstellt nur einen, wenn ein edgeVtx vorhanden ist
 	if(UVsDiffer & (centerVtx == -1))
 	{//es muss auf jeden Fall ein neuer CenterVtx erzeugt werden
 		MIntArray newVtxIDs;
 
-		//zuerst einen CenterVtx holen, wenn m�glich
+		//zuerst einen CenterVtx holen, wenn moeglich
 		
 	
-		//er ist also an border gestoßen - jetzt noch in die andere richtung gehen, wenn mögich
+		//er ist also an border gestoueen - jetzt noch in die andere richtung gehen, wenn muegich
 		if((static_cast<selEdge*>(nachbarn[s][0]))->C_queryCenterVtx(id, this, newVtxIDs, centerVtx) && nachbarn[s][1] != 0 )
 		{	//in der anderen richtung suchen
 			(static_cast<selEdge*>(nachbarn[s][1]))->C_queryCenterVtx(id, this, newVtxIDs, centerVtx);
@@ -2823,29 +2820,29 @@ UINT		selEdge::C_addVtx(int requesterID,const selEdge* requester, edgeFaceData* 
 	if(edgeVtx[s] > -1 || UVsDiffer)
 	{
 		
-		//edgeVtx zu InfaceData hinzufügen, wenn die UVs zusammenhängen
+		//edgeVtx zu InfaceData hinzufuegen, wenn die UVs zusammenhuengen
 		
 		int thisVtx;
 createOtherFace:
 
 
 		if(UVsDiffer)
-		{//in diesem Fall muss der erste Vtx der neueVtx sein auf der Seite des Requesters - keinen edgeVtx hinzuf�gen zum Face
+		{//in diesem Fall muss der erste Vtx der neueVtx sein auf der Seite des Requesters - keinen edgeVtx hinzufoegen zum Face
 			thisVtx = newVtx[s*2+r];
 		}
 		else
-		{//also reicht der edgeVtx - man kann ihn dann auch zur inFaceData hinzufügen
+		{//also reicht der edgeVtx - man kann ihn dann auch zur inFaceData hinzufuegen
 			thisVtx = edgeVtx[s];
 			C_dataAddVtx(fData, faceData[r], edgeVtx[s], false);
 		}
 		
 
-		//FERTIG MIT DEM HINZUF�GEN
+		//FERTIG MIT DEM HINZUFoeGEN
 
 		//EIGENES
 		//FACE ERSTELLEN ____________________________________________________ ->Dies manuell machen, da die CAddVtx methode mindesten einen Vtx braucht als referenz
 
-		//Okay, jetzt erstmal ein eigenes Face erzeugen, den EdgeVtx und den newVtx hinzufügen
+		//Okay, jetzt erstmal ein eigenes Face erzeugen, den EdgeVtx und den newVtx hinzufuegen
 		edgeFaceData* tmpFace = new edgeFaceData(0);
 		
 
@@ -2854,7 +2851,7 @@ createOtherFace:
 
 
 
-		//jetzt den edgeVtx drauftun, wenn nötig
+		//jetzt den edgeVtx drauftun, wenn nuetig
 		if(UVsDiffer)
 		{//dies bedeutet, dass zuerst der newVtx draufgetan wurde 
 			//wenn sich die UVs unterscheiden, muss erstmal ein dreieck erstellt werden
@@ -2887,7 +2884,7 @@ createOtherFace:
 				//jetzt einfach den UVsDiffer Flag auschalten und die Sach nochmal ablaufen lassen von marker aus
 				UVsDiffer = false;
 				
-				//löschung face
+				//lueschung face
 				delete tmpFace;
 				
 				//jetzt wird das face auf der anderen Seite erstellt, wie geplant
@@ -2918,10 +2915,10 @@ createOtherFace:
 			return 1;	//requester soll noch in die andere Richtung schauen
 		}
 
-		//wenn das face, welches zurückkommt, unverändert viele vertizen hat, dann bestimmt der returnvalue - wie man sich verhalten muss
+		//wenn das face, welches zurueckkommt, unveruendert viele vertizen hat, dann bestimmt der returnvalue - wie man sich verhalten muss
 		
 	//	if(returnValue == 2)
-	//	{//der nächste nachbar war der requester - er kümmert sich um dieses Face, also abbrechen
+	//	{//der nuechste nachbar war der requester - er kuemmert sich um dieses Face, also abbrechen
 		//	delete tmpFace;
 		//	return 0;
 	//	}
@@ -2929,7 +2926,7 @@ createOtherFace:
 		
 
 		//CenterVtx
-		//gut, jetzt einfach noch den centerVtx drauftun aufs tmpFace - die UVs m�sen neu erzeugt werden
+		//gut, jetzt einfach noch den centerVtx drauftun aufs tmpFace - die UVs moesen neu erzeugt werden
 		tmpFace->insertEdgeVtx(tmpFace->faceVertices[tmpFace->faceVertices.length() -1], centerVtx, true);
 		
 		MFloatArray UVPos;
@@ -2956,16 +2953,16 @@ createOtherFace:
 
 
 	//	if(UVsDiffer)
-	//		return 1;	//so wird der requester gezwungen, das face umzukehren und in der anderen richtung zu schauen ->unn�tig
+	//		return 1;	//so wird der requester gezwungen, das face umzukehren und in der anderen richtung zu schauen ->unnoetig
 	
 	
 		return 2;
 	
 	}
 	else
-	{//aha, dieses face hat also keinen edgeVtx - einfach den newVtx raufpacken und den nachbarn zwingen, seinen Vtx draufzutun, wenn möglich
+	{//aha, dieses face hat also keinen edgeVtx - einfach den newVtx raufpacken und den nachbarn zwingen, seinen Vtx draufzutun, wenn mueglich
 		
-		//wenn die n�chste edge bereits wieder der requester ist, dann abbrechen - der Vtx, den man jetzt hinzuf�gen wollte ist bereits drauf
+		//wenn die noechste edge bereits wieder der requester ist, dann abbrechen - der Vtx, den man jetzt hinzufoegen wollte ist bereits drauf
 		if(nachbarn[s][1-r]->getID() == requesterID)
 			return 0;
 
@@ -2993,11 +2990,11 @@ bool		selEdge::C_queryCenterVtx(int requesterID,edge* lastEdge, MIntArray& newVt
 //--------------------------------------------------------------------------------------------------------------
 {
 
-	//clean = false; //Ob sich eine Edge aktiviert oder nicht hängt jetzt vom smallFaceClean wert ab
+	//clean = false; //Ob sich eine Edge aktiviert oder nicht huengt jetzt vom smallFaceClean wert ab
 
 	if(id == requesterID)
-	{//wir sind wieder am anfang angekommen - normalerweise könnte man jetzt die eigentlich position ermitteln, allerdings
-		//könnte es auch sein, dass man hierher nie kommt da der loop durch borders gestoppt wurde. Aus dem grund macht das
+	{//wir sind wieder am anfang angekommen - normalerweise kuennte man jetzt die eigentlich position ermitteln, allerdings
+		//kuennte es auch sein, dass man hierher nie kommt da der loop durch borders gestoppt wurde. Aus dem grund macht das
 		//die aufrufende prozedur
 
 		return false;
@@ -3009,12 +3006,12 @@ bool		selEdge::C_queryCenterVtx(int requesterID,edge* lastEdge, MIntArray& newVt
 
 	
 
-	//newVtx anhängen
+	//newVtx anhuengen
 	newVtxIDs.append(newVtx[s*2+r]);
 
 	//wenn diese Edge einen edgeVtx hat und cernterVtxID noch -1 ist, dann einen neuen Vtx erzeugen und in centerVtx schreiben
 	//MAN MUSS HIER AUCH NOCH CHECKEN, OB DIE BEIDEN eventell die UVs an vtxID nicht teilen - dann muss auch ein centerVtx erzeugt werden
-	//darum kümmert sich die addVtx prozedur
+	//darum kuemmert sich die addVtx prozedur
 	if( (edgeVtx[s] > -1) & (centerVtxID == -1) )
 	{//position ist egal erstmal
 		centerVtxID = edge::creator->newVtx(MPoint());

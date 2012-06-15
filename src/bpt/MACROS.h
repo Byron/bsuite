@@ -17,7 +17,7 @@
  */
 
 
-//DIESE DATEI ENTHÃ„LT AUSSCHLIE?LICH MAKROS UND WIRD VON JEDER ANDEREN HEADER DATEI EINGEBUNDEN; DIE SIE BENÃ–TIGT
+//DIESE DATEI ENTHAELLT AUSSCHLIESSLICH MAKROS UND WIRD VON JEDER ANDEREN HEADER DATEI EINGEBUNDEN
 
 #ifndef MACRO_FILE
 #define MACRO_FILE
@@ -28,7 +28,7 @@
 #define	PI		3.14159265358979323846	/* pi */
 #define	PI2		1.57079632679489661923	/* pi/2 */
 
-// IOStream includes - ist absolut nötig
+// IOStream includes - ist absolut noetig
 //
 #ifndef REQUIRE_IOSTREAM
 	#include <iostream>
@@ -87,7 +87,6 @@ using namespace BPT;
 		}
 #else
 #	define MPRINT(message)
-#	define INVIS(code)	
 #	define MCheckStatus(status,message)	
 #endif
 
@@ -106,7 +105,7 @@ typedef	unsigned int uint;
 
 #ifndef WIN32
 //das hier ist eigentlich ABSOLUTER UNFUG - wieso immer ULONG schreiben und es ersetzen lassen, wenn man auch gleich ulong verwenden kann..
-//naja, so hat man immerhin maximale Kontrolle über das, was ULONG wirklich ist
+//naja, so hat man immerhin maximale Kontrolle ueber das, was ULONG wirklich ist
 	#define ULONG ulong		
 	#define UINT uint
 	#define UCHAR unsigned char
@@ -119,7 +118,7 @@ typedef	unsigned int uint;
 //*****************************
 #ifdef EXPIRES
 
-// Gibt die Zeit zurück, die die version noch gültig ist
+// Gibt die Zeit zurueck, die die version noch gueltig ist
 //
 uint	checkExpires();
 void	createExpireFile();

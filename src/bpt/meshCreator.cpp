@@ -1971,10 +1971,6 @@ void	meshCreator::checkForUV(int thisFaceID,
 
 		INVIS(cout<<endl<<endl;);
 
-		INVIS(for(u = 0; u < otherFaceUVs.length(); u++))
-		INVIS(cout<<otherFaceUVs[u]<<" == otherFaceUVs"<<endl;);
-
-		INVIS(cout<<endl<<endl;);
 
 		//wenn UVMatch NUR 1 ist, dann reict dies nicht aus für einen gemeinsamen UV
 		if(UVMatch.length() > 1)

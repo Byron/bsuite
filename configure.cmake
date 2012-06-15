@@ -17,7 +17,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LO
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LOWER})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE_LOWER})
 
-message(STATUS "In QtCreator, when running cmake, make sure you specify -DQTCREATOR as additional commandline arguments to have the maya headers parsed.")
+if(NOT QTCREATOR)
+	message(STATUS "In QtCreator, when running cmake, make sure you specify -DQTCREATOR=1 as additional commandline arguments to have the maya headers parsed.")
+endif()
 
 # add the profiling configuration. Its essentially the release config, but
 # compiles with profiling instructions, enabling gprof
