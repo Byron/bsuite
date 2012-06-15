@@ -51,6 +51,9 @@ if(UNIX)
 	# Also, the architecture is hardcoded, this is a problem for older maya versions which where 32 bit on osx
 	# TODO: put the arch in the config, but make sure its correct on osx for maya plugins automatically
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -fvisibility=hidden -Wall -Wno-long-long -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-comment -Wcast-qual")
+	if(APPLE)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-gnu-keywords -fpascal-strings")
+	endif()
 endif() #unix
 
 if(${CMAKE_BUILD_TYPE} MATCHES Debug OR ${CMAKE_BUILD_TYPE} MATCHES Profile)
@@ -113,11 +116,11 @@ if(NOT EXISTS ${MAYA_INSTALL_BASE_PATH})
 endif()
 
 if(APPLE)
-	set(OSX_AGL_INCLUDE_DIR "/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/AGL.framework/Versions/A/Headers" CACHE STRING
-		"Directory containing the headers of the agl framework of osx")
+	set(CMAKE_FRAMEWORK_PATH "/Developer/SDKs/MacOSX10.6.sdk" CACHE STRING
+		"Directory containing all the osx 10.6 headers")
 	
-	if(NOT EXISTS ${OSX_AGL_INCLUDE_DIR})
-		message(SEND_ERROR "AGL include directory not found at ${OSX_AGL_INCLUDE_DIR} - please configure it in your cmake cache and try again")
+	if(NOT EXISTS ${CMAKE_FRAMEWORK_PATH})
+		message(SEND_ERROR "SYSROOT include directory not found at ${CMAKE_FRAMEWORK_PATH} - please configure it in your cmake cache and try again")
 	endif()
 endif()
 

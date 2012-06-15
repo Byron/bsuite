@@ -364,7 +364,16 @@ function(add_maya_project)
 	
 	# assure we have agl
 	if(APPLE)
-		include_directories(${OSX_AGL_INCLUDE_DIR})
+		foreach(LIB AGL OpenGL IOKit ApplicationServices Cocoa Carbon CoreServices SystemConfiguration System)
+			set(LOCATION_VAR ${LIB}_LOCATION)
+			# This will find the framework in the default system location, couldn't set it to use the 
+			# CMAKE_FRAMEWORK_PATH only.
+			# So we use isysroot as link flag later
+			find_library(${LOCATION_VAR} ${LIB})
+			if(${LOCATION_VAR})
+				list(APPEND OS_SPECIFIC_LIBRARIES ${${LOCATION_VAR}})
+			endif()
+		endforeach()
 	endif()
 	
 	
@@ -427,9 +436,15 @@ function(add_maya_project)
 			endif()
 		endif()
 		
+		# Make sure we get the osx 10.6 libs
+		if(APPLE)
+			append_to_target_property(${PROJECT_ID} LINK_FLAGS "-isysroot ${CMAKE_FRAMEWORK_PATH}" YES)
+		endif()
+		
 		target_link_libraries(${PROJECT_ID} 
 										${DEFAULT_MAYA_LIBRARIES} 
-										${PROJECT_LINK_LIBRARIES})
+										${PROJECT_LINK_LIBRARIES}
+										${OS_SPECIFIC_LIBRARIES})
 		
 		# append maya specic libraries
 		foreach(LIBRARY_NAME IN LISTS PROJECT_LINK_MAYA_LIBRARIES)
