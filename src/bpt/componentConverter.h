@@ -37,10 +37,10 @@
 namespace BPT
 {
 
-/** Einfache KapselKlasse, welche hilfsmethoden beinhaltet, die speziell f�r die umwandlung von polygoncomponenten
+/** Einfache KapselKlasse, welche hilfsmethoden beinhaltet, die speziell fuer die umwandlung von polygoncomponenten
 	gemacht sind.
 
-	Die Namen der Funktionen sind selbsterkl�rend
+	Die Namen der Funktionen sind selbsterklrend
 
 */
 
@@ -77,7 +77,7 @@ void		vtxToConnectedFaceVtx(const	MIntArray&		vtxIDs,
 private:
 //------------------
 MObject		mesh;			//hält das mesh, auf dem gearbeitet wird
-int			tmp;			//wird für.setIndex der iteratoren benötigt
+int			tmp;			//wird für.setIndex der iteratoren benoetigt
 
 
 };

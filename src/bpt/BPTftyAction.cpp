@@ -133,7 +133,7 @@ MStatus BPTfty::doIt()//int slideInt)
 	case 0:
 		{
 //			zuerst díe Vertizen bearbeiten
-//			Regeln: vertizen mit nur einer edgeConnection zur gesamtauswahl gehören mit dazu, wenn sie mindestens eine connection zu 
+//			Regeln: vertizen mit nur einer edgeConnection zur gesamtauswahl gehoeren mit dazu, wenn sie mindestens eine connection zu 
 //			nem vertex haben. Wenn diese ein face mit anderem Vertex teilen, kommen diese beiden auf die nonConnectableList, am besten zusammen mit dem Fae, was sie teilen.
 
 //			Bei allen anderen werden die IDs des äusseren EdgeRings gefunden und mit der eventuell vorhandenen EdgeSelection gemerged, um dann dort
@@ -166,7 +166,7 @@ MStatus BPTfty::doIt()//int slideInt)
 				/*
 				MIntArray	included;	//enthält die Vtx, welche miteinander verbunden sind
 				
-				//beim entfernen der Überlappungen könnte man auch warten, bis die IncludedList feststeht, 
+				//beim entfernen der UEberlappungen koennte man auch warten, bis die IncludedList feststeht, 
 				//damit man im Fall der separierten Vertizes nich zuviel wegnimmt. Bei ihnen sollte man dann die Betroffenen
 				//faces verwenden bzw. deren edges
 				
@@ -198,7 +198,7 @@ MStatus BPTfty::doIt()//int slideInt)
 				
 				
 				//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				//Allerdings ist dieser Algo etwas zu großzügig, soll nur die Faces entfernen, die von excludedVtx 
+				//Allerdings ist dieser Algo etwas zu grosszügig, soll nur die Faces entfernen, die von excludedVtx 
 				//geteilt werden
 			
 				//überschneidende Faces abziehen
@@ -211,7 +211,7 @@ MStatus BPTfty::doIt()//int slideInt)
 				
 				//splitAround - gibts nicht mehr
 			
-				//includedVtx in Kanten umformen, dann die äußersten kannten finden und diese dann zum
+				//includedVtx in Kanten umformen, dann die äussersten kannten finden und diese dann zum
 				//edgeIDs Array hinzufügen
 				//vertGetConnectedEdgeIndices(included,connectedEdges);
 				//helper.addIntArrayToLHS(edgeIDs,findOuterEdges(connectedEdges,included) );
@@ -289,7 +289,7 @@ MStatus BPTfty::doIt()//int slideInt)
 					//	INVIS(cout<<"CREATE_NETWORK: "<<"Bearbeite ID: "<<neighbors[0]<<endl;)
 						
 						//vor jedem durchlauf realnachbarn auf 0 setzen
-						//!!!!!!!!!!!Abhängig von NachbarGröße
+						//!!!!!!!!!!!Abhängig von NachbarGroesse
 						for(int h = 0; h < 20; h++)
 							realNachbarn[h] = 0;
 						
@@ -432,11 +432,11 @@ MStatus BPTfty::doIt()//int slideInt)
 						//INVIS(helper.printArray(faceVerts," = FACE_VERTS");)
 						
 						//!!!!!!!!!!!!!!HIER ZAHL VERÄNDERN,WENN MAX NACHBAR COUNT ERHÖHT WIRD
-						//Nun bachbarArray erstellen, wenn NachbarGröße über 10, abbruch
+						//Nun bachbarArray erstellen, wenn NachbarGroesse über 10, abbruch
 						
 						for(unsigned int z = 0; z < nachbarFaces.length();z++)
 						{
-							if(nachbarFaces.length() < (20 + 2))	//+2 wegen flag am ende und weil sie ja 20 groß seín dürfen
+							if(nachbarFaces.length() < (20 + 2))	//+2 wegen flag am ende und weil sie ja 20 gross seín dürfen
 							{
 								if(nachbarFaces[z] == -1 || faceMatchWasZero)
 								{
@@ -639,7 +639,7 @@ MStatus BPTfty::doIt()//int slideInt)
 			switchComponentModeIfNeeded(true);
 			
 
-			//meshCreator löschen
+			//meshCreator loeschen
 			delete creator;
 			ftyCreator = 0;
 
@@ -651,7 +651,7 @@ MStatus BPTfty::doIt()//int slideInt)
 	
 		//CHAMFER
 	case 4:
-		{//es wird einfach nur ein Flag umgesetzt, der standardmäßig auf true ist (->SC als standard)
+		{//es wird einfach nur ein Flag umgesetzt, der standardmässig auf true ist (->SC als standard)
 			isSC = false;	//einfach weitermachen
 		}
 
@@ -751,10 +751,10 @@ MStatus BPTfty::doIt()//int slideInt)
 		{
 			//um ganz einfach zu bestimmen, ob das Face an einem Vtx schon erstellt wurde, verwende ich BA auf der edge, welches eh bereits mit allen
 			//origVtx initialisiert wurde 
-			//es jetzt zur�cksetzen
+			//es jetzt zuruecksetzen
 			edge::origVtxDoneBA.setAllFalse();
 			
-			//jetzt alle selEdges, die clean sind, dazu bewegen, ihre smallFaces zu erstellen, wenn nötig
+			//jetzt alle selEdges, die clean sind, dazu bewegen, ihre smallFaces zu erstellen, wenn noetig
 			for(i = 0; i < l; i++)
 			{
 				if(edgePtrs[i]->isSelected() && edgePtrs[i]->isClean())
@@ -766,7 +766,7 @@ MStatus BPTfty::doIt()//int slideInt)
 			
 		}
 
-		//die Edges löschen
+		//die Edges loeschen
 		for(i = 0; i < l;i++)
 		{
 			delete edgePtrs[i];
@@ -774,7 +774,7 @@ MStatus BPTfty::doIt()//int slideInt)
 
 		
 		//nun durch die FaceData gehen und diese OriginalFaces wiederherstellen und 
-		//dann alle Faces löschen
+		//dann alle Faces loeschen
 		
 		l = edge::MAINFaceDataPtrs.size();
 		std::list<edgeFaceData*>::iterator fIter = edge::MAINFaceDataPtrs.begin();
@@ -790,7 +790,7 @@ MStatus BPTfty::doIt()//int slideInt)
 		}
 		
 
-		//jetzt die nSelEdges wiederherstellen und löschen, genauso wie ihre edgePtr
+		//jetzt die nSelEdges wiederherstellen und loeschen, genauso wie ihre edgePtr
 		l = edge::nSelEdgeDataArray.size();
 		std::list<nSelEdgeData*>::iterator nIter = edge::nSelEdgeDataArray.begin();
 
@@ -830,8 +830,8 @@ MStatus BPTfty::doIt()//int slideInt)
 		std::list<endFaceData*>::iterator eIter = edge::endFacePtrs.begin();
 		endFaceData* eTmp;	//tmpVariable
 
-		//hier benötogt man 2 durchgänge: Im ersten werden alle nonConnectEnds faces ausgeführt
-		//Hier werden auch alle endFaces angepasst, das heißt, neue Vtx werden ihnen hinzugefügt
+		//hier benoetogt man 2 durchgänge: Im ersten werden alle nonConnectEnds faces ausgeführt
+		//Hier werden auch alle endFaces angepasst, das heisst, neue Vtx werden ihnen hinzugefügt
 		for(i = 0; i < l; i++)
 		{
 			eTmp = *eIter;
@@ -870,7 +870,7 @@ MStatus BPTfty::doIt()//int slideInt)
 		}
 
 
-		//jetzt im 2. durchlauf die eigentlichen prozeduren aufrufen, welche originalVtx wieder entfernen (wenn nötig
+		//jetzt im 2. durchlauf die eigentlichen prozeduren aufrufen, welche originalVtx wieder entfernen (wenn noetig
 		eIter = edge::endFacePtrs.begin();
 		for(i = 0; i < l; i++)
 		{

@@ -37,7 +37,7 @@ namespace BPT
 {
 
 /** Der EdgeMeshCreator implememtiert spezialisierte funktionen, welche von der BPTfty verwendet werden, er
-	wird also insbesondere zum beveln benötigt
+	wird also insbesondere zum beveln bentigt
 
 */
 
@@ -55,10 +55,10 @@ public:
 //SLIDE METHODEN
 //---------------
 
-	void	addNormalSlide(int vtxID);										//!< speziell für vtxIDs der Edges
-	void	addSlideAndNormal(int startID,int edgeVtx,MIntArray&  faces);	//!< nur für die neuen Vtx auf Edges
+	void	addNormalSlide(int vtxID);										//!< speziell fuer vtxIDs der Edges
+	void	addSlideAndNormal(int startID,int edgeVtx,MIntArray&  faces);	//!< nur fuer die neuen Vtx auf Edges
 
-	void	addSlideAndNormal(int startID, int edgeVtx,MPoint& position, bool usePositionInstead = false);	//!< speziell für chamfer;
+	void	addSlideAndNormal(int startID, int edgeVtx,MPoint& position, bool usePositionInstead = false);	//!< speziell fuer chamfer;
 
 	void	addSlide(int startID,int endID);
 
@@ -106,7 +106,7 @@ public:
 
 	void	changeEndFace(int origVtxID,int newVtxID[],int directions[], edgeFaceData* faceData[2]);
 
-	void	changeEndFace(int origVtxID,int newVtxID, int direction, edgeFaceData* faceData); //!< speziell für die endbereiche des chamfers
+	void	changeEndFace(int origVtxID,int newVtxID, int direction, edgeFaceData* faceData); //!< speziell fuer die endbereiche des chamfers
 	
 
 

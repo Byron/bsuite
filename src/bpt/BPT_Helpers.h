@@ -26,7 +26,7 @@
 #include "BPT_BA.h"
 
 
-//EINFACHE HELPER KLASSE ALS KAPSEL FÜR OFT VERWENDETE FUNKTIONEN
+//EINFACHE HELPER KLASSE ALS KAPSEL FUER OFT VERWENDETE FUNKTIONEN
 
 namespace BPT
 {
@@ -69,7 +69,7 @@ ulong		genKey(const MString& string);
 
 //	gibt IntArray mit IDs der doppelten Indices, OBSOLETE
 MIntArray	pruneIntArray(MIntArray& orig, MIntArray& pruned);
-//	Überladener PrundAlgorhytmus, der direkt auf array arbeitet
+//	UEberladener PrundAlgorhytmus, der direkt auf array arbeitet
 
 void		pruneIntArray(MIntArray& orig);
 

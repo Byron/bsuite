@@ -43,8 +43,8 @@
 namespace BPT
 {
 
-/** Diese Klasse wird direkt von maya gerufen und bereitet alles vor, um die Nodes erstellen zu können, welche für 
-	operation benötigt werden
+/** Diese Klasse wird direkt von maya gerufen und bereitet alles vor, um die Nodes erstellen zu knnen, welche fuer 
+	operation bentigt werden
 	
 */
 
@@ -161,7 +161,7 @@ MIntArray	polyIDs;
 	MObject bptNode;	//!< beinhaltet den Namen der neuen BPTNode (fÃ¼r scripter zur Steuerung der node)
 	
 	// ByronsPolyTools Factory NO History - erledigt alle selection aufgaben, so dass der Command wirklich nur das hat was 
-	//er wirklich benÃ¶tigt
+	//er wirklich benoetigt
 
 	BPTfty_NH				fBPTfty;
 };

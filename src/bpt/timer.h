@@ -39,7 +39,7 @@ using std::string;
 
 
 
-/** Diese Klasse misst die Zeit vo Beginn ihrer Erzeugzung bis zur zerstörung und gibt dise aus
+/** Diese Klasse misst die Zeit vo Beginn ihrer Erzeugzung bis zur zerstoerung und gibt dise aus
 	
 	Sie funktioniert nur unter win32, Momentan.
 
@@ -47,7 +47,7 @@ using std::string;
 		Sie wird exportiert und so generell verfügbar gemacht.
 
 	@todo
-		Einen PerformanceManager bauen, welcher es ermöglicht, die Zeít zu messen, die in den einzelnen
+		Einen PerformanceManager bauen, welcher es ermoeglicht, die Zeít zu messen, die in den einzelnen
 		gemonitorten Prozeduren verbraucht wird.
 */
 

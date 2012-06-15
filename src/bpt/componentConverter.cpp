@@ -118,7 +118,7 @@ void		componentConverter::vtxToConnectedFaceVtx(const	MIntArray&		vtxIDs,
 //--------------------------------------------------------------------------------------
 {
 	// Wandelt die vtxSelection in die connecteten faceVtx um (die Vertizen der verbundenen Faces)
-	// Die gegebenen Vtx werden nicht mit hinzugefügt
+	// Die gegebenen Vtx werden nicht mit hinzugefuegt
 
 	outVtxIDs.setLength(0);
 	outVtxIDs.setSizeIncrement(vtxIDs.length() / 4);
@@ -133,7 +133,7 @@ void		componentConverter::vtxToConnectedFaceVtx(const	MIntArray&		vtxIDs,
 	allVtx.setBits(vtxIDs, false);
 
 
-	MIntArray		conFaces;		// hält die verbundenen Faces
+	MIntArray		conFaces;		// hlt die verbundenen Faces
 	MIntArray		conVtx;			// Im face enthaltene Vtx
 	
 	uint i, x, y , l2,l3, l = vtxIDs.length();
@@ -145,7 +145,7 @@ void		componentConverter::vtxToConnectedFaceVtx(const	MIntArray&		vtxIDs,
 		
 		vertIter.getConnectedFaces(conFaces);
 		
-		// Jetzt die gültigen conFaces holen
+		// Jetzt die gueltigen conFaces holen
 		conFaces = allFaces & conFaces;
 		
 		// Jetzt die conFaces false setzen, danit diese nicht wieder  bearbeitet werden
@@ -166,7 +166,7 @@ void		componentConverter::vtxToConnectedFaceVtx(const	MIntArray&		vtxIDs,
 			// Checken, ob Vtx einzigartig sind
 			conVtx = allVtx & conVtx;
 
-			// Das was übrig bleibt im BitArray deaktivieren und zum outArray hinzufügen 
+			// Das was uebrig bleibt im BitArray deaktivieren und zum outArray hinzufuegen 
 			allVtx.setBits(conVtx, false);
 
 

@@ -47,8 +47,8 @@
 
 
 //TEST
-//Einfach mal die WndPoc, die f�rs messageHandling verantwortlich ist, mit einer eigenen ersetzen
-//dies erm�glicht das abfangen s�mtlicher Commandos
+//Einfach mal die WndPoc, die fuers messageHandling verantwortlich ist, mit einer eigenen ersetzen
+//dies ermglicht das abfangen smtlicher Commandos
 /*
 LRESULT CALLBACK myWinProc(HWND hWnd,UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -108,13 +108,13 @@ MStatus		ByronsPolyTools::doIt(const MArgList& args)
 
 	
 
-//SELECTION ÜBERPRÜFEN
+//SELECTION UEBERPRUEFEN
 
 //	Selection holen
 //
 	argData.getObjects(sList);
 	
-//	OrigList für UndoZwecke speichern	
+//	OrigList fuer UndoZwecke speichern	
 	origList = sList;
 
 
@@ -122,7 +122,7 @@ MStatus		ByronsPolyTools::doIt(const MArgList& args)
 
 
 
-//	Check, ob überhaupt Objekt gewählt
+//	Check, ob ueberhaupt Objekt gewaehlt
 
    if ( (sList.length() == 0) )
 
@@ -141,7 +141,7 @@ MStatus		ByronsPolyTools::doIt(const MArgList& args)
 	MItSelectionList sIter(sList);//,MFn::kMesh);
 	bool meshOK = false,hasComps = false;
 
-	INVIS(cout<<"SELECTIONLIST L�NGE: "<<sList.length()<<endl);
+	INVIS(cout<<"SELECTIONLIST LAENGE: "<<sList.length()<<endl);
 
 	for(;!sIter.isDone();sIter.next())
 	{
@@ -311,7 +311,7 @@ default_values:
 			else
 				options[2] = 16666666;
 
-			options[3] = 0;	//side ist standardmäßig 0:
+			options[3] = 0;	//side ist standardmaessig 0:
 
 
 			if(argData.isFlagSet("-snl") )
@@ -326,7 +326,7 @@ default_values:
 			if(argData.isFlagSet("-se"))
 				options[6] = 1;
 
-			if( CMDactionMode == 5 && argData.isFlagSet("-oe") )
+			if( CMDactionMode == 5 && argData.isFlagSet("-") )
 				options[6] += 3;
 
 			if(argData.isFlagSet("-sf"))
@@ -419,8 +419,8 @@ default_values:
 			//getEdgeComponents(sList);
 			convertToEdges(sList, argData.isFlagSet("-peb") );
 				
-			// setCreateAnimCurves(false);//damit nicht versucht wird, auf dieser Node animCurves für tweak zu erstellen
-			// Jetzt sind tweaks vonn�ten
+			// setCreateAnimCurves(false);//damit nicht versucht wird, auf dieser Node animCurves fuer tweak zu erstellen
+			// Jetzt sind tweaks vonnten
 
 			setModifierNodeType( BPT_InsertVtx::IVid );
 			break;
@@ -438,7 +438,7 @@ default_values:
 		}
 	}
 
-//	Aktion ausführen
+//	Aktion ausfuehren
 
 	if(CMDactionMode == 0 || CMDactionMode == 4 || CMDactionMode == 5 || CMDactionMode == 6 || operationMode == 0)
 	{
@@ -459,14 +459,14 @@ default_values:
 	}
 	else
 	{
-//		Wenn mesh nicht verändert wird, wird einfach so die Factory gerufen
+//		Wenn mesh nicht veraendert wird, wird einfach so die Factory gerufen
 		directModifier(meshDagPath.node());
 		//setResult( "BPTOperation succeeded" );
 	}
 
 
-	//Command wird nur einmal verwendet, also müssen die Datenarrays auch m#keinen Speicher mehr verschwenden
-	//.clear() würde sie nicht physisch löschen
+	//Command wird nur einmal verwendet, also muessen die Datenarrays auch m#keinen Speicher mehr verschwenden
+	//.clear() wuerde sie nicht physisch loeschen
 	polyIDs.setLength(0);
 	edgeIDs.setLength(0);
 	vertIDs.setLength(0);
@@ -506,7 +506,7 @@ MStatus		ByronsPolyTools::redoIt()
 	}
 	else
 	{
-//		Wenn mesh nicht verändert wird, wird einfach so die Factory gerufen
+//		Wenn mesh nicht veraendert wird, wird einfach so die Factory gerufen
 		fBPTfty.redoFty();
 		setResult( "BPTOperation succeeded" );
 	}
@@ -530,7 +530,7 @@ MStatus		ByronsPolyTools::undoIt()
 	if(CMDactionMode == 0 || CMDactionMode == 4 || CMDactionMode == 5 || CMDactionMode == 6 || operationMode == 0)
 	{
 	
-		MPRINT("Mache BPT rückgängig")
+		MPRINT("Mache BPT rueckgaengig")
 		status = undoModifyPoly();
 
 

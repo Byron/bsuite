@@ -34,7 +34,7 @@
 //		generalize a node that can receive an input mesh object, modify the mesh and
 //		return the modified mesh.
 //
-//		polyModifierNode is an abstraction which does not need to know about the DG
+//		polyModifierNode is an abstraction which ds not need to know about the DG
 //		and simply needs to know about the process outlined above. polyModifierCmd
 //		manages when and how this node will be used.
 //

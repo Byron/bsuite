@@ -62,7 +62,7 @@ namespace BPT
 		
 		int directions[2];			//!< besagt, ob der refVtx in faceRictung zeigt (true), oder nicht
 	
-		int branding;				//!< hält die edgeID der edge, die diese instanz erstellt hat. Wird von chamfer benötigt, um später seine faces wiederzufinden, irrelevant für SC
+		int branding;				//!< hält die edgeID der edge, die diese instanz erstellt hat. Wird von chamfer benoetigt, um später seine faces wiederzufinden, irrelevant für SC
 	};
 
 

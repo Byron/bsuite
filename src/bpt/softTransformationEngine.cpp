@@ -27,13 +27,13 @@
 // Statische Objekte
 //////////////////////////////////////////////////////////////////////
 /*
-MObject	softTransformationEngine::distanceObj;		// Attribut für die TweakDistance	
+MObject	softTransformationEngine::distanceObj;		// Attribut fuer die TweakDistance	
 MObject	softTransformationEngine::vfObj;			// VisualizeFalloffObject
 MObject	softTransformationEngine::ftObj;			// FalloffTypeObj; Enum: Linear, Smooth, Spike - idealerweise - wird eventuell durch rampAttribute ersetzt, sobald die Mathematik dahinter klar ist
 		
 
 // SPEZIELL: MATRIX ATTRIBUT
-// MObject softTransformationEngine::inMatrixObj;		// Hält die TransformationsMatrix, welche im Fall der SoftTransformationNode für die Transformation sorgt
+// MObject softTransformationEngine::inMatrixObj;		// Huelt die TransformationsMatrix, welche im Fall der SoftTransformationNode fuer die Transformation sorgt
 
 
 MObject softTransformationEngine::vtxOrigPosObj;
@@ -74,7 +74,7 @@ void	softTransformationEngine::setVtxSet(MDataBlock& data)
 {
 
 	
-	// Wenn sich die Topologie des Meshes verändert, dann kann diese Methode verwendet werden
+	// Wenn sich die Topologie des Meshes veruendert, dann kann diese Methode verwendet werden
 	
 	uint numNewVtx = 0;
 	uint initialLastID;
@@ -168,7 +168,7 @@ void	softTransformationEngine::setVtxSet(const MIntArray& newIDs, MDataBlock& da
 	MFnSingleIndexedComponent	compFn;
 	MObject compfnObj = compFn.create(MFn::kMeshVertComponent);
 
-	compFn.addElements( *(const_cast<MIntArray *>(&newIDs)) );	// Gemein - die AddElements Methode verändert das MIntArray nicht, ist aber nicht const !
+	compFn.addElements( *(const_cast<MIntArray *>(&newIDs)) );	// Gemein - die AddElements Methode veruendert das MIntArray nicht, ist aber nicht const !
 
 
 	// compData erzeugen
@@ -192,7 +192,7 @@ MStatus		softTransformationEngine::extractNonstaticData(const MPlug& plug,
 //--------------------------------------------------------------------------------------
 {
 	// Diese Methode extrahiert die Daten aus dem Datablock und speichert Sie lokal
-	// Die Daten sind nur jene, welche der User verändern kann.
+	// Die Daten sind nur jene, welche der User veruendern kann.
 
 	MStatus status;
 
@@ -238,7 +238,7 @@ MStatus		softTransformationEngine::extractNonstaticData(const MPlug& plug,
 
 	// Checken ob die matrix ne connection hat
 
-	// Man muss diese Methode verwenden, da das Statische Object wohl nur noch zur BPTIV node gehört irgendwie
+	// Man muss diese Methode verwenden, da das Statische Object wohl nur noch zur BPTIV node gehuert irgendwie
 	MPlug matrixPlug( thisNode, inMatrix );
 	
 	
@@ -268,7 +268,7 @@ MStatus		softTransformationEngine::extractStaticData(const MPlug& plug, MDataBlo
 //--------------------------------------------------------------------------------------
 {
 	// Diese Methode extrahiert die Daten aus dem Datablock und speichert Sie lokal
-	// Die Daten sind nur jene, welche im Grunde nur nach der originalComputeMethod geholt werden müssen
+	// Die Daten sind nur jene, welche im Grunde nur nach der originalComputeMethod geholt werden muessen
 
 	MStatus status;
 
@@ -290,7 +290,7 @@ MStatus		softTransformationEngine::extractStaticData(const MPlug& plug, MDataBlo
 
 	
 	INVIS(status.perror("Extrahiere VtxOrigPos") );
-	INVIS(cout<<" HABE vtxORIGPos extrahier mit länge von: "<<vd.vtxOrigPos.length()<<" vs Länge vtxSet: "<<vd.vtxSet.length()<<endl);
+	INVIS(cout<<" HABE vtxORIGPos extrahier mit luenge von: "<<vd.vtxOrigPos.length()<<" vs Luenge vtxSet: "<<vd.vtxSet.length()<<endl);
 
 	// und zuguterletzt das inMesh, welches nur zum lesen der origPos der TweakParents benutzt werden darf
 	nd.inMesh = data.inputValue(inMesh).asMesh();
@@ -331,9 +331,9 @@ bool	softTransformationEngine::rebuildTweakArrays()
 	
 	
 	
-	//erstmal alle arrays loeschen
+	//erstmal alle arrays lschen
 
-	if( nd.edgeDistance == 0 || lastEdgeDistance == 0 )	// Da edgeMode nen cache hat, werden die Daten nicht angerührt, wenn er aktiviert ist
+	if( nd.edgeDistance == 0 || lastEdgeDistance == 0 )	// Da edgeMode nen cache hat, werden die Daten nicht angeruehrt, wenn er aktiviert ist
 		td.clearAll();
 
 	
@@ -343,10 +343,10 @@ bool	softTransformationEngine::rebuildTweakArrays()
 	// POTENTIAL VTX BEARBEITEN
 	//###########################################
 
-	if(vd.potVtx.length() == 0 && nd.edgeDistance == 0)	// wenn eh der edgeMode verwendet wird, sind keine potentialVtx nötig
+	if(vd.potVtx.length() == 0 && nd.edgeDistance == 0)	// wenn eh der edgeMode verwendet wird, sind keine potentialVtx nuetig
 	{
 
-		// hier muss noch ne prozedur hin, die es ermöglicht, Elemente auszuschließen, 
+		// hier muss noch ne prozedur hin, die es ermueglicht, Elemente auszuschlieueen, 
 		MItMeshVertex inVertIter(nd.inMesh);	
 		
 		l = inVertIter.count();		//da das inMesh verwendet wird, sind die neuen Vtx im Falle einer meshModifizierenden Node automatisch ausgeschlossen
@@ -361,7 +361,7 @@ bool	softTransformationEngine::rebuildTweakArrays()
 		}
 
 		
-		// Jetzt die vtxSet Vtx ausschließen, wenn die niedrigste ID im VtxSet kleiner inVertIter.count() ist - also die Topologie NICHT verändert wurde
+		// Jetzt die vtxSet Vtx ausschlieueen, wenn die niedrigste ID im VtxSet kleiner inVertIter.count() ist - also die Topologie NICHT veruendert wurde
 		// ( wie beim SMC )
 		// Merke: vtxSet hat mindestens einen Eintrag, wenn er hier ist
 		
@@ -379,11 +379,11 @@ bool	softTransformationEngine::rebuildTweakArrays()
 	// VTX ORIG POS SETZEN
 	//###########################################
 
-	// Nun die originalPositionen der selektierten Vertizen holen, wenn nötig
-	// Wenn die SoftSelection vorher aus war oder die Zahl an origPos nicht mit der des vtxSets übereinstimmt, dann  die origPos holen
+	// Nun die originalPositionen der selektierten Vertizen holen, wenn nuetig
+	// Wenn die SoftSelection vorher aus war oder die Zahl an origPos nicht mit der des vtxSets uebereinstimmt, dann  die origPos holen
 	if(	 vd.vtxSet.length() != vd.vtxOrigPos.length() )
 	{
-		//einfach die gegenwärtigen Positionen der origVtx holen
+		//einfach die gegenwuertigen Positionen der origVtx holen
 		l = vd.vtxSet.length();
 
 		vd.vtxOrigPos.setLength(l);
@@ -462,18 +462,18 @@ void	softTransformationEngine::resampleWeights()
 	int add = (lastEdgeDistance < nd.edgeDistance) ? 1 : 0;	// nur wenn gegrowed wird, den letzten ring extra bearbeiten
 
 	
-	double	myMultiplier;		// cache für mutliplier
+	double	myMultiplier;		// cache fuer mutliplier
 
-	// Außerdem müssen die alten Weights angepasst werden an die neue edgeLength
+	// Auueerdem muessen die alten Weights angepasst werden an die neue edgeLength
 	// a * b = c ---> c / b = a
 	// - 1, weil der letzte ring immer 0 ist in diesem - diese Werte kann man nicht rekonstruieren, so dass man sie neu errechnen muss
 	for(i = 0; i < myMaxCalculationLength - add; i++)
 	{
 
-		// Jetzt ring für ring die weights zurückrechnen
+		// Jetzt ring fuer ring die weights zurueckrechnen
 		max += ec.ringCounts[i];
 
-		// Der multiplikator rechnet auf 1 zurück und multipliziert dann mit dem entsprechend neuen Wert
+		// Der multiplikator rechnet auf 1 zurueck und multipliziert dann mit dem entsprechend neuen Wert
 		myMultiplier = ( (double)lastEdgeDistance / (double)( lastEdgeDistance - i - 1) ) * ( (double) (nd.edgeDistance - i - 1)  / (double)nd.edgeDistance );
 
 
@@ -497,7 +497,7 @@ void	softTransformationEngine::resampleWeights()
 	
 
 	// i hat jetzt den richtigen wert und zeigt auf den letzten (0) ring
-	// min zeigt auf den ersten ringVtx, und max wird entsprechend gesetzt, später
+	// min zeigt auf den ersten ringVtx, und max wird entsprechend gesetzt, spueter
 	// Jetzt wie gewohnt die weights ausrechnen
 
 	if( add == 1)
@@ -519,7 +519,7 @@ void	softTransformationEngine::resampleWeights()
 void	softTransformationEngine::generateNormalVectors()
 //-----------------------------------------------------------------------------------------
 {
-	// All normalen der tweakVtx cachen und die Größe des Faces kodieren als länge der Normale selbst - sie sind also nicht normalisiert
+	// All normalen der tweakVtx cachen und die Grueuee des Faces kodieren als luenge der Normale selbst - sie sind also nicht normalisiert
 
 	MItMeshPolygon	inPolyIter(nd.inMesh);
 	MItMeshVertex	inVertIter(nd.inMesh);
@@ -546,7 +546,7 @@ void	softTransformationEngine::generateNormalVectors()
 		inVertIter.getConnectedFaces(conFaces);
 
 
-		// Alles 0 setzen für den nächsten durchlauf
+		// Alles 0 setzen fuer den nuechsten durchlauf
 		aSize = 0.0;
 
 		aNormal.x = 0.0;
@@ -586,7 +586,7 @@ void	softTransformationEngine::generateNormalVectors()
 
 	l = vd.vtxSet.length();
 
-	// Länge anpassen, wenn nötig
+	// Luenge anpassen, wenn nuetig
 	if(l != td.pNormals.length() )
 		td.pNormals.setLength(l);
 
@@ -598,7 +598,7 @@ void	softTransformationEngine::generateNormalVectors()
 		inVertIter.getConnectedFaces(conFaces);
 
 
-		// Alles 0 setzen für den nächsten durchlauf
+		// Alles 0 setzen fuer den nuechsten durchlauf
 		aSize = 0.0;
 
 		aNormal.x = 0.0;
@@ -668,7 +668,7 @@ void	softTransformationEngine::generateEdgeWeights(	const MIntArray& vtxSet,
 		inVertIter.setIndex( vtxSet[x] ,tmp);
 		startPoint = inVertIter.position();
 		
-		map<double, int>	weights;			// Speichert die weights (als key) zusammen mit den dazugehörigen localPosIDs
+		map<double, int>	weights;			// Speichert die weights (als key) zusammen mit den dazugehuerigen localPosIDs
 		
 		
 		// Jetzt die Distanzen zu allen vtxSetMitgliedern ausrechnen und auf jeden Fall aufs weightArray hauen
@@ -691,7 +691,7 @@ void	softTransformationEngine::generateEdgeWeights(	const MIntArray& vtxSet,
 
 		if( minID == -1)
 		{
-			// Aha, also sollen die arrays angehängt werden - wir erzeugen neue Arrays im heap
+			// Aha, also sollen die arrays angehuengt werden - wir erzeugen neue Arrays im heap
 			dWeights = new MDoubleArray(maxWeights);
 
 			pVtxPosIDs = new MIntArray(maxWeights);
@@ -704,7 +704,7 @@ void	softTransformationEngine::generateEdgeWeights(	const MIntArray& vtxSet,
 		}
 		else
 		{
-			// Existierende arrays modifiezieren - also die Ptr mit referenzen bestücken
+			// Existierende arrays modifiezieren - also die Ptr mit referenzen bestuecken
 
 			// minID ist in diesem Fall der Offset
 			dWeights = &(td.bWeights[minID + x]);
@@ -721,7 +721,7 @@ void	softTransformationEngine::generateEdgeWeights(	const MIntArray& vtxSet,
 		
 		
 		
-		// Pass 1: Daten übertragen in arbeitsArray
+		// Pass 1: Daten uebertragen in arbeitsArray
 		for( y = 0; y < maxWeights; y++, iter++)
 		{
 			(*pVtxPosIDs)[y] = iter->second;
@@ -737,8 +737,8 @@ void	softTransformationEngine::generateEdgeWeights(	const MIntArray& vtxSet,
 		
 		
 		
-		// Pass 2: Vtx entsprechend ihrer relativen Distanzen zueinander: Vtx näher am Parent sollen stärker transformieren
-		//	und alles anhand des gegenwärtigen edgeCounts skalieren
+		// Pass 2: Vtx entsprechend ihrer relativen Distanzen zueinander: Vtx nueher am Parent sollen stuerker transformieren
+		//	und alles anhand des gegenwuertigen edgeCounts skalieren
 		if( maxWeights > 1 )
 		{
 			
@@ -759,8 +759,8 @@ void	softTransformationEngine::generateEdgeWeights(	const MIntArray& vtxSet,
 			
 			
 			
-			// Pass 3:Die weights wieder runterskalieren mit newSum und sie entsprechend ihrer edgeDistance abschwächen
-			// hier kommt auch noch der scaleParameter zum tragen - er skaliert die dustanz - je weiter weg, desto stärker ist sein effekt
+			// Pass 3:Die weights wieder runterskalieren mit newSum und sie entsprechend ihrer edgeDistance abschwuechen
+			// hier kommt auch noch der scaleParameter zum tragen - er skaliert die dustanz - je weiter weg, desto stuerker ist sein effekt
 			for( y = 0; y < maxWeights; y++)
 			{
 				dTmp = (*dWeights)[y];
@@ -778,10 +778,10 @@ void	softTransformationEngine::generateEdgeWeights(	const MIntArray& vtxSet,
 		
 		
 		
-		// zuguterletzt die heapArrays  löschen, wenn nicht auf referenzen gearbeitet wurd
+		// zuguterletzt die heapArrays  lueschen, wenn nicht auf referenzen gearbeitet wurd
 		if(minID == -1)
 		{
-			// zuguterletzt alles hinzufügen
+			// zuguterletzt alles hinzufuegen
 			td.bWeights.push_back(*dWeights);
 			
 			td.pVtxPosID.push_back(*pVtxPosIDs);
@@ -800,11 +800,11 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 //-----------------------------------------------------------------------------------------
 {
 	// VARIABLEN
-	uint l , i;	// Für Iterationen
+	uint l , i;	// Fuer Iterationen
 	
 
 	
-	MPoint startPoint;	// cache für position des potVtx
+	MPoint startPoint;	// cache fuer position des potVtx
 
 
 	MIntArray	vtxSet[2];	// 2 IntArrays, welche abwechselnd die originalVtx halten und die mit ihnen verbundenen
@@ -816,12 +816,12 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 	MItMeshVertex	inVertIter(nd.inMesh);	
 	MItMeshVertex	vertIter(nd.outMesh);
 
-	componentConverter	converter(nd.outMesh);				// convertiert die vtxSelection zu faces, und danach zu den ensprechenden Vtx, ohne doppelte Einträge
+	componentConverter	converter(nd.outMesh);				// convertiert die vtxSelection zu faces, und danach zu den ensprechenden Vtx, ohne doppelte Eintruege
 
-	BPT_BA		forbiddenVtx(vertIter.count(), true);		// Hält die Vtx, welche bereits bearbeitet wurden und folglich nicht nochmal konvertiert werden sollen
+	BPT_BA		forbiddenVtx(vertIter.count(), true);		// Huelt die Vtx, welche bereits bearbeitet wurden und folglich nicht nochmal konvertiert werden sollen
 
 
-	// Wenn ec bereits initialisiert, dann arbeiten wir mit cache und die forbidden Vtx müssen alle TwerakVtx sein
+	// Wenn ec bereits initialisiert, dann arbeiten wir mit cache und die forbidden Vtx muessen alle TwerakVtx sein
 
 
 
@@ -835,8 +835,8 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 	if( difference == 0 )
 //	if(true)		
 	{
-		// Da in diesem Falle die Zahl der Weights geändert wurde oder die distance, muss 
-		// alles neu aufgerollt werden -> jetzt den Weg dafür ebnen
+		// Da in diesem Falle die Zahl der Weights geuendert wurde oder die distance, muss 
+		// alles neu aufgerollt werden -> jetzt den Weg dafuer ebnen
 		ec.ringCounts.setLength(0);
 
 		lastEdgeDistance = 0;
@@ -848,13 +848,13 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 	}
 
 
-	// Die originalVtx müssen in jedem fall verboten werden
+	// Die originalVtx muessen in jedem fall verboten werden
 	forbiddenVtx.setBits(vd.vtxSet, false);
 	
 	
 	if( ec.ringCounts.length() > 0 )
 	{
-		// Wenn wir nen cache haben, dann müssen auch noch alle tweakVtx auf die forbiddenList
+		// Wenn wir nen cache haben, dann muessen auch noch alle tweakVtx auf die forbiddenList
 		forbiddenVtx.setBits(td.vtx, false);
 	}
 	
@@ -883,10 +883,10 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 		{
 			converter.vtxToConnectedFaceVtx(vtxSet[cvs], vtxSet[ocvs]);
 			
-			// jetzt die forbiddenVtx ausschließen
+			// jetzt die forbiddenVtx ausschlieueen
 			vtxSet[ocvs] = forbiddenVtx & vtxSet[ocvs];
 			
-			// jetzt die übriggebliebenen aufs vorbiddenArray packen
+			// jetzt die uebriggebliebenen aufs vorbiddenArray packen
 			forbiddenVtx.setBits(vtxSet[ocvs], false);
 			
 			// Nun die Distanzen ermitteln und die Weights, pro gefundenem Vtx 
@@ -894,7 +894,7 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 			generateEdgeWeights(vtxSet[ocvs], i, inVertIter);
 
 
-			// Außerdem noch den Cache updaten mit der Zahl an Einträgen für diesen Ring
+			// Auueerdem noch den Cache updaten mit der Zahl an Eintruegen fuer diesen Ring
 			ec.ringCounts.append(vtxSet[ocvs].length());
 
 			
@@ -917,9 +917,9 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 	{
 		// Es muss geshrinked werden
 
-		// Die bedeutet, dass die letzten, nun veralteten ringe gelöscht werden müssen, danach resampled
-		// Außerdem muss man den ec updaten
-		uint delIDRange = 0;			// zusammenfassung aller IDs,welche gelöschgt werden sollen
+		// Die bedeutet, dass die letzten, nun veralteten ringe geluescht werden muessen, danach resampled
+		// Auueerdem muss man den ec updaten
+		uint delIDRange = 0;			// zusammenfassung aller IDs,welche gelueschgt werden sollen
 		for( i = lastEdgeDistance - 1; i > nd.edgeDistance - 1; i--)
 		{
 			 delIDRange += ec.ringCounts[i];
@@ -927,15 +927,15 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 		}
 
 		
-		// jetzt die letzten einträge löschen aus baseWeigths und potVtxIDs
+		// jetzt die letzten eintruege lueschen aus baseWeigths und potVtxIDs
 		td.bWeights.resize(td.bWeights.size() - delIDRange);
 
 		td.pVtxPosID.resize(td.pVtxPosID.size() - delIDRange);
 
-		// Die tweakVtx selbst müssen natürlich auch noch gelöscht werden 
+		// Die tweakVtx selbst muessen natuerlich auch noch geluescht werden 
 		td.vtx.setLength(td.vtx.length() - delIDRange);
 		
-		// Länge anpassen
+		// Luenge anpassen
 		ec.ringCounts.setLength(ec.ringCounts.length() - (lastEdgeDistance - nd.edgeDistance) );
 
 
@@ -965,15 +965,15 @@ void	softTransformationEngine::createWeightsBasedOnDistance()
 	
 	MItMeshVertex inVertIter(nd.inMesh);
 	
-	int		maxWeights;		// Speichert die tatsächlich zahl an maxWeights zwischen . mindestens td.maxWeights, oder weniger
-	double	sumWeights;		// Tmpvar für Summe der Weights;
+	int		maxWeights;		// Speichert die tatsuechlich zahl an maxWeights zwischen . mindestens td.maxWeights, oder weniger
+	double	sumWeights;		// Tmpvar fuer Summe der Weights;
 	double	newSum;
-	MDoubleArray distScales;		// DistanceScale - je weiter weg, desto schwächer ist das weight - pro weight
+	MDoubleArray distScales;		// DistanceScale - je weiter weg, desto schwuecher ist das weight - pro weight
 	
 
 
 	//#########################################################################################################################################
-	// WEIGHTS AUSRECHNEN - MERKE: Weights hat immer numVtx einträge - für die VisNode - und eventuell zum painten später
+	// WEIGHTS AUSRECHNEN - MERKE: Weights hat immer numVtx eintruege - fuer die VisNode - und eventuell zum painten spueter
 	//#########################################################################################################################################
 	
 	
@@ -981,7 +981,7 @@ void	softTransformationEngine::createWeightsBasedOnDistance()
 	
 	
 	
-	INVIS(cout<<"REBUILT TWEAK ARRAYS: MUSS "<<l * l2<<" RECHNUNGEN AUSFÃœHREN"<<endl);
+	INVIS(cout<<"REBUILT TWEAK ARRAYS: MUSS "<<l * l2<<" RECHNUNGEN AUSFueueHREN"<<endl);
 	
 	
 	
@@ -994,11 +994,11 @@ void	softTransformationEngine::createWeightsBasedOnDistance()
 		inVertIter.setIndex(vd.potVtx[i],tmp);
 		startPoint = inVertIter.position();
 		
-		map<double, int>	weights;			// Speichert die weights (als key) zusammen mit den dazugehörigen localPosIDs
+		map<double, int>	weights;			// Speichert die weights (als key) zusammen mit den dazugehuerigen localPosIDs
 		
 		sumWeights = 0.0;
 		
-		//distancen ausrechnen: hier eventuell noch ne adaptivitÃ¤t einbauen: z.B nur jeden 2. vtx ind SlideIndices einbeziehen
+		//distancen ausrechnen: hier eventuell noch ne adaptivitueuet einbauen: z.B nur jeden 2. vtx ind SlideIndices einbeziehen
 		for(x = 0; x < l2; x++)
 		{//nun ist die Frage, ob es schneller ist, den vertIter zu strapazieren, oder sich die Position einfach zu berechnen ... 
 			//vertIter.setIndex(vd.vtxSet[x],tmp);
@@ -1011,20 +1011,20 @@ void	softTransformationEngine::createWeightsBasedOnDistance()
 			// Bereits hier wird aussortiert: Wenn die Distance immernoch innerhalb der toleranz, dann in die Map packen
 			if( dTmp <= nd.distance )
 			{
-				weights.insert( wp( dTmp , x) );	// Den wert hier nicht verändern - die kleinsten Werte sollen zuerst kommen
+				weights.insert( wp( dTmp , x) );	// Den wert hier nicht veruendern - die kleinsten Werte sollen zuerst kommen
 			}
 			
 		}
 		
 		
 		
-		// Es soll die größtMögliche zahl an weights genommen werden
+		// Es soll die grueuetMuegliche zahl an weights genommen werden
 		maxWeights = (nd.maxWeights < weights.size() ) ? nd.maxWeights : weights.size();
 		
 		
 		if(maxWeights > 0 )
 		{
-			// erstmal diesen TweakVtx hinzufügen
+			// erstmal diesen TweakVtx hinzufuegen
 			td.vtx.append(vd.potVtx[i]);
 			
 			
@@ -1042,7 +1042,7 @@ void	softTransformationEngine::createWeightsBasedOnDistance()
 			sumWeights = newSum = 0.0;
 			distScales.setLength(maxWeights);
 			
-			// Zuerstmal die benötigten MaxScaleDaten holen
+			// Zuerstmal die benuetigten MaxScaleDaten holen
 			for( x = 0; x < maxWeights; x++, iter++)
 			{
 				dWeights[x] =  nd.distance - iter->first;
@@ -1061,7 +1061,7 @@ void	softTransformationEngine::createWeightsBasedOnDistance()
 			}
 			
 			
-			// jetzt die weights entsprechend ihrer Nähe zum parent modifizieren: Parents nah am TweakVtx werden so viel stärker
+			// jetzt die weights entsprechend ihrer Nuehe zum parent modifizieren: Parents nah am TweakVtx werden so viel stuerker
 			for( x = 0; x < maxWeights; x++)
 			{
 				
@@ -1197,8 +1197,8 @@ void	softTransformationEngine::recalculateTweakScaleFactors( )
 	if(nd.fType != 0)
 	{
 
-		// Wir unterscheiden der effizienz wegen 2 Modi: Bei dem einen muss das WeightsArray vällig neu aufgebaut werden, beim anderen
-		// Kann die vorhanden einträge extrahieren
+		// Wir unterscheiden der effizienz wegen 2 Modi: Bei dem einen muss das WeightsArray vuellig neu aufgebaut werden, beim anderen
+		// Kann die vorhanden eintruege extrahieren
 
 		if(		lastDistance == nd.distance
 			&&	
@@ -1207,8 +1207,8 @@ void	softTransformationEngine::recalculateTweakScaleFactors( )
 				lastEdgeDistance == nd.edgeDistance
 			&&
 				lastSmoothen == nd.smoothen)
-		{	// Die zahl der Einträge hat sich nicht verändert, also auf vorhandenen Daten arbeiten
-			// Wenn er hier hinkommt, dann hat sich nur der FType verändert
+		{	// Die zahl der Eintruege hat sich nicht veruendert, also auf vorhandenen Daten arbeiten
+			// Wenn er hier hinkommt, dann hat sich nur der FType veruendert
 
 			for( i = 0; i < l; i++)
 			{
@@ -1218,7 +1218,7 @@ void	softTransformationEngine::recalculateTweakScaleFactors( )
 				
 				numWeights = bWeights.length();
 
-				// Die beiden Arrays sollten auch noch gleich groß sein
+				// Die beiden Arrays sollten auch noch gleich groue sein
 				
 				for( x = 0; x < numWeights; x++)
 				{
@@ -1288,7 +1288,7 @@ void	softTransformationEngine::saveMeshPathes()
 	MPlug thisOutMesh(thisNode, outMesh);
 	thisOutMesh.connectedTo(connections,false, true);
 
-	// Da die nächste Node die visMeshnode ist, muss man noch eine stufe weiter gehen
+	// Da die nuechste Node die visMeshnode ist, muss man noch eine stufe weiter gehen
 	if( connections.length() == 0 )
 		return;
 	
@@ -1309,12 +1309,12 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 {
 	
 
-	// Diese Methode kümmert sich um die gesamte Transformation des Meshes
+	// Diese Methode kuemmert sich um die gesamte Transformation des Meshes
 
 	// Momentan gibt es 2 Modi: - Transformation mithilfe einer Matrix - quasi wie ein cluser
 	//							- Transformation mithilfe von BeFwegungsvektoren
 
-	// Wenn sich die weights verändern, werden diese sogleich in den Datablock geschrieben
+	// Wenn sich die weights veruendern, werden diese sogleich in den Datablock geschrieben
 
 
 	// Wenn aus irgendeinem Grund keine BaseVtx vorhanden, einfach raushier
@@ -1336,7 +1336,7 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 
 
 	// Wenn die neue Distance kleiner ist als die alte wird es weniger tweakVtx geben, 
-	// so dass man erstmal alle TweakVtx zurücksetzen muss	
+	// so dass man erstmal alle TweakVtx zuruecksetzen muss	
 	// Oder wenn die edges hinzugeschaltet werden
 	if(		nd.distance < lastDistance 
 		|| 
@@ -1355,7 +1355,7 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 
 
 	// -----------------------------
-	// TweakArrays neu aufbauen/ändern
+	// TweakArrays neu aufbauen/uendern
 	// -----------------------------
 
 	
@@ -1365,7 +1365,7 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 
 
 
-	// Wenn sich distanz verändert hat. dann die weights neu berechnen
+	// Wenn sich distanz veruendert hat. dann die weights neu berechnen
 	if(		lastDistance != nd.distance 
 		||
 			lastMaxWeights != nd.maxWeights
@@ -1375,10 +1375,10 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 			lastEdgeDistance != nd.edgeDistance
 		||
 			vd.vtxSet.length() != vd.vtxOrigPos.length() )
-	{//Die TweakArrays mÃ¼ssen neu aufgebaut werden
+	{//Die TweakArrays mueuessen neu aufgebaut werden
 		
 
-		// Wenn die edgeDistance auf 0 gestellt wurde, dann den Cache löschen
+		// Wenn die edgeDistance auf 0 gestellt wurde, dann den Cache lueschen
 		if( (nd.edgeDistance == 0) & (lastEdgeDistance > 0) )
 		{
 			
@@ -1386,7 +1386,7 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 		}
 
 
-		//wenn die Distanz 0 ist, dann sämtliche TempArrays löschen, um speicher zu sparen
+		//wenn die Distanz 0 ist, dann suemtliche TempArrays lueschen, um speicher zu sparen
 		if(nd.distance == 0.0 && nd.edgeDistance == 0)
 		{
 			// ZUERST alle Vtx wieder auf ursprungort setzen
@@ -1400,7 +1400,7 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 			lastSmoothen = nd.smoothen;
 			lastEdgeDistance = nd.edgeDistance;
 
-			// Damit beim nächsten mal die neuen VtxPositionen geholt werden
+			// Damit beim nuechsten mal die neuen VtxPositionen geholt werden
 			vd.vtxOrigPos.clear();
 
 			nd.fVis = false;
@@ -1425,10 +1425,10 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 		}
 		
 		
-		// Jetzt müssen die Aktualisieren outWeights noch gesetzt werden in Datablock
-		// Sie dienen als input für die eventuell aktivierte VisNode
+		// Jetzt muessen die Aktualisieren outWeights noch gesetzt werden in Datablock
+		// Sie dienen als input fuer die eventuell aktivierte VisNode
 
-		// Man muss bedenken, dass pro tweakVtx mehrere Weights existieren können, so dass diese erst gemittelt werden müssen
+		// Man muss bedenken, dass pro tweakVtx mehrere Weights existieren kuennen, so dass diese erst gemittelt werden muessen
 		
 		// Alles 0 setzen
 		//
@@ -1465,7 +1465,7 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 
 	}
 		
-	// hat sich der fallofftype verändert?
+	// hat sich der fallofftype veruendert?
 	if(lastFType != nd.fType)
 	{
 		recalculateTweakScaleFactors();
@@ -1550,10 +1550,10 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 	// PUSH FUNKTIONEN SETZEN
 	// -----------------------------
 
-	// Wenn push vorhanden ist, wird die funktion entsprechend gesetzt, so dass nicht für jeden TweakVtx derselbe check gemacht werden muss
+	// Wenn push vorhanden ist, wird die funktion entsprechend gesetzt, so dass nicht fuer jeden TweakVtx derselbe check gemacht werden muss
 	if( nd.push != 0.0)
 	{
-		// Sichergehen, dass auch einträge vorhanden sind, was nicht zwangsweise sein muss
+		// Sichergehen, dass auch eintruege vorhanden sind, was nicht zwangsweise sein muss
 		if( td.normals.length() != td.vtx.length() )
 		{// Aha, also welche erzeugen
 			generateNormalVectors();
@@ -1620,12 +1620,12 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 		
 		numWeights = weights.length();
 
-		// Direction zurücksetzen
+		// Direction zuruecksetzen
 		direction = MVector::zero;
 
 		// MERKE: Die weights sind bereits so skaliert, dass man hier nicht mehr dividieren muss
-		// Dieser abschnitt ist wirklich NUR für die erzeugung und die translation der direction anhand der weights zuständig und für sonst nix
-		// Jetzt für jedes weight die direction addieren ... 
+		// Dieser abschnitt ist wirklich NUR fuer die erzeugung und die translation der direction anhand der weights zustuendig und fuer sonst nix
+		// Jetzt fuer jedes weight die direction addieren ... 
 		for( x = 0; x < numWeights; x++)
 		{
 
@@ -1636,7 +1636,7 @@ void	softTransformationEngine::doTweak(MDataBlock& data)
 		
 		(this->*careAboutPush)(direction , i);
 
-		// Nun die Direction dividieren, um den entgültigen wert zu erhalten
+		// Nun die Direction dividieren, um den entgueltigen wert zu erhalten
 		vertIter.setPosition(inVertIter.position() + direction );
 		
 	}
@@ -1704,13 +1704,13 @@ softTransformationEngine::nodeStatusAllowsDrawing()
 
 	if( activeList.hasItem(thisNode) )
 	{
-		// die Node ist gewählt - also auf jeden fall zeichnen
+		// die Node ist gewuehlt - also auf jeden fall zeichnen
 		//
 		return true;
 	}
 
 
-	// Die node ist nicht gewählt - ist sie denn ganz oben in der history ?
+	// Die node ist nicht gewuehlt - ist sie denn ganz oben in der history ?
 	//
 	MPlug plug ( thisNode, outMesh );
 
@@ -1720,7 +1720,7 @@ softTransformationEngine::nodeStatusAllowsDrawing()
 
 	if(connections.length() )
 	{
-		// Außerdem muss das mesh gehilited sein, damit das funktioniert
+		// Auueerdem muss das mesh gehilited sein, damit das funktioniert
 		//
 		MSelectionList	hl;
 		MGlobal::getHiliteList( hl );
@@ -1763,13 +1763,13 @@ softTransformationEngine::draw(M3dView& view)
 // --------------------------------------------
 {
 
-	// Sollen wir überhaupt zeichnen ?
+	// Sollen wir ueberhaupt zeichnen ?
 	// 
 	if( !nd.fVis || ( (nd.distance == 0.0) & (nd.edgeDistance == 0)  ) )
 		return;
 
 
-	// Dürfen wir zeichnen ?
+	// Duerfen wir zeichnen ?
 	//
 	if( ! nodeStatusAllowsDrawing() )
 		return ;
@@ -1782,12 +1782,12 @@ softTransformationEngine::draw(M3dView& view)
 
 	softTransformationEngine::meshStatus mStat = getMeshStatus();
 
-	// Das mesh muss gewählt sein, damit man was zeuchnen darf
+	// Das mesh muss gewuehlt sein, damit man was zeuchnen darf
 	//
 	if( mStat == kNone )
 		return;
 
-	// Wenn sich der Anezigstatus des Meshes ändert, dann muss die DisplayList neu erstellt werden
+	// Wenn sich der Anezigstatus des Meshes uendert, dann muss die DisplayList neu erstellt werden
 	// Nur um den PolygonOffset zu aktualisieren
 	// Diese procedur muss im endeffekt nur herausfinden, ob das mesh gehilited ist oder selected, weil der
 	// PolyOffset dann entsprechend angepasst werden muss
@@ -1820,14 +1820,14 @@ softTransformationEngine::draw(M3dView& view)
 
 	bool	allowBeautyMode = false;
 
-	// Jetzt das Plug auslesen um herauszufinden, ob man schön zeichnen darf oder nicht
+	// Jetzt das Plug auslesen um herauszufinden, ob man schuen zeichnen darf oder nicht
 	// TODO
 
 	
 
-	//Farbe holen	-> Diese Schreibweise hat den (hier unbedeutenden) Vorteil, dass Objekte automatisch zerstört werden - sie existieren nur innerhalb der Klammern
+	//Farbe holen	-> Diese Schreibweise hat den (hier unbedeutenden) Vorteil, dass Objekte automatisch zerstuert werden - sie existieren nur innerhalb der Klammern
 	{
-		MColor tmpColor;
+		MColor tmpColor(0.0f, 0.0f);
 		
 
 		plug.setAttribute(vtxColorObj);
@@ -1838,7 +1838,7 @@ softTransformationEngine::draw(M3dView& view)
 		MFnNumericData	numDataFn(colorObj);
 		numDataFn.getData(tmpColor.r, tmpColor.g, tmpColor.b);
 
-		//wenn sich die Farben verändert haben, dann die liste updaten - und alles neuzeichnen
+		//wenn sich die Farben veruendert haben, dann die liste updaten - und alles neuzeichnen
 		if(tmpColor != dd.vtxColor1 )
 		{
 			dd.vtxColor1 = tmpColor;
@@ -1928,15 +1928,15 @@ softTransformationEngine::draw(M3dView& view)
 		
 
 
-		//Die displayList prüfen
+		//Die displayList pruefen
 		if( listNeedsUpdate )//|| lastDMode != style )
-		{	//neue Liste erzeugen - wird eigentlich nur gemacht, wenn sich was verändert hat
+		{	//neue Liste erzeugen - wird eigentlich nur gemacht, wenn sich was veruendert hat
 			//
 			
 		//	lastDMode = style;
 
 			if( dd.list != 450000 ) 
-				//alte liste löschen
+				//alte liste lueschen
 				glDeleteLists(dd.list, 1);
 			
 			dd.list = glGenLists(1);
@@ -2007,8 +2007,8 @@ softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 			
 
 
-			MColor tmpColor;
-			double dTmp;		// hält das weight, cache
+			MColor tmpColor(0.0f, 0.0f);
+			double dTmp;		// huelt das weight, cache
 
 			//weights verwenden um Farbe zu skalieren
 			uint numCVs = vertIter.count();
@@ -2069,7 +2069,7 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 				
 				
 				
-				//Dass muss ausßerhalb der displayList bleiben, weil dieser Wert nicht precompiliert werden darf
+				//Dass muss ausueerhalb der displayList bleiben, weil dieser Wert nicht precompiliert werden darf
 				float param1 = 0.45, param2 = 0.55;
 
 				// im DebugMode werden die Params anhand der NodeParameter gesetzt
@@ -2108,7 +2108,7 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 				uint numPolys = polyIter.count();
 				uint i, x , l;
 				MPoint	point;
-				MColor	tmpCol;
+				MColor	tmpCol(0.0f, 0.0f);
 				MPointArray triPoints;
 				MIntArray	triVtx;
 				//glColor4f(0.0f, 0.0f, 1.0f, 0.2);

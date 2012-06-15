@@ -259,9 +259,9 @@ MStatus		BPT_InsertVtx::initialize()
 
 
 
-	// Zuletzt die SoftTransformationAttribute hinzuf�gen
-	// Per Macro - dirty, aber funktioniert - wie machen die ALIAS Typen das ??? Die leiten auch st�ndig von einer BaseNode ab, und da gehen dann keine Attribute fl�ten
-	// Oder werden unbrauchbar so wie bei mir, so dass im Endeffekt s�mtliche Attribute ein eindeutiges statisches Attribut haben m�ssen
+	// Zuletzt die SoftTransformationAttribute hinzufuegen
+	// Per Macro - dirty, aber funktioniert - wie machen die ALIAS Typen das ??? Die leiten auch stuendig von einer BaseNode ab, und da gehen dann keine Attribute flueten
+	// Oder werden unbrauchbar so wie bei mir, so dass im Endeffekt suemtliche Attribute ein eindeutiges statisches Attribut haben muessen
 
 	STE_ADD_ATTRIBUTES(IV)
 
@@ -286,7 +286,7 @@ bool	BPT_InsertVtx::setInternalValue ( const MPlug & plug, const MDataHandle & d
 
 
 		if( isLimited )
-		{//limits setzen, wenn gewünscht
+		{//limits setzen, wenn gewueuenscht
 			
 			double value = dataHandle.asDouble();
 			
@@ -308,7 +308,7 @@ bool	BPT_InsertVtx::setInternalValue ( const MPlug & plug, const MDataHandle & d
 		int value = dataHandle.asInt();
 		
 		if(value != lastCount)
-		{//count hat sich nicht verändert, also outHandle säubern und raus hier
+		{//count hat sich nicht verueuendert, also outHandle sueueubern und raus hier
 			meshDirty = true;
 			lastCount = value;	
 		}
@@ -342,7 +342,7 @@ bool	BPT_InsertVtx::setInternalValue ( const MPlug & plug, const MDataHandle & d
 	}
 
 	
-	// Sich jetzt um die STE internals k�mmern
+	// Sich jetzt um die STE internals kuemmern
 	//
 	//
 
@@ -368,7 +368,7 @@ void	IV_makeSelection(void* data)
 	MDagPath meshPath;
 	nodePtr->getMeshPath(meshPath);
 
-	if( !(meshPath.apiType() == MFn::kInvalid) && nodePtr->validIndices.length() != 0)	//zur Sicherheit, sollte aber eigentlich nicht möglich sein
+	if( !(meshPath.apiType() == MFn::kInvalid) && nodePtr->validIndices.length() != 0)	//zur Sicherheit, sollte aber eigentlich nicht mueueglich sein
 	{
 		MFnSingleIndexedComponent compFn;
 		
@@ -432,10 +432,10 @@ MStatus		BPT_InsertVtx::doCompleteCompute( MDataBlock& data )
 				fIVfty.setSpin(spinHandle.asInt());
 				
 
-				int initialVtxCount;	//wird später benötigt, um das ValidIndicesArray gleich in der rictigen größe zu erstellen und zu schreiben
+				int initialVtxCount;	//wird spueueter benueuetigt, um das ValidIndicesArray gleich in der rictigen grueueueuee zu erstellen und zu schreiben
 
 
-				//gleich zu beginn muss der MeshPath initialisiert werden, damit der MeshPath an die fty übergeben werden kann
+				//gleich zu beginn muss der MeshPath initialisiert werden, damit der MeshPath an die fty ueuebergeben werden kann
 				// Dies geschieht besser durch die STE - sie ist darauf ausgelegt
 				softTransformationEngine::gatherAttributeObjects(thisMObject());
 				softTransformationEngine::saveMeshPathes();
@@ -484,7 +484,7 @@ MStatus		BPT_InsertVtx::doCompleteCompute( MDataBlock& data )
 				fIVfty.setSlide(slideHandle.asDouble());
 
 				
-				//whichSide attribute wird nur für SLide selbst verwendet und kann nicht bereits beim command gestetzt werden
+				//whichSide attribute wird nur fueuer SLide selbst verwendet und kann nicht bereits beim command gestetzt werden
 				
 				
 
@@ -532,14 +532,14 @@ MStatus		BPT_InsertVtx::doCompleteCompute( MDataBlock& data )
 
 
 			
-				//nur wenn sich spin nicht verändert hat, darf ne neue selection gemacht werden - dies wird auch von der IV berücksichtigt
-				//die selection wird nur noch einmal ausgeführt, weshalb scriptJobInitiated nicht mehr gesetzt wird vom scriptjob
+				//nur wenn sich spin nicht verueuendert hat, darf ne neue selection gemacht werden - dies wird auch von der IV berueuecksichtigt
+				//die selection wird nur noch einmal ausgefueuehrt, weshalb scriptJobInitiated nicht mehr gesetzt wird vom scriptjob
 				if( optionsArray[6] && !scriptJobInitated && !(meshPath.apiType() == MFn::kInvalid) )
 				{
 						
-						//auf jeden Fall erstmal die neuen Vertizen holen, damit die anderen prozeduren auch darauf arbeiten können
+						//auf jeden Fall erstmal die neuen Vertizen holen, damit die anderen prozeduren auch darauf arbeiten kueuennen
 
-						//alles neuen Vertces sollen gewählt werden, also einfach alle Indices eintragen vom initialVtxCount
+						//alles neuen Vertces sollen gewueuehlt werden, also einfach alle Indices eintragen vom initialVtxCount
 						//bis zum jetzigen VtxCount
 						MIntArray validEdges, validFaces;
 						componentConverter CC(newOutMesh);
@@ -575,7 +575,7 @@ MStatus		BPT_InsertVtx::doCompleteCompute( MDataBlock& data )
 					{
 						CC.getConnectedFaces(validEdges,validFaces);
 
-						//jetzt kann gleich alles beendet werden, da hiernach keine componente mehr kommt, in die man faces umwandeln müsste
+						//jetzt kann gleich alles beendet werden, da hiernach keine componente mehr kommt, in die man faces umwandeln mueuesste
 						validIndices.clear();
 						validIndices.append(2);
 
@@ -630,9 +630,9 @@ MStatus		BPT_InsertVtx::doCompleteCompute( MDataBlock& data )
 				}
 				else
 				{//ansonsten muss die SelectionList neu aufgebaut werden, allerdings ohne komponenten
-					//diese Aktion solte auch nur einmal ausgeführt werden
+					//diese Aktion solte auch nur einmal ausgefueuehrt werden
 
-					//gegenwärtige selection holen
+					//gegenwueuertige selection holen
 					MSelectionList currentList;
 					MSelectionList newList;
 					MGlobal::getActiveSelectionList(currentList);
@@ -674,7 +674,7 @@ MStatus		BPT_InsertVtx::compute(const MPlug& plug, MDataBlock& data)
 	
 	
 //	FactoryWerte setzen
-//	(hier überall eventuell noch MCheck nutzen für Debug wenn nötig)
+//	(hier ueueberall eventuell noch MCheck nutzen fueuer Debug wenn nueuetig)
 	MStatus status;
 	
 		MDataHandle stateHandle = data.outputValue(state);
@@ -720,15 +720,15 @@ MStatus		BPT_InsertVtx::compute(const MPlug& plug, MDataBlock& data)
 						outMeshHandle.setClean();
 						return status;
 					}
-						//das problem ist, das mein Script bei bevelOPs nach der Operation noch die SelectionList verändert und der Callback so gleich wieder
+						//das problem ist, das mein Script bei bevelOPs nach der Operation noch die SelectionList verueuendert und der Callback so gleich wieder
 						//ausgeschaltet wird ... alles scheisse!
 				}
 
-				//es wird generell nach der creation erstmal slide ausgeführt, damit auch along normal und andere parameter stimmen nach ladeVorgang
+				//es wird generell nach der creation erstmal slide ausgefueuehrt, damit auch along normal und andere parameter stimmen nach ladeVorgang
 
 
 				//jetzt Daten, die slide erzeugen, extrahieren und mit gespeicherten werten vergleichen.
-				//wenn abweichung, wurde also nur einer dieser werte verändert und slide muss erfolgen
+				//wenn abweichung, wurde also nur einer dieser werte verueuendert und slide muss erfolgen
 
 
 				MDataHandle slideHandle = data.inputValue(IVslide);
@@ -756,7 +756,7 @@ MStatus		BPT_InsertVtx::compute(const MPlug& plug, MDataBlock& data)
 
 				//slide initialisieren
 				//merke: Die SlidingEngine verursacht diesen komischen crash fehler!!!
-				//testen: funzt es, wenn sie MObject wieder zurückgibt und die handle damit setzt?
+				//testen: funzt es, wenn sie MObject wieder zurueueckgibt und die handle damit setzt?
 				
 				
 
@@ -795,7 +795,7 @@ MStatus		BPT_InsertVtx::compute(const MPlug& plug, MDataBlock& data)
 				cout<<sets.length()<<" == Num Sets"<<endl;
 				cout<<comps.length()<<" == Num comps"<<endl;
 
-				//funzt nicht w�hrend DGEval
+				//funzt nicht wuehrend DGEval
 				*/
 
 

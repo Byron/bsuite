@@ -55,7 +55,7 @@ BPT_BA::BPT_BA( ULONG initialSize, bool initialValue ):array(NULL), lowBound(nul
 	allocSize += (rest > null) ? one : null;
 	numChunks = allocSize;
 
-	INVIS(cout<<"Größe der SpeicherAllocation = "<<allocSize<<" == "<<allocSize * nBitsInUlong<<" Bit"<<endl;);
+	INVIS(cout<<"Groesse der SpeicherAllocation = "<<allocSize<<" == "<<allocSize * nBitsInUlong<<" Bit"<<endl;);
 
 	array = (ULONG*) malloc(allocSize*sizeof(ULONG));
 
@@ -104,7 +104,7 @@ BPT_BA::BPT_BA(const MIntArray& initialArray, bool beginIsIndex0, bool initialVa
 
 	if(maxLength == null)
 	{
-		//größten index herausfinden
+		//groessten index herausfinden
 		long max = 0;
 		
 		for(i = null; i < l; i++)
@@ -119,7 +119,7 @@ BPT_BA::BPT_BA(const MIntArray& initialArray, bool beginIsIndex0, bool initialVa
 	//smallest index herausfinden
 	offset = lowBound = null;
 	if(!beginIsIndex0)
-	{//verhindert, dass kleine Arrays mit großen indizes auch große BitArrays zu folge haben
+	{//verhindert, dass kleine Arrays mit grossen indizes auch grosse BitArrays zu folge haben
 
 		long min = 999999999;
 	
@@ -146,7 +146,7 @@ BPT_BA::BPT_BA(const MIntArray& initialArray, bool beginIsIndex0, bool initialVa
 	highBound = maxLength + one;	//entweder man speichert den Reellen wert, oder man müsste sich die Size jedesmal errechnen, was unsinn ist
 								//eventuel fügt man ne: RealSize variabl ein
 
-	INVIS(cout<<highBound<<" == GRÖßE DES NEUEN BITARRAYS"<<endl;);
+	INVIS(cout<<highBound<<" == GRÖssE DES NEUEN BITARRAYS"<<endl;);
 	
 
 	ULONG rest = highBound % nBitsInUlong;
@@ -158,7 +158,7 @@ BPT_BA::BPT_BA(const MIntArray& initialArray, bool beginIsIndex0, bool initialVa
 	numChunks = allocSize;
 
 
-	INVIS(cout<<"Größe der SpeicherAllocation = "<<allocSize<<" == "<<allocSize * nBitsInUlong<<" Bit"<<endl;);
+	INVIS(cout<<"Groesse der SpeicherAllocation = "<<allocSize<<" == "<<allocSize * nBitsInUlong<<" Bit"<<endl;);
 
 
 
@@ -302,7 +302,7 @@ BPT_BA::BPT_BA(const BPT_BA& rhs)
 BPT_BA&			BPT_BA::operator = (const BPT_BA& rhs)
 //--------------------------------------------------------------------
 {
-	INVIS(cout<<"GEBE NEW BA& ZURÜCK, rhs hat nummer: "<<rhs.number<<endl;);
+	INVIS(cout<<"GEBE NEW BA& ZURUECK, rhs hat nummer: "<<rhs.number<<endl;);
 	INVIS(cout<<"Bin in Nummer: "<<number<<endl;)
 	
 	highBound = rhs.getHighBound();
@@ -343,7 +343,7 @@ BPT_BA::~BPT_BA(void)
 bool	BPT_BA::operator [] (long index) const
 //--------------------------------------------------------------------
 {	
-		//UNSICHERE METHODE - IS FLAG SET BENUTZEN FÜR KOMPLETTEN RANGECHECK
+		//UNSICHERE METHODE - IS FLAG SET BENUTZEN FUER KOMPLETTEN RANGECHECK
 		// (wenn man also nicht weis, ob index im Array ist)
 		//allerdings gehts kaum schneller ...
 	
@@ -412,7 +412,7 @@ bool		BPT_BA::isFlagSet ( long index) const
 		//index MUSS singned sein, damit index -= offset auch negativ werden kann und die ifKlausel anschlagen kann
 		
 		//diese Funktion ist etwa s wie operator[], nur dass sie noch nen RangeCheck macht
-		if(index > highBound || index < lowBound)		//rangeCheking eventuell rausnehmen, wenn es unnötig ist
+		if(index > highBound || index < lowBound)		//rangeCheking eventuell rausnehmen, wenn es unnoetig ist
 			return false;
 
 
@@ -504,7 +504,7 @@ void	BPT_BA::setBits (const MIntArray& indices, bool value)
 //--------------------------------------------------------------------
 {
 	ULONG l = indices.length();
-	ULONG index;	//im inices Array könnten auch negative Werte sein, allerdings wird diese Klasse eh nur 
+	ULONG index;	//im inices Array koennten auch negative Werte sein, allerdings wird diese Klasse eh nur 
 							//mit positiven KomponentenArrays verwendet
 	ULONG wert;
 	ULONG aIndex;
@@ -520,7 +520,7 @@ void	BPT_BA::setBits (const MIntArray& indices, bool value)
 			index = indices[i];
 
 
-		//	if(index > highBound || index < lowBound)		//rangeCheking eventuell rausnehmen, wenn es unnötig ist
+		//	if(index > highBound || index < lowBound)		//rangeCheking eventuell rausnehmen, wenn es unnoetig ist
 		//		continue;
 
 
@@ -557,7 +557,7 @@ void	BPT_BA::setBits (const MIntArray& indices, bool value)
 			index = indices[i];
 
 
-		//	if(index > highBound || index < lowBound)		//rangeCheking eventuell rausnehmen, wenn es unnötig ist
+		//	if(index > highBound || index < lowBound)		//rangeCheking eventuell rausnehmen, wenn es unnoetig ist
 		//		continue;
 
 			index -= offset;
@@ -586,7 +586,7 @@ void	BPT_BA::setBits (const MIntArray& indices, bool value)
 void	BPT_BA::invertBits (MIntArray& indices)
 //--------------------------------------------------------------------
 {
-	ULONG index;			//im inices Array könnten auch negative Werte sein, allerdings wird diese Klasse eh nur 
+	ULONG index;			//im inices Array koennten auch negative Werte sein, allerdings wird diese Klasse eh nur 
 							//mit positiven KomponentenArrays verwendet
 
 	ULONG l = indices.length();
@@ -648,9 +648,9 @@ void BPT_BA::useThisData(	ULONG* allocatedMemoryPtr,
 	numChunks = inNumChunks;
 
 	//size wird hier nicht ermittelt, da der rechenaufwand hier ungerechtfertigt ist - 
-	//wenn diese prozedur aufgerufen wird, wurde ein BA mit anerem BA verrechnet, wo eigentlich keine Size benötigt wird
+	//wenn diese prozedur aufgerufen wird, wurde ein BA mit anerem BA verrechnet, wo eigentlich keine Size benoetigt wird
 
-	INVIS(cout<<"Übertrage Daten auf Nummer: "<<number<<endl;);
+	INVIS(cout<<"UEbertrage Daten auf Nummer: "<<number<<endl;);
 
 }
 
@@ -663,7 +663,7 @@ bool	BPT_BA::expand	(ULONG  expandBy, bool valueOfNewBits )
 
 	ULONG newSize = highBound + expandBy;
 
-	//wenn alte größe für die expansion ausreicht, dann ...
+	//wenn alte groesse für die expansion ausreicht, dann ...
 	if( newSize < numChunks * nBitsInUlong )
 	{//... einfach highBound umsetzen und fertig
 	
@@ -685,7 +685,7 @@ bool	BPT_BA::expand	(ULONG  expandBy, bool valueOfNewBits )
 
 				array[aIndex] += operand;
 				numTrue += operand >> shift;
-				//eigentlich könnte man hier auch gleich +wert machen, aber ich checke das sicherheitshalber nochmal ...
+				//eigentlich koennte man hier auch gleich +wert machen, aber ich checke das sicherheitshalber nochmal ...
 				
 				//( (array[aIndex] & wert) == null ) ? array[aIndex] += wert, ++numTrue : null;
 			}
@@ -752,7 +752,7 @@ bool	BPT_BA::expand	(ULONG  expandBy, bool valueOfNewBits )
 	}
 	else
 	{//Bits false setzen (sicher)
-	 //das ist hier ja eigentlich nicht nötig, wenn wirklich immer alles stimmt mit den "überzähligen" bits
+	 //das ist hier ja eigentlich nicht noetig, wenn wirklich immer alles stimmt mit den "überzähligen" bits
 		for(i = highBound; i < chunkBound; i++)
 		{
 			shift = i - aIndex * nBitsInUlong;
@@ -799,7 +799,7 @@ bool	BPT_BA::contract (ULONG  contractBy)
 
 	//hier lohnt sich die arbeit mit operand usw. nicht unbedingt.
 	ULONG wert;
-	//wenn alte größe für die kontraktion ausreicht, dann ...
+	//wenn alte groesse für die kontraktion ausreicht, dann ...
 	if( newSize > (numChunks - 1) * nBitsInUlong )
 	{//... einfach highBound umsetzen und fertig
 
@@ -840,7 +840,7 @@ bool	BPT_BA::contract (ULONG  contractBy)
 	//Okay, jetzt noch highBound ändern, alten speicher freigeben, ptr umsetzen und fertig
 	highBound = newSize;
 
-	//hier kein check, da bereits früher überprüft wird, ob es möglich ist
+	//hier kein check, da bereits früher überprüft wird, ob es moeglich ist
 	free((void*)array);
 
 	array = newArray;
@@ -894,7 +894,7 @@ ULONG	BPT_BA::getFirstBitIndex() const
 	if(!numTrue)
 		return null;
 
-	 //eventuell könnte man sich den check sparen, wenn der check in der aufrufenden prozedur gemacht wirdb aber naja ;)
+	 //eventuell koennte man sich den check sparen, wenn der check in der aufrufenden prozedur gemacht wirdb aber naja ;)
 
 	//jetzt runup machen und das erste gefundene bit samt index zurückgeben
 	ULONG i = lowBound;
@@ -937,7 +937,7 @@ ULONG	BPT_BA::getLastBitIndex() const
 	if(!numTrue)
 		return null;
 
-	 //eventuell könnte man sich den check sparen, wenn der check in der aufrufenden prozedur gemacht wirdb aber naja ;)
+	 //eventuell koennte man sich den check sparen, wenn der check in der aufrufenden prozedur gemacht wirdb aber naja ;)
 
 	//jetzt runup machen und das erste gefundene bit samt index zurückgeben
 	ULONG i = highBound;
@@ -1005,7 +1005,7 @@ bool	BPT_BA::setLength(ULONG  newLength, bool valueOfNewBits )
 bool	BPT_BA::add (  MIntArray& operand, ULONG max, ULONG minSize )
 //----------------------------------------------------------------------------------------------------
 {
-	//mit diese Methode kann man ein BA mit nem beliebig großen (was indices angeht) intArray zusammenführen, inklusive dynamischer 
+	//mit diese Methode kann man ein BA mit nem beliebig grossen (was indices angeht) intArray zusammenführen, inklusive dynamischer 
 	//expansion
 
 	//->numTrue ändert sich bei der ganzen Sache nicht
@@ -1043,9 +1043,9 @@ bool	BPT_BA::add (  MIntArray& operand, ULONG max, ULONG minSize )
 
 
 
-	//wenn die zu mergende Spanne zu groß, dann array vergrößern
+	//wenn die zu mergende Spanne zu gross, dann array vergroessern
 	if( minSize < lowBound || max > highBound )
-	{//array expansion: Da expand und contract nur die HighBound ändern können, muss hier ne eigene prozedur her
+	{//array expansion: Da expand und contract nur die HighBound ändern koennen, muss hier ne eigene prozedur her
 		
 		//für das nach dem highbound noch genügend bits zur Verfügung stehen 
 
@@ -1097,7 +1097,7 @@ bool	BPT_BA::add (  MIntArray& operand, ULONG max, ULONG minSize )
 
 outOfIf:
 
-	//wenn er hier ist, hat das array auf jeden Fall die passende größe, so dass die operation ausgeführt werden kann
+	//wenn er hier ist, hat das array auf jeden Fall die passende groesse, so dass die operation ausgeführt werden kann
 	return performLogicalOperation(operand,2,operand);
 
 }
@@ -1231,9 +1231,9 @@ bool		BPT_BA::performLogicalOperation(const MIntArray& rhs, long operation,MIntA
 bool		BPT_BA::performLogicalOperation(const BPT_BA& rhs, long operation, BPT_BA& inResult, bool keepLHSSize) 
 //----------------------------------------------------------------------------------------------------
 {
-	//arrays müssen nicht gleichGroß sein - er nimmt das Gemeinsame Vielfache
+	//arrays müssen nicht gleichGross sein - er nimmt das Gemeinsame Vielfache
 	
-	//größten Offset finden und kleinste Size
+	//groessten Offset finden und kleinste Size
 	ULONG rhsOffset		= rhs.getOffset();
 	
 	ULONG rhsHighBound	= rhs.getHighBound();
@@ -1242,7 +1242,7 @@ bool		BPT_BA::performLogicalOperation(const BPT_BA& rhs, long operation, BPT_BA&
 	
 	ULONG myOffset		= (offset > rhsOffset) ? offset : rhsOffset;
 
-	//lowBound wird der von dem Array genommen, der auch schon den größten Offset hatte (damit beide zusammenpassen)
+	//lowBound wird der von dem Array genommen, der auch schon den groessten Offset hatte (damit beide zusammenpassen)
 	ULONG myLowBound	= (lowBound > rhs.getLowBound()) ? lowBound : rhs.getLowBound();
 	
 
@@ -1256,7 +1256,7 @@ bool		BPT_BA::performLogicalOperation(const BPT_BA& rhs, long operation, BPT_BA&
 
 
 
-	//Array größe errechen
+	//Array groesse errechen
 	ULONG rest = (myHighBound - myOffset) % nBitsInUlong;
 
 	ULONG allocSize = (myHighBound - myOffset - rest) / nBitsInUlong;
@@ -1270,12 +1270,12 @@ bool		BPT_BA::performLogicalOperation(const BPT_BA& rhs, long operation, BPT_BA&
 	
 
 
-	//chunks sind passend angeordnet, so dass die Chunks selbst verglichen werden können
+	//chunks sind passend angeordnet, so dass die Chunks selbst verglichen werden koennen
 	//hier muss bedacht werden, dass der beginn des & vergleichs eventuell mitten in einem Chunk liegt, 
 	//so dass der errechnete Speicherbedarf für den ResultPtr eventuell nicht reicht.
-	//deshalb auf nummer sicher gehen und einen Chunk mehr allokalisieren, wenn nötg
+	//deshalb auf nummer sicher gehen und einen Chunk mehr allokalisieren, wenn noetg
 
-	//unnötig - glaube ich ...
+	//unnoetig - glaube ich ...
 //	if(	rest + (myOffset % nBitsInUlong) > nBitsInUlong)
 //		allocSize++;
 
@@ -1295,7 +1295,7 @@ bool		BPT_BA::performLogicalOperation(const BPT_BA& rhs, long operation, BPT_BA&
 	ULONG* result = NULL;
 
 	if(keepLHSSize) //nur für Operator minus (erstmnal), sollte also auch nur vpn OP -  gesetzt werden
-	{//dieser flag bewirkt, dass das resultierende Array genau so groß ist wie das LHS array (dies ist wichtig bei der minus operation)
+	{//dieser flag bewirkt, dass das resultierende Array genau so gross ist wie das LHS array (dies ist wichtig bei der minus operation)
 
 		MPRINT(" VERWENDE NUMCHUNKS ALS ARAYGRÖ?E VON RESULT");
 		result = 	(ULONG*)malloc(numChunks * sizeof(ULONG));
@@ -1308,12 +1308,12 @@ bool		BPT_BA::performLogicalOperation(const BPT_BA& rhs, long operation, BPT_BA&
 		//OPminOffset anpassen (wenn die Arrays bei 0 anfangen ist das egal, aber bei allen anderen nicht mehr
 		OPminOffset = thisAOffset;
 
-		//ALLOCSIZE ist NIE größer als numChunks, da ja immer das KGV genommen wird
+		//ALLOCSIZE ist NIE groesser als numChunks, da ja immer das KGV genommen wird
 
 	}
 	else
 	{
-		//alles klar,also erstmal ergenisArray ertstellen mit passender Größe
+		//alles klar,also erstmal ergenisArray ertstellen mit passender Groesse
 		//IM Standardfall kann einfach die AllocSize verwendet werden
 		result = (ULONG*)malloc(allocSize * sizeof(ULONG));
 	}
@@ -1368,7 +1368,7 @@ bool		BPT_BA::performLogicalOperation(const BPT_BA& rhs, long operation, BPT_BA&
 
 	//und BA zurückgeben
 	if(keepLHSSize)
-	{// eventuell müssten hier auch einige überschüssige Bits null gesetzt werden (was ja eigentlich unnötig ist dank Hi und lowBound ...)
+	{// eventuell müssten hier auch einige überschüssige Bits null gesetzt werden (was ja eigentlich unnoetig ist dank Hi und lowBound ...)
 		inResult.useThisData(result, highBound, lowBound ,offset ,numChunks );
 		return true;
 	}
@@ -1540,9 +1540,9 @@ void	BPT_BA::print()
 	ULONG l = null;
 	
 	cout<<endl<<"---------------------------------------------------"<<endl;
-	cout<<"Logische Maximalgröße des Arrays ist: "<<highBound<<endl;
+	cout<<"Logische Maximalgroesse des Arrays ist: "<<highBound<<endl;
 	cout<<"WertSpanne ist: "<<lowBound<<" bis "<<highBound<<endl;
-	cout<<"Speichergröße in bit ist "<<numChunks * 8<<", (byte)"<<numChunks<<endl;
+	cout<<"Speichergroesse in bit ist "<<numChunks * 8<<", (byte)"<<numChunks<<endl;
 	cout<<"---------------------------------------------------"<<endl<<endl;
 
 	for(ULONG x = null; x < chunkSize; x++)

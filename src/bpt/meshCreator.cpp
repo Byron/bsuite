@@ -138,7 +138,7 @@ meshCreator::meshCreator(	MObject&		fMesh,
 
 	int polyCount = polyIter.count();
 	
-	//arrayGröße anpassen, um effizienter zu sein
+	//arrayGroesse anpassen, um effizienter zu sein
 	offsets->setLength(polyCount);
 	offsetsAbsolute->setLength(polyCount);
 
@@ -167,7 +167,7 @@ meshCreator::meshCreator(	MObject&		fMesh,
 	//UVs und normalen extrahieren
 	
 
-	//Arrays müssen mit listen versehen werden, aber da der meshcreatoe eh nur temporär ist, müssen sie nicht gesäubert werden vor der benutzung
+	//Arrays müssen mit listen versehen werden, aber da der meshcreat eh nur temporär ist, müssen sie nicht gesäubert werden vor der benutzung
 
 
 		//initialisieren der Pointer
@@ -344,7 +344,7 @@ meshCreator::meshCreator(	MObject&		fMesh,
 		
 		for(UINT i = 0; i < l; i++)
 		{
-			//!!!!MAN könnte dies beschleunigen durch wegfall des isFlipped lookups indem man einfach auf die faceVerts direkt zugreift.
+			//!!!!MAN koennte dies beschleunigen durch wegfall des isFlipped lookups indem man einfach auf die faceVerts direkt zugreift.
 			//Man müsste nur herausfinden, ob die contained edges in reihenfolge gegeben werden, also o, wie sie auch i face auftauchen
 			
 			edgeIter.setIndex(containedEdges[i],tmp);
@@ -355,8 +355,8 @@ meshCreator::meshCreator(	MObject&		fMesh,
 			{
 				
 				if(faceVerts.length() == 0)
-				{//entweder man checkt das vorher, holt aber nur dir vertizen, wenn wiklich nötig, oder man 
-					//lässt den check aus, aber holt standardMäßig pro fce alle Daten - diese Variante ist wahrscheinlich besser 
+				{//entweder man checkt das vorher, holt aber nur dir vertizen, wenn wiklich noetig, oder man 
+					//lässt den check aus, aber holt standardMässig pro fce alle Daten - diese Variante ist wahrscheinlich besser 
 					//in den meisten Fällen
 					polyIter.getVertices(faceVerts);
 				}
@@ -409,7 +409,7 @@ meshCreator::~meshCreator()
 {
 //memory cleanup
 
-	//mesh löschen
+	//mesh loeschen
 	delete vtxPoints;
 	delete offsets;
 	delete offsetsAbsolute;
@@ -421,7 +421,7 @@ meshCreator::~meshCreator()
 
 
 		if(deallocUVs)
-		{//diese Daten werden eventuell von außen benutzt, auch nachdem der meshcreatoer zerstört wurde
+		{//diese Daten werden eventuell von aussen benutzt, auch nachdem der meshcreatr zerstoert wurde
 			//deshalb shutz durch flag
 			delete Us;
 			delete Vs;
@@ -437,7 +437,7 @@ meshCreator::~meshCreator()
 		delete UVAbsOffsets;
 
 		
-		//slide Arrays werden nie hier zerstört, sondern von fty selbst
+		//slide Arrays werden nie hier zerstoert, sondern von fty selbst
 
 	
 
@@ -509,13 +509,13 @@ MStatus 	meshCreator::createMesh(MObject& newMeshData)
 		
 	}
 	
-	//Löschen der UVDaten darf nict hier vorgenommen werden, da sie später vom destruktor der FTY gelöscht werden
+	//Loeschen der UVDaten darf nict hier vorgenommen werden, da sie später vom destruktor der FTY geloescht werden
 	
 	
 	
 
 
-	//normalen erstellen, wenn möglich
+	//normalen erstellen, wenn moeglich
 	
 	MIntArray	mFaceList;	//man muss bedenken, dass der MeshCreator wirklich nur passende face - vertex Kombinationen erzeugt !!!
 	
@@ -530,7 +530,7 @@ MStatus 	meshCreator::createMesh(MObject& newMeshData)
 	MIntArray smoothEdgeList;
 	smoothEdgeList.setSizeIncrement(normalOffsetsLUT.length() + 20);	//so dürfte das Array ohne realloc auskommen
 	
-	MFnMesh meshFn(newMeshData,&status);	//hier koennte man eigentlich auch den meshCreator nehmen
+	MFnMesh meshFn(newMeshData,&status);	//hier knnte man eigentlich auch den meshCreator nehmen
 	MItMeshPolygon polyIter(newMeshData);
 	MItMeshEdge		edgeIter(newMeshData);
 	
@@ -794,7 +794,7 @@ void	meshCreator::addNormalSlide(int vtxID, MVector& normal,double normalScaleVa
 	slideNormals->append(normal);
 	normalScale->append(normalScaleValue);
 	
-	slideEndPoints->setLength(slideEndPoints->length() + 1);			//werden ebenfalls vergrößert, damit die Arrays in Sync bleiben
+	slideEndPoints->setLength(slideEndPoints->length() + 1);			//werden ebenfalls vergroessert, damit die Arrays in Sync bleiben
 	slideDirections->setLength(slideDirections->length() + 1);
 	
 	slideScale->append(-1);			//slideScale muss immer synchron zu allen anderen bleiben
@@ -816,7 +816,7 @@ void	meshCreator::getFaceVtxIDs(int faceID, MIntArray& array) const
 	array.setLength((*offsets)[faceID]);	//nun hat das Array garantiert genug slots zum halten der Infos
 											//so dass beim append kein realloc gemacht wird
 
-	array.clear();							//vohandene Einträge logisch löschen
+	array.clear();							//vohandene Einträge logisch loeschen
 	
 	for(int i = offset; i < count; i++)
 		array.append( (*faceVtxIDs)[i]);
@@ -989,7 +989,7 @@ int 	meshCreator::doFaceOneSplit(int faceID,
 					cycleVtxMatch(vtxMatch,nFaceVtx);
 				
 				//cout<<"DO_FACE_ONE_SPLIT: "<<"BEARBEITE FACE "<<connectedFaces[i]<<endl;
-				//wenn größe ungerade, dann vorhandenen Vtx nutzen, ansonsten neuen erstellen, generell ohne jeden Slide
+				//wenn groesse ungerade, dann vorhandenen Vtx nutzen, ansonsten neuen erstellen, generell ohne jeden Slide
 				if(vtxMatch.length() % 2 == 1)
 				{
 					//ist ungerade, also mittleren Vtx in newVtxIndices eintragen
@@ -1133,7 +1133,7 @@ int 	meshCreator::doFaceOneSplit(int faceID,
 		returnNachbar = -2;
 
 	return returnNachbar;
-	//jetzt auf jeden Fall sortieren -> jetzt eigentlich nicht mehr nötig
+	//jetzt auf jeden Fall sortieren -> jetzt eigentlich nicht mehr noetig
 	//sortArray(newVtxIndices);
 	
 }
@@ -1165,7 +1165,7 @@ bool	meshCreator::orderNachbarn(MIntArray&	faceIDs,MIntArray&	bounds, MIntArray&
 		if(mL > 2 )	
 			cycleVtxMatch(matchVtx,verts);
 		
-		//Diese Variante gibt den Index für den StartVtx für jeden Nachbarn zurück, egal wie groß MatchVtx ist
+		//Diese Variante gibt den Index für den StartVtx für jeden Nachbarn zurück, egal wie gross MatchVtx ist
 		if(mL > 1)
 		{
 			for(int i = 0; i < l; i++)
@@ -1272,7 +1272,7 @@ int		meshCreator::newVtxBetweenIDs(int startID,int endID,int currentFace,bool us
 	if(useSlide)
 		mySlide = slide;
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//Slide ist immer relativ zum startVtx. Wenn das anders sein soll, muss man bei der AgumentÜbergabe Start/EndVtxID vertauschen
+	//Slide ist immer relativ zum startVtx. Wenn das anders sein soll, muss man bei der AgumentUEbergabe Start/EndVtxID vertauschen
 	MPoint start = (*vtxPoints)[startID];
 	MPoint end = (*vtxPoints)[endID];
 	MVector direction = end - start;
@@ -1305,7 +1305,7 @@ int	meshCreator::getNormalsIndices(	int			faceID,
 										MIntArray&	inIndices) const
 //-------------------------------------------------------------------------------------------
 {
-	//eventuell wurde vor dieser procedur bereits ein changePoly ausgeführt, so dass *Offsets eventell 1 zu groß sein kann
+	//eventuell wurde vor dieser procedur bereits ein changePoly ausgeführt, so dass *Offsets eventell 1 zu gross sein kann
 	//deshalb wird sicherheitshalber für diesen Fall 
 
 	//dieser Check muss vermutlich nicht sein, das schon vorher überprüft wird
@@ -1363,7 +1363,7 @@ void	meshCreator::createNormal(int faceID,
 
 	if(startAbsID == -1)
 	{//centerVtxMode: diese Vertizen werden immer hinten (relativ zum Face) angehängt in der Form: -(centerIndex + 1)
-		//außerdem werden diese nur einmal eingefügt, da jetzt noch kein Zusammenhang zu irgendeiner edge besteht
+		//ausserdem werden diese nur einmal eingefügt, da jetzt noch kein Zusammenhang zu irgendeiner edge besteht
 		offset = offset + normalCount[faceID] ;		
 		
 		normalVertexIndices.insert(-newVtxID-1,offset);
@@ -1443,7 +1443,7 @@ void	meshCreator::changeNormals(	int faceID,
 	normalIndicesChange.setSizeIncrement(localVtxChange.length());
 
 	int offset = getValidAbsoluteOffset(faceID);
-	//erstmal normalen holen, um den alten Vtx ihre normale zuordnen zu können
+	//erstmal normalen holen, um den alten Vtx ihre normale zuordnen zu koennen
 	
 
 	//backup machen, wenn nicht im append mode
@@ -1463,11 +1463,11 @@ void	meshCreator::changeNormals(	int faceID,
 	unsigned int l = localVtxChange.length();
 
 
-	INVIS(cout<<"INDICES FÜR FACE: "<<faceID<<endl;);
+	INVIS(cout<<"INDICES FUER FACE: "<<faceID<<endl;);
 	INVIS(helper.printArray(normalIndices," = normalIndices");)
 
 
-	//centerID suchen, wenn nötig
+	//centerID suchen, wenn noetig
 	if(hasCenter)
 	{//Center wurde als -(centerID + 1) am ende des FaceVtxSlots gespeichert
 		int centerID;
@@ -1603,7 +1603,7 @@ void	meshCreator::changeNormals(	int faceID,
 void	meshCreator::updateNormalArraysWith(const MIntArray& normalIndicesChange, int faceID)
 //------------------------------------------------------------------------------------------------------------------------
 {
-	//fügt die übergebenen normalIndices in große normalArrays ein
+	//fügt die übergebenen normalIndices in grosse normalArrays ein
 
  		int l = normalIndicesChange.length();
 
@@ -1654,13 +1654,13 @@ void	meshCreator::createUV(int			currentFace,
 							  bool			isAbsolute	)
 //------------------------------------------------------------------------------------------------------------------------
 {
-	//erzeugt neuen UV, wenn möglich
+	//erzeugt neuen UV, wenn moeglich
 	//wenn vtxID nicht gegeben, dann wird neue CenterUV erstellt
 
 	
 
 	//is Absolute: wenn true, dann sind die start - und endLocIDs absolute Vtx IDs und müssen erst zu relativen gemacht werden (pro UVSet)
-	//dies wird nur von doFaceOneSplit so benötigt
+	//dies wird nur von doFaceOneSplit so benoetigt
 
 	//iteratoren
 	std::list<MIntArray>::iterator iterCounts			= UVCounts->begin();
@@ -1690,7 +1690,7 @@ void	meshCreator::createUV(int			currentFace,
 
 	//NEWUVARRAY VORBEREITEN
 	/////////////////////////
-	//erstmal den Sizeincrement auf die benötigte größe stellen, damit beim append nur einmal ein realloc durchgeführt wird
+	//erstmal den Sizeincrement auf die benoetigte groesse stellen, damit beim append nur einmal ein realloc durchgeführt wird
 	newUVArray.setSizeIncrement(numUVSets + 1);
 
 	//Sie sind nur einmal auf dem Array (am Anfang), gefolgt von einer UVID pro UVSet ( -1, wenn keine UV)
@@ -1882,8 +1882,8 @@ void	meshCreator::checkForUV(int thisFaceID,
 								bool useSlide) const
 //--------------------------------------------------------------------------------
 {//checkt, ob der bereits vorhandene Vtx eine UV hat
- //useSlide wird benötigt, wenn diese Prozedur doch einen Vtx erzeugen muss, welcher dann natürlich einen eigenen slide benötigt
- //wenn nötig
+ //useSlide wird benoetigt, wenn diese Prozedur doch einen Vtx erzeugen muss, welcher dann natürlich einen eigenen slide benoetigt
+ //wenn noetig
 
 	std::list<MIntArray>::iterator iterCounts		=		UVCounts->begin();
 	std::list<MIntArray>::iterator iterOffset		=		UVAbsOffsets->begin();
@@ -1921,7 +1921,7 @@ void	meshCreator::checkForUV(int thisFaceID,
 	UINT i;
 	for(i = 0; i < length; i += numUVSets + 1)
 	{
-		//nach centerVtx wird hier nicht gesucht, da diese eh immer nur einem Face gehören
+		//nach centerVtx wird hier nicht gesucht, da diese eh immer nur einem Face gehoeren
 		if(newNachbarUVs[i] == newVtx)
 		{
 			nUVOffset = i+1;	//zeigt auf ersten UV des gefundenen Vtx
@@ -1979,7 +1979,7 @@ void	meshCreator::checkForUV(int thisFaceID,
 
 			newUVs[firstElement + i] = newNachbarUVs[nUVOffset + i];
 
-			//UVSliding initialisieren //wenn er hier ist besteht sehr wohl die möglichkeit, dass der gefundene UV noch keinen Slide hat, 
+			//UVSliding initialisieren //wenn er hier ist besteht sehr wohl die moeglichkeit, dass der gefundene UV noch keinen Slide hat, 
 			//da er von einem typeOne (fake) face erstellt wurde (über meshCreator)
 			if(useSlide)
 			{
@@ -2076,7 +2076,7 @@ void	meshCreator::checkForUV(int thisFaceID,
 
 	bool hasNewUVs = false;
 	length = firstElement + numUVSets;
-	//jetzt noch letzte Überprüfung machen, ob überhaupt neue UVs eingefügt wurden
+	//jetzt noch letzte UEberprüfung machen, ob überhaupt neue UVs eingefügt wurden
 	for(i = firstElement; i < length; i++)
 	{
 		if(newUVs[i] > 0)
@@ -2526,14 +2526,14 @@ void	meshCreator::createPoly(MIntArray& vtxIDs)
 	helper.addIntArrayToLHS(*faceVtxIDs,vtxIDs);
 	
 	//offsetsAbsolute muss nicht verändert werden, da er 
-	//für die MeshCreation nicht benötigt wird.
-	//er ist nur für reele faces nötig
-	//->DIE ABSOLUTEN OFFSETS WERDEN AUCH FÜR NEUE FACES BENÖTIGT, WENN NORMALEN ERSTELLT WERDEN
+	//für die MeshCreation nicht benoetigt wird.
+	//er ist nur für reele faces noetig
+	//->DIE ABSOLUTEN OFFSETS WERDEN AUCH FUER NEUE FACES BENÖTIGT, WENN NORMALEN ERSTELLT WERDEN
 	//-->ALSO AUCH ABSOFFSETS AKTUALISIEREN
 	offsetsAbsolute->append( (*offsetsAbsolute)[ offsetsAbsolute->length() - 1 ] + vtxIDs.length() );
 
 	//UVs werden von der aufrufenden Procedur in "Face" erzeugt bzw. die entsprechende methode wird aufgerufen
-	//weil sie unbedingt die ID des original Faces benötigt
+	//weil sie unbedingt die ID des original Faces benoetigt
 }
 
 
@@ -2554,7 +2554,7 @@ void	meshCreator::changePolyVtxIDs(int faceID,const MIntArray& localVtxChange)
 
 	change =  localVtxChange.length() - (*offsets)[faceID];
 
-	//erstmal neue element erstellen bzw. alte rausschmeissen wenn nötig/möglich
+	//erstmal neue element erstellen bzw. alte rausschmeissen wenn noetig/moeglich
 	if(change > 0)
 		for(int i = 0; i < change; i++)
 			faceVtxIDs->insert(-1,aOffset);
@@ -2568,7 +2568,7 @@ void	meshCreator::changePolyVtxIDs(int faceID,const MIntArray& localVtxChange)
 	for(int i = aOffset; i < l;i++)
 		(*faceVtxIDs)[i] = localVtxChange[r++];
 
-	//wenn vtcChangeArray größer/kleiner als original faceVtxCount
+	//wenn vtcChangeArray groesser/kleiner als original faceVtxCount
 	//dann wird auch der OffsetArray verändert
 
 	if(change != 0)
@@ -2784,7 +2784,7 @@ startNextCycle:;
 		}
 		else
 		{//UVCounts aktualisieren wenn im append modus; 
-		 //da offset (absolut) nicht aktualisiert wird, kann man im nachhinein nicht auf neue Faces zugreifen, was allerdings auch nicht nötig ist
+		 //da offset (absolut) nicht aktualisiert wird, kann man im nachhinein nicht auf neue Faces zugreifen, was allerdings auch nicht noetig ist
 			if(append)
 				UVCountArray.append(0);
 
@@ -2823,7 +2823,7 @@ double		meshCreator::getFaceSize( const MPointArray& pointList) const
 //-----------------------------------------------------------------
 {
 
-	//!!!GRUNDSÄTZLICH muss die methode so schnell wie möglich routinen erhalten, die die Triangulation des Faces errechnen, so dass ich nicht Maya
+	//!!!GRUNDSÄTZLICH muss die methode so schnell wie moeglich routinen erhalten, die die Triangulation des Faces errechnen, so dass ich nicht Maya
 	//objecte bemühen muss, die ich nicht wirklich unter kontrolle habe!!
 
 	UINT l = pointList.length();
@@ -2844,7 +2844,7 @@ double		meshCreator::getFaceSize( const MPointArray& pointList) const
 	meshFn.create(l, 1, pointList, MIntArray(1,l), vtxList, tmpMesh);
 
 
-	//jetzt die größe des Faces holen und zurückgeben
+	//jetzt die groesse des Faces holen und zurückgeben
 	MItMeshPolygon polyIter(tmpMesh);
 
 	polyIter.getArea(size);

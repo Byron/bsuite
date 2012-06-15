@@ -28,7 +28,7 @@
 #define	PI		3.14159265358979323846	/* pi */
 #define	PI2		1.57079632679489661923	/* pi/2 */
 
-// IOStream includes - ist absolut noetig
+// IOStream includes - ist absolut ntig
 //
 #ifndef REQUIRE_IOSTREAM
 	#include <iostream>
@@ -87,6 +87,7 @@ using namespace BPT;
 		}
 #else
 #	define MPRINT(message)
+#	define INVIS(code)
 #	define MCheckStatus(status,message)	
 #endif
 

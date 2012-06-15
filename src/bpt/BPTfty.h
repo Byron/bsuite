@@ -108,8 +108,8 @@ public:
 //	**ZUGRIFFS METHODEN	 ->SET **
 //	*****************************
 
-//	Parameter werden nicht als Referenz übergeben, weil diese MObjects nicht unbedingt
-//	gültig sein müssen. Deshalb werden sie kopiert (denke ich)
+//	Parameter werden nicht als Referenz uebergeben, weil diese MObjects nicht unbedingt
+//	gueltig sein muessen. Deshalb werden sie kopiert (denke ich)
 	void		setMesh( MObject mesh );
 	
 	void		setActionMode(int aMode);
@@ -185,7 +185,7 @@ private:
 
 	void			createNSelGerade(	edge*			thisEdge,
 										int				verts[], 
-										MItMeshVertex&	vertIter); //nur für nSelEdges
+										MItMeshVertex&	vertIter); //nur fuer nSelEdges
 	
 	
 	int				getUID(		int face, 
@@ -365,7 +365,7 @@ private:
 	
 	void		faceGetContainedEdgeIndices(MIntArray& faceIndices,
 											MIntArray& edgeIndices,
-											MObject& mesh);	//für die externe BoundaryMethode
+											MObject& mesh);	//fuer die externe BoundaryMethode
 
 	int			getContainedFaces(MIntArray faceStorage,MIntArray& containedFaces);
 	void		invertSelection(MIntArray& lhs, int maxElement, MIntArray& );
@@ -452,11 +452,11 @@ private:
 	//					 calls to the plugin as the MObject handle could be invalidated
 	//					 between calls to the plugin.
 	//
-	MDagPath	meshPath;	//!< wird benötigt für selectMethoden, also für alles, was KEINE history erzeugt und wird am anfang auf jeden fall gesetzt 
+	MDagPath	meshPath;	//!< wird bentigt fuer selectMethoden, also fuer alles, was KEINE history erzeugt und wird am anfang auf jeden fall gesetzt 
 	MObject		fMesh;
 	MObject		newMeshData;
 
-	int			actionMode;	//!< welche Aktion wird ausgeführt?
+	int			actionMode;	//!< welche Aktion wird ausgefuehrt?
 
 
 
@@ -465,8 +465,8 @@ private:
 	int				whichSide;
 	double			slide;
 	double			normal;
-	MDoubleArray*	normalScale;		//!< scaleFactor für absolute normalen 
-	MDoubleArray*	slideScale;			//!< ScaleFactor für absoluten slide
+	MDoubleArray*	normalScale;		//!< scaleFactor fuer absolute normalen 
+	MDoubleArray*	slideScale;			//!< ScaleFactor fuer absoluten slide
 	MVectorArray*	slideDirections;	//!< slideRichtungen
 	MVectorArray*	slideNormals;		//!< slideNormalRichtungen
 	MPointArray*	slideStartPoints;
@@ -476,10 +476,10 @@ private:
 	
 
 	//hier keine Ptr verwenden - MArrays localisieren ihren Daten intern sowieso im heap
-	MVectorArray	slideDirections2;	//!< ist die 2.slideDirection, die für SMC notwendig sein kann (bei edgeLines)
+	MVectorArray	slideDirections2;	//!< ist die 2.slideDirection, die fuer SMC notwendig sein kann (bei edgeLines)
 	MDoubleArray	slideScale2;
 	MDoubleArray	normalScale2;
-	MVectorArray	slideNormals2;		//!< ist die 2.normalDirection, die für die SMC notwendig sein kann (bei edgeLines)
+	MVectorArray	slideNormals2;		//!< ist die 2.normalDirection, die fuer die SMC notwendig sein kann (bei edgeLines)
 	MIntArray		hasSecondDirection;	//!< bestimmt, ob slide ne 2. Direction hat oder nicht;
 
 
@@ -494,7 +494,7 @@ private:
 
 
 
-//UV DATEN ARRAYS (zur weitergabe an die BPTNode, damit das irgendwie klappt mit der Übertragung der UVs aufs neue Mesh)
+//UV DATEN ARRAYS (zur weitergabe an die BPTNode, damit das irgendwie klappt mit der UEbertragung der UVs aufs neue Mesh)
 //---------------------------------
 /*
 	list<MFloatArray>*			Us;
@@ -503,7 +503,7 @@ private:
 	list<MIntArray>*			UVperVtx;
 
 */
-	MStringArray				UVSetNames;			//!< strings mit UVSetNamen, wird von SMC benötigt
+	MStringArray				UVSetNames;			//!< strings mit UVSetNamen, wird von SMC bentigt
 
 
 
@@ -526,7 +526,7 @@ private:
 
 	MIntArray	options;			//!< 0 = relative, 1 = connectallEnds, 2 = maxEdgeCount, 3 = whichSide - 4slideNotLimited
 	MSelectionList	redoSelection;
-	int	isRelative,isNormalRelative;	//!< relative ist für normal und slide getrennt steuerbar;
+	int	isRelative,isNormalRelative;	//!< relative ist fuer normal und slide getrennt steuerbar;
 
 
 

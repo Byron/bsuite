@@ -45,17 +45,17 @@ nSelEdge::~nSelEdge()
 //-------------------------------------------------------
 {
 	//MUSS HIER ALL IHRE NACHBARN LÖSCHEN
-	//MERKE: NSEL EDGES HABEN NIE PTS ZU SELEDGES; SO DASS MAN DIESE GETROST von "Oben" löschen kann
+	//MERKE: NSEL EDGES HABEN NIE PTS ZU SELEDGES; SO DASS MAN DIESE GETROST von "Oben" loeschen kann
 
 	for(int i = 0; i < 2; i++)
 	{
 		for(int a = 0; a < 2; a++)
 		{
 			if(nachbarn[i][a] != 0)
-			{//zuerst sich selbst beim nachban 0 setzen, damit der nicht wiederum versucht, diesen hier zu löschen - feedbackschleife
+			{//zuerst sich selbst beim nachban 0 setzen, damit der nicht wiederum versucht, diesen hier zu loeschen - feedbackschleife
 
 				nachbarn[i][a]->setThisNachbarZero(this);
-				//jetzt kann man diesen nachbarn ebenfalls löschen
+				//jetzt kann man diesen nachbarn ebenfalls loeschen
 				delete nachbarn[i][a];
 			}
 		}
@@ -207,7 +207,7 @@ void		nSelEdge::changeFace(int origVtx, int newVtx,const edgeFaceData* faceData,
 	if(recurseCount == 0 )//&& faceIDs.length() == 2)	//wenn es eine borderEdge ist, dann muss sie nicht abbrechen - 
 		return;
 
-	--recurseCount;	//auf diese Weise kann diese Variable nicht negativ (und als UINT), riesengroß werden
+	--recurseCount;	//auf diese Weise kann diese Variable nicht negativ (und als UINT), riesengross werden
 
 	UINT i = 0;
 	
@@ -308,7 +308,7 @@ void		nSelEdge::changeFace(int origVtx, int newVtx,const edgeFaceData* faceData,
 				
 				
 				//Okay, jetzt die UVPositionen erstellen, wenn überhaupt ungeteilte UVs vorhanden
-				if(found /*&& newVtx > creator->getInitialVtxCount()*/)	//das dürfte auch keine endgültige Lösung darstellen
+				if(found /*&& newVtx > creator->getInitialVtxCount()*/)	//das dürfte auch keine endgültige Loesung darstellen
 				{
 					MFloatArray newUVPos;
 					getUVPos(creator->getVtxPoint(newVtx), thisFace, newUVPos, false);
@@ -345,7 +345,7 @@ void		nSelEdge::changeFace(int origVtx, int newVtx,const edgeFaceData* faceData,
 				creator->changeSideFace(origVtx, newVtx, faceIDs[i], newUVs);
 				
 				
-				//jetzt muss thisFace noch aufgerüstet werden mit vtx/ UVChange informationen, damit die nächst edge auch weiß, wonach sie suchen soll
+				//jetzt muss thisFace noch aufgerüstet werden mit vtx/ UVChange informationen, damit die nächst edge auch weiss, wonach sie suchen soll
 				thisFace->vtxChange.append(origVtx);
 				thisFace->vtxChange.append(newVtx);
 
@@ -371,7 +371,7 @@ void		nSelEdge::changeFace(int origVtx, int newVtx,const edgeFaceData* faceData,
 
 				//in der anderen Richtung (falls es sie gibt) kann nichts mehr sein, also abbrechen
 
-				//zuguterletzt kann thisFace getrost gelöscht werden - es gibt immer nur ein thisFace, da immer nur in eine Richtung ein gültiger nachbar ist			
+				//zuguterletzt kann thisFace getrost geloescht werden - es gibt immer nur ein thisFace, da immer nur in eine Richtung ein gültiger nachbar ist			
 				delete thisFace;
 				return;
 				

@@ -46,7 +46,7 @@
 		tweaks. That is:
 @par
 		<pre>
-		(1) Does construction history exist?
+		(1) Ds construction history exist?
 		(2) Do tweaks exist?
 		(3) Is construction history turned on?
 		</pre>
@@ -184,7 +184,7 @@
 @par
 		This section has described the "why" part of the question regarding this command.
 		Following sections will provide a more in depth look at "how" this command
-		treats each of these situations and what it really does behind the scenes
+		treats each of these situations and what it really ds behind the scenes
 		to handle the above cases.
 
 @par
@@ -235,7 +235,7 @@
 			that can be done to respect the fact that no history is desired. The first
 			involves using the approach in case (c) and simply "baking" or "flattening"
 			the nodes down into the mesh node. Unfortunately, this presents some
-			serious problems with undo, as the Maya API in its current state does not
+			serious problems with undo, as the Maya API in its current state ds not
 			support construction history manipulation. Resorting to the MEL command:
 			"delete -ch" would be possible, however undoing the operation would not be
 			trivial as calling an undo from within an undo could destabilize the undo
@@ -352,7 +352,7 @@
 			it as an intermediate object.
 @par
 			The problem with this duplication is that the only duplicate method in the
-			Maya API resides in MFnDagNode, which does not have an associated undo/redo
+			Maya API resides in MFnDagNode, which ds not have an associated undo/redo
 			mechanism. Attempting to manually delete the node by use of a DGmodifier or
 			the MEL delete command will break the undo/redo mechanism for the entire
 			command. As a result, this duplicate mesh is a remnant of each instance of the
@@ -427,7 +427,7 @@ protected:
 						no history exists and construction history is turned off.
 						(ie. no DG operations desired)
 	
-						This method is called only if history does not exist and
+						This method is called only if history ds not exist and
 						history is turned off. At this point, a handle to the
 						meshNode is passed in so a derived class may directly
 						modify the mesh.
@@ -582,7 +582,7 @@ private:
 	bool				createAnimCurves;	//!< wenn false(Im fall von insertVtx), dann keine AnimCurves erstellen, weil polyModifier dann base von ganz ander node ist
 
 	MDagPath			myMeshPath;
-	MObject				myModifierNode;		//!< Hält die ModifierNode selbst
+	MObject				myModifierNode;		//!< Hlt die ModifierNode selbst
 
 
 	/**DG and DAG Modifier (see detaills)
@@ -593,7 +593,7 @@ private:
 			when dealing with the DAG.
 	@par
 		  - There is a limitation between the reparentNode() and deleteNode()
-			methods on the MDagModifier. The deleteNode() method does some
+			methods on the MDagModifier. The deleteNode() method ds some
 			preparation work before it enqueues itself in the MDagModifier list
 			of operations, namely, it looks at it's parents and children and
 			deletes them as well if they are the only parent/child of the node
@@ -602,7 +602,7 @@ private:
 			This conflicts with our call to MDagModifier::reparentNode(),
 			since we want to reparent the shape of a duplicated node under
 			another node and then delete the transform of that node. Now you 
-			can see that since the reparentNode() doesn't execute until after
+			can see that since the reparentNode() dsn't execute until after
 			the MDagModifier::doIt() call, the scheduled deleteNode() call
 			still sees the child and marks it for delete. The subsequent
 			doIt() call reparents the shape and then deletes both it and the
@@ -613,7 +613,7 @@ private:
 			method is enqueued on the modifier.
 	*/
 
-	MDagModifier		fDGModifier;	//!< ist nun DagModifier, da er ne visNode erstellen können muss und parenten unter die Transform
+	MDagModifier		fDGModifier;	//!< ist nun DagModifier, da er ne visNode erstellen knnen muss und parenten unter die Transform
 	MDagModifier		fDagModifier;
 
 };

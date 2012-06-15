@@ -137,7 +137,7 @@ void ByronsPolyTools::convertToEdges(MSelectionList& sList,bool doNotConvertVert
 		}
 	}
 
-	//standardmäßig die gweählten komponenten mit einbeziehen
+	//standardmässig die gweählten komponenten mit einbeziehen
 	////wenn -peb aktiv ist, sollen die Vertizen behalten werden wie sie sind, da sie in connect mit einbezogen werden
 	/*
 	if(! doNotConvertVertices )
@@ -273,7 +273,7 @@ void	ByronsPolyTools::getModifierUINodeName(MString& newName)
 			newName = "BPT_SMC";
 
 	}
-	//else if( und wer weiß was noch alles kommt ;)
+	//else if( und wer weiss was noch alles kommt ;)
 
 }
 
@@ -378,7 +378,7 @@ MSyntax		ByronsPolyTools::newSyntax()
 
 	syntax.addFlag("-se","-selectEdges",MSyntax::kNoArg);
 	syntax.addFlag("-sf","-selectFaces",MSyntax::kNoArg);
-	syntax.addFlag("-oe","-outerEdges",MSyntax::kNoArg);
+	syntax.addFlag("-","-outerEdges",MSyntax::kNoArg);
 	syntax.addFlag("-sv","-selectVertices",MSyntax::kNoArg);
 	
 
@@ -596,7 +596,7 @@ MStatus ByronsPolyTools::initModifierNode(MObject modifierNode)
 	}
 
 
-	// Jede Node enth�lt das slideLimted attribut, welches jetzt direkt in die  Node gesetzt wird
+	// Jede Node enthlt das slideLimted attribut, welches jetzt direkt in die  Node gesetzt wird
 	//
 	FnDepNode.findPlug("sll").setValue( !options[4] );
 	

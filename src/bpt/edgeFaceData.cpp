@@ -210,7 +210,7 @@ bool				edgeFaceData::verifyStartEndVtx(int& startID, int& endID) const
 			else if(faceVertices[(i+l - 1)%l] == endID)	
 			{
 
-				//dies bedeutet auch, dass die Vtx geflipped sind, so dass dies jetzt korrigiert werden muss, damit dir normalen korrekt bearbeitet werden können
+				//dies bedeutet auch, dass die Vtx geflipped sind, so dass dies jetzt korrigiert werden muss, damit dir normalen korrekt bearbeitet werden koennen
 				int tmp = startID;
 				startID = endID;
 				endID = tmp;
@@ -310,7 +310,7 @@ MIntArray			edgeFaceData::insertEdgeVtx(int startID, int endID, int edgeVtxID, b
 		if(faceVertices[i] == startID)
 		{
 			//aleso den EdgeVtx an i+i einfügen
-			//jetzt auch gleich UVs aktualisieren, was die Arraygröße angeht
+			//jetzt auch gleich UVs aktualisieren, was die Arraygroesse angeht
 
 			if(inFaceRichtung)
 			{
@@ -420,7 +420,7 @@ void			edgeFaceData::insertEdgeVtx(int startID, int edgeVtxID, bool inFaceRichtu
 		if(faceVertices[i] == startID)
 		{
 			//aleso den EdgeVtx an i+i einfügen
-			//jetzt auch gleich UVs aktualisieren, was die Arraygröße angeht
+			//jetzt auch gleich UVs aktualisieren, was die Arraygroesse angeht
 
 			if(inFaceRichtung)
 			{

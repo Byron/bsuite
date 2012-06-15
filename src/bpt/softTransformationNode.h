@@ -74,7 +74,7 @@ namespace BPT
 
   @todo
 	Soll noch eine softTransformationEngine erhalten, und an einen matrixManipulator gekoppelt werden
-	Diese node muss nochmal überarbeitet und auf den neuesten Stand gebracht werden
+	Diese node muss nochmal ueberarbeitet und auf den neuesten Stand gebracht werden
 
 */
 
@@ -111,7 +111,7 @@ public:
 	static MObject	maskSizeOBJ;
 	
 	static MObject	fTypeOBJ;
-	static MObject	inverseMatrix;	//!<hält die inverseMAtrix des meshes, weil der Vektor in WorldSpace geliefert wird und umgerechnet werden muss
+	static MObject	inverseMatrix;	//!<hlt die inverseMAtrix des meshes, weil der Vektor in WorldSpace geliefert wird und umgerechnet werden muss
 
 	static MObject	customFalloff;
 	static MObject	falloffVis;

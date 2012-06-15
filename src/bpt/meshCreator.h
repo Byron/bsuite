@@ -56,10 +56,10 @@ using std::list;
 namespace BPT
 {
 
-/** Der MeshCreator implememtiert die grundlegende funktionalität, um meshes verändern zu können und wird so  nur 
+/** Der MeshCreator implememtiert die grundlegende funktionalitt, um meshes verndern zu knnen und wird so  nur 
 	von smartSplit genutzt
 
-	Er hält außerdem sämtliche meshDaten, um auf ihnen efizient arbeiten zu können
+	Er hlt ausserdem smtliche meshDaten, um auf ihnen efizient arbeiten zu knnen
 
   @sa
 	edgeMeshCreator, IVMeshCreator
@@ -91,7 +91,7 @@ public:
 //Daten Zugriff, immer direkt durch Ptr, nie durch Kopie
 //
 
-	//*sorgt dafür, das der initialValue neu definiert wird wird verwendet von der connectEngine
+	//*sorgt dafuer, das der initialValue neu definiert wird wird verwendet von der connectEngine
 	void	applyCurrentState(){initialVtxCount = vtxPoints->length() - 1;}		
 
 	void	getUVData(	list<MFloatArray>*&			inUs,
@@ -143,7 +143,7 @@ public:
 /////////////////////////////////////////////
 //	MESH MODIFIKATOREN
 /////////////////////////////////////////////
-//Verändern die Topologie des Meshes
+//Verndern die Topologie des Meshes
 //
 	
 
@@ -170,7 +170,7 @@ public:
 							int& otherNachbar,
 							MIntArray& resultVs);	
 	
-	//*addVtx dient eher der Arbeit an nicht gewählten Faces, die durch gewählte beeinflusst werden 
+	//*addVtx dient eher der Arbeit an nicht gewhlten Faces, die durch gewhlte beeinflusst werden 
 	void	addVtx(	int vtxID,
 					int edgeID, 
 					int faceID);		
@@ -222,14 +222,14 @@ public:
 /////////////////////////////////////////////
 //	HELFER METHODEN
 /////////////////////////////////////////////
-//WERDEN VON AUßERHALB BENUTZT
+//WERDEN VON AUssERHALB BENUTZT
 //
 	int		getNumFaces() const {return offsets->length();}; 
 
 	//* gibt die aktuellen IDs der Vtx
 	void	getFaceVtxIDs(int faceID, MIntArray& array) const;	
 
-	//*gibt offset zurück, so dass die Procs ihn nicht doppelt holen müssen
+	//*gibt offset zurueck, so dass die Procs ihn nicht doppelt holen muessen
 	void	getFaceNormalIDs(	int			faceID,			
 								MIntArray&	normalIndices) const 
 																	{getNormalsIndices(faceID, normalIndices);};
@@ -240,7 +240,7 @@ public:
 	void	getUVPositions(const MIntArray& UVIds, MFloatArray& UVPos) const;	
 
 
-	//* holt die größe des Faces - holt die FaceVtxList und übergibt diese an die andere Methode
+	//* holt die grsse des Faces - holt die FaceVtxList und uebergibt diese an die andere Methode
 	double	getFaceSize(int faceID) const ;						
 
 	//* macht die eigentlice arbeit
@@ -256,9 +256,9 @@ public:
 
 public:
 /////////////////////////////////////////////
-//	DATENELEMENTE (öffentlich)
+//	DATENELEMENTE (ffentlich)
 /////////////////////////////////////////////
-//WERDEN VON AUßERHALB BENUTZT
+//WERDEN VON AUssERHALB BENUTZT
 //
 
 
@@ -303,7 +303,7 @@ protected:
 //NORMAL HELFER
 //---------------
 
-	//* gibt offset zurück, so dass die Procs ihn nicht doppelt holen müssen
+	//* gibt offset zurueck, so dass die Procs ihn nicht doppelt holen muessen
 	int		getNormalsIndices(	int			faceID,					
 								MIntArray&	normalIndices) const;
 	
@@ -335,13 +335,13 @@ protected:
 //----------------
 //MESH ARRAYS
 //----------------
-//Arrays für MeshDaten - werden sicherheitshalber im Heap erstellt, um stackoverflows bei großen meshes zu vermeiden
+//Arrays fuer MeshDaten - werden sicherheitshalber im Heap erstellt, um stackoverflows bei grossen meshes zu vermeiden
 
 	MPointArray*		vtxPoints;		//!< VTXIds und deren Position							
 	MIntArray*			faceVtxIDs;		//!< Die VtxIDs, so wie sie die Faces definieren		
 	MIntArray*			offsets;		//!< relativer offset(zahl der vtx/face) pro faceID	
 	MIntArray*			offsetsAbsolute;//!< absoluter offset zum finden des richtigen \
-										   	 insertpoints für neue vtx/zum ändern der \
+										   	 insertpoints fuer neue vtx/zum ndern der \
 											 vtxNumerierung
 
 	MPlugArray			compPlugs;		//!< speichert die Plugs, welche selectionLists enthalten
@@ -349,10 +349,10 @@ protected:
 	MFnSingleIndexedComponent	compFn;	//!< dient der Bearbeitung der compList Objekte
 	
 
-	MIntArray*		offsetsLUT;			//!< beinhaltet index, an dem vtx hinzufgefügt/genommen wurde
+	MIntArray*		offsetsLUT;			//!< beinhaltet index, an dem vtx hinzufgefuegt/genommen wurde
 	MIntArray*		offsetsLUTValues;	//!< Beinhaltet den Wert zum entsprechenden Slot in <offsetsALookUp>
 	int				minID;				//!< die kleinste ID im LUT, efizienzsteigerung
-	int				maxID;				//!< die gößte ID usw.
+	int				maxID;				//!< die gsste ID usw.
 
 
 //----------------
@@ -363,19 +363,19 @@ protected:
 
 	
 	MIntArray					normalCount;	//!< Wenn mindestens eine Normale nicht geteilt ist, dann \
-													hält dieses Array die Zahl der Normalen /bzw. faceVtx \
+													hlt dieses Array die Zahl der Normalen /bzw. faceVtx \
 													ansonsten 0; pro face
 	
-	MIntArray					normalVertexIndices; //!< hält Indices (obj relativ) der vertizen, die geteilte normalen haben
+	MIntArray					normalVertexIndices; //!< hlt Indices (obj relativ) der vertizen, die geteilte normalen haben
 													 
 
-	MIntArray					normalAbsOffsets;	//!< hält verweise direkt ins normalIndices Array (absolut), (im gegensatz dazu \
+	MIntArray					normalAbsOffsets;	//!< hlt verweise direkt ins normalIndices Array (absolut), (im gegensatz dazu \
 													ist normalCount relativ)
 	
-	MIntArray					normalOffsetsLUT;	//!< beinhaltet index, an dem normale hinzufgefügt/genommen \
+	MIntArray					normalOffsetsLUT;	//!< beinhaltet index, an dem normale hinzufgefuegt/genommen \
 													wurde (was einhergeht mit faceVtxChanges)
 	
-	MIntArray					normalOffsetsLUTValues; //!< beinhaltet den Wert zum entsprechenden slot im OffsetsLUT (Wieviele Normalen wurden hinzugefügt?)\
+	MIntArray					normalOffsetsLUTValues; //!< beinhaltet den Wert zum entsprechenden slot im OffsetsLUT (Wieviele Normalen wurden hinzugefuegt?)\
 														synchron zu offsetsLUT
 
 
@@ -394,8 +394,8 @@ protected:
 	list<MFloatArray>*			Vs;
 	
 	list<MIntArray>*			UVCounts;
-	list<MIntArray>*			UVAbsOffsets;		//!< enthält die absoluten offsets der UVs zum referenzieren der UVs im
-	list<MIntArray>*			UVperVtx;			//!< eigentlich scheisse benannt: sollte UVIDs heißen, und definiert die UVs pro Face
+	list<MIntArray>*			UVAbsOffsets;		//!< enthlt die absoluten offsets der UVs zum referenzieren der UVs im
+	list<MIntArray>*			UVperVtx;			//!< eigentlich scheisse benannt: sollte UVIDs heissen, und definiert die UVs pro Face
 
 	
 	MIntArray					UVMin;				//!< verbessert die LUTPerformance im offsets Array
@@ -405,8 +405,8 @@ protected:
 	list<MIntArray>*			UVoffsetsLUTValues;
 
 
-	list<MIntArray>				UVBackup;			//!< enthält die originalUVs des faces, welches gerade von changeUVs geändert wurde.\
-													diese werden dann von der folgenden Append procedure verwendet, da diese die original UVs benötigt \
+	list<MIntArray>				UVBackup;			//!< enthlt die originalUVs des faces, welches gerade von changeUVs gendert wurde.\
+													diese werden dann von der folgenden Append procedure verwendet, da diese die original UVs bentigt \
 													pro UVSet, wird im konstruktor initialisiert											
 
 	MStringArray				UVSetNames;			//!< strings mit UVSetNamen
@@ -422,7 +422,7 @@ protected:
 	MDoubleArray*	normalScale;		//!< hat eigene versionen der Arrays, die schlussendlich von der BBTfty geholt werden
 	MDoubleArray*	slideScale;			
 	MVectorArray*	slideDirections;
-	MVectorArray*	slideNormals;		//!< wenn ein Vtx nicht slided, dann wird gegenwärtiger punkt als startPunkt eingetragen und maySlide[n] wird auf 0 gesetzt
+	MVectorArray*	slideNormals;		//!< wenn ein Vtx nicht slided, dann wird gegenwrtiger punkt als startPunkt eingetragen und maySlide[n] wird auf 0 gesetzt
 	MPointArray*	slideStartPoints;	
 	MPointArray*	slideEndPoints;
 	MIntArray*		slideIndices;
@@ -443,13 +443,13 @@ protected:
 //----------------
 //DIVERSES DATEN
 //----------------
-	int					tmp;				//!< als dummy für setIndex(x,tmp);
+	int					tmp;				//!< als dummy fuer setIndex(x,tmp);
 
 	int					initialVtxCount;	//!< Anzahl der Vertizen bevor sie bearbeitet wurden.
 
-	//BPT_Helpers			helper;	//hat hilfsprozeduren, und ist öffentlich (dies ist ein reminder )
+	//BPT_Helpers			helper;	//hat hilfsprozeduren, und ist ffentlich (dies ist ein reminder )
 
-	bool				deallocUVs;		//!< sollen die UVDaten mit der zerstörung des creators ebenfalls gelöscht werden oder soll das jemand anders machen? \
+	bool				deallocUVs;		//!< sollen die UVDaten mit der zerstrung des creators ebenfalls gelscht werden oder soll das jemand anders machen? \
 										default = false;
 };
 

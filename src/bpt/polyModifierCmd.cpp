@@ -153,7 +153,7 @@ MStatus polyModifierCmd::directModifier( MObject /* mesh */ )
 //
 //		Override this method in a derived class to provide an implementation for
 //		directly modifying the mesh (writing on the mesh itself). This method is
-//		only called in the case where history does not exist and history is turned
+//		only called in the case where history ds not exist and history is turned
 //		off (ie. DG operations are not desirable).
 //
 //		The argument 'MObject mesh', is not used by this base class implementation.
@@ -207,13 +207,13 @@ MStatus polyModifierCmd::doModifyPoly()
 			depNodeFn.setName(newName);
 
 			//jetzt noch die customAttributes nonKeyable machen
-			//kÃ¶nnte zu fehlern fÃ¼hren bei undo und redo ->tuts aber nicht :)
+			//koennte zu fehlern fÃ¼hren bei undo und redo ->tuts aber nicht :)
 			if(createAnimCurves)
-			{//diese Attribute kÃ¶nnen nur gesetzt werden, wenn eine BPTNode erstellt wird
+			{//diese Attribute koennen nur gesetzt werden, wenn eine BPTNode erstellt wird
 				depNodeFn.findPlug("customSlFalloff").setKeyable(false);
 			}
 			
-			// Selection vorher frei machen, weil unter umständen noch eine parameter gewählt war, welcher
+			// Selection vorher frei machen, weil unter umstnden noch eine parameter gewhlt war, welcher
 			// dann verhindert, dass die Channelbox den neuen anzeigt
 			//
 			MGlobal::clearSelectionList();
@@ -318,7 +318,7 @@ MStatus polyModifierCmd::redoModifyPoly()
 		MGlobal::select(conObj);
 
 
-		// Da das modifierNodeHandle im letzten Undo gekillt wurde, regenerieren wir diese wieder für die  nächste benutzung
+		// Da das modifierNodeHandle im letzten Undo gekillt wurde, regenerieren wir diese wieder fuer die  nchste benutzung
 		myModifierNode = conObj;
 
 	}
@@ -342,7 +342,7 @@ MStatus polyModifierCmd::undoModifyPoly()
 	else
 	{
 
-		// Merke: Das MObject zur ModifierNode sollte jetzt zerstört werden, da es ungültig wird, wenn der modifier rückgängig gemacht wird.
+		// Merke: Das MObject zur ModifierNode sollte jetzt zerstrt werden, da es ungueltig wird, wenn der modifier rueckgngig gemacht wird.
 		// Ansonsten gibts nen absturz
 		myModifierNode = MObject::kNullObj;
 
@@ -591,7 +591,7 @@ MStatus polyModifierCmd::processUpstreamNode( modifyPolyData& data )
 		// Construction history only deals with shapes, so we can grab the
 		// upstreamNodeShape off of the source plug.
 		//
-		// Dieser Bereich muss bleiben, weil diese Attribute noch benötigt werden
+		// Dieser Bereich muss bleiben, weil diese Attribute noch bentigt werden
 		data.upstreamNodeShape = data.upstreamNodeSrcPlug.node();
 		depNodeFn.setObject( data.upstreamNodeShape );
 		data.upstreamNodeSrcAttr = data.upstreamNodeSrcPlug.attribute();
@@ -1012,7 +1012,7 @@ MStatus polyModifierCmd::connectNodes( MObject modifierNode )
 //									  an actual upstreamNode exists and that is used to
 //									  drive the input of our modifierNode.
 //
-//									  Otherwise, if the node does not have history, the
+//									  Otherwise, if the node ds not have history, the
 //									  meshNode is duplicated, set as an intermediate object
 //									  and regarded as our new upstreamNode which will drive
 //									  the input of our modifierNode. The case with history
@@ -1090,7 +1090,7 @@ MStatus polyModifierCmd::connectNodes( MObject modifierNode )
 	}
 	else
 	{
-		//hier müssen die Plugs verwendet werden, weil die Attribute eventuell multis sind
+		//hier muessen die Plugs verwendet werden, weil die Attribute eventuell multis sind
 		
 		MPlug destPlug(modifierNode,data.modifierNodeDestAttr );
 		
@@ -1111,7 +1111,7 @@ MStatus polyModifierCmd::connectNodes( MObject modifierNode )
 	fDGModifier.connect(MPlug(modifierNode,data.modifierNodeSrcAttr), data.meshNodeDestPlug);
 	
 	
-	// Außerdem das MatrixAttribut des Meshes mit dem meshMatrix Attr der Node verbinden
+	// Ausserdem das MatrixAttribut des Meshes mit dem meshMatrix Attr der Node verbinden
 	//
 	MFnDependencyNode depFn( modifierNode );
 	MPlug	meshMatrix( modifierNode, depFn.attribute("meshMatrix") );
@@ -1146,7 +1146,7 @@ MStatus polyModifierCmd::connectNodes( MObject modifierNode )
 
 	if(createAnimCurves)
 	{
-		//AnimCurve erstellen(dies ist nur hier mÃ¶glich, da die Node erst nach dem DoIt wirklich existiert (scheinbar)
+		//AnimCurve erstellen(dies ist nur hier moeglich, da die Node erst nach dem DoIt wirklich existiert (scheinbar)
 		MFnAnimCurve	aCurve;
 
 		MFnDependencyNode myDepNodeFn(modifierNode);

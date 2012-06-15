@@ -158,7 +158,7 @@ void	face::convertType3ToType2(int startCornerLocID,int endCornerLocID)
 				type = 2;
 				isControlTwo = false;
 				
-				//nachbarPtrs noch löschen
+				//nachbarPtrs noch loeschen
 
 
 				UINT a;
@@ -193,7 +193,7 @@ void	face::convertType3ToType2(int startCornerLocID,int endCornerLocID)
 						//3. wenn es ID ist, dann natürlich -888888 setzen 
 						//4. wenn es -888888 ist, dann jetziges feld -1 setzen
 						
-						//ursprung des counts zurückverfolgen, wenn möglich
+						//ursprung des counts zurückverfolgen, wenn moeglich
 						
 						for(int x = nLocIDs[a] - 1;;x--)
 						{
@@ -402,7 +402,7 @@ void	face::splitTypeMinusOne()
 
 	//FUNKTIONSWEISE: Face wird datentechnisch zu face Typ 4 gemacht und dann bearbeitet
 
-	//erstmal werden die CornerEdges gelöscht, für den Fall
+	//erstmal werden die CornerEdges geloescht, für den Fall
 	//printArray(corners," = corners");
 
 	corners.clear();
@@ -499,7 +499,7 @@ void	face::splitTypeMinusOne()
 
 
 
-	//letzten Vtx von [3] runterschmeißen, damit kein Face doppelt erstellt wird
+	//letzten Vtx von [3] runterschmeissen, damit kein Face doppelt erstellt wird
 	vtxPerCorner[last].remove(vtxPerCorner[last].length()-1);
 	newVtxOrder.clear();
 	
@@ -523,7 +523,7 @@ void	face::splitTypeMinusOne()
 	vtxPerCorner[second].remove(0);
 
 	
-	//Jetzt Faces zwischen den Bounds erstllen, falls nötig
+	//Jetzt Faces zwischen den Bounds erstllen, falls noetig
 	if(rBound-lBound > 0)
 		createInnerCornerPolys(lBound,rBound,centerVtx,vtxPerCorner[first],newVtxOrder);
 	
@@ -660,7 +660,7 @@ void	face::splitNormalTwo()
 
 	if(change < 0 )//|| change > 1)
 	{
-		//cout<<"SPLIT_NORMAL_TWO: "<<"ERROR: CHANGE war "<<change<<" BRECHE SPLIT FÜR DIESES FACE AB"<<endl;
+		//cout<<"SPLIT_NORMAL_TWO: "<<"ERROR: CHANGE war "<<change<<" BRECHE SPLIT FUER DIESES FACE AB"<<endl;
 		doIt = false;
 	}
 	if(doIt)
@@ -715,7 +715,7 @@ void	face::createType2Corner4Faces(int origLBound,
 			//-------------------------ORIG_FACE_ÄNDERN--------------------------------
 			MIntArray	newVtxOrder;
 			
-			//Wenn Edge dazwischen liegt, müssen alle ihre Vtx außer 0 benutzt werden
+			//Wenn Edge dazwischen liegt, müssen alle ihre Vtx ausser 0 benutzt werden
 			int l;
 			
 			
@@ -729,7 +729,7 @@ void	face::createType2Corner4Faces(int origLBound,
 			}
 			
 			
-			//jetzt alle Verts dieser CEdge richtung 0 (außer 0 selbst) von lBound aus hinzufügen
+			//jetzt alle Verts dieser CEdge richtung 0 (ausser 0 selbst) von lBound aus hinzufügen
 			for(i = 0; i <= origLBound; i++)
 			{
 				newVtxOrder.append(vtxPerCornerStart[i]);
@@ -889,7 +889,7 @@ void		face::SplitTypeOne()
 				vtxPerCorner[2].clear();
 				vtxPerCorner[3].clear();
 				
-				//VtxPerCorner ist nun bereit, jetzt noch cornerData anpassen, es werden nur aktuelle Längen benötigt
+				//VtxPerCorner ist nun bereit, jetzt noch cornerData anpassen, es werden nur aktuelle Längen benoetigt
 				cornerData[2] = vtxPerCorner[0].length();
 				cornerData[4] = vtxPerCorner[1].length();
 				numCorners = 2;
@@ -958,7 +958,7 @@ void		face::SplitTypeOne()
 
 		numCorners = 4;
 		endCornerEdgeID = (startCornerEdgeID + 2)%numCorners;
-		//cornerData wird eigentlich nicht benötigt
+		//cornerData wird eigentlich nicht benoetigt
 
 	}
 	*/
@@ -1004,7 +1004,7 @@ void		face::SplitTypeOne()
 	//nun die eigentliche SplitArbeit machen, entsprechend des cornerCounts
 	
 	//jetzt Slide zu neuem Vtx hinzufügen
-	//erst datenObject aufbauen, alles außer start/endAbsIDs und nachbarID egal
+	//erst datenObject aufbauen, alles ausser start/endAbsIDs und nachbarID egal
 	int middleID = (vtxPerCorner[endCornerEdgeID].length() - 1)/2;
 	int fakeNachbarID;
 	//locID von erstem nachbarn finden
@@ -1025,7 +1025,7 @@ void		face::SplitTypeOne()
 
 	//wenn returnCode 1 ist, dann slide erstellen
 	//wenn dreiecke dabei sind, dürfen diese keinen slide erhalten (erstmal), da die slides dann fehlerhaft sind
-	//Allderdings ist das nicht die eleganteste Lösung, da die Ursache füra problem ja in den Daten liegt
+	//Allderdings ist das nicht die eleganteste Loesung, da die Ursache füra problem ja in den Daten liegt
 	//allerdings funzt das hier ganz gut :)
 	if(isDirectionStored(data) == 1 && vtx.length() != 3)
 	{
@@ -1166,7 +1166,7 @@ void		face::SplitTypeOne()
 				creator->changeNormals(id,newVtxOrder,false, true);
 
 
-			//letzten Vtx von [3] runterschmeißen, damit kein Face doppelt erstellt wird
+			//letzten Vtx von [3] runterschmeissen, damit kein Face doppelt erstellt wird
 			vtxPerCorner[last].remove(vtxPerCorner[last].length()-1);
 			newVtxOrder.clear();
 
@@ -1189,7 +1189,7 @@ void		face::SplitTypeOne()
 			vtxPerCorner[second].remove(0);
 
 
-			//Jetzt Faces zwischen den Bounds erstllen, falls nötig
+			//Jetzt Faces zwischen den Bounds erstllen, falls noetig
 			if(rBound-lBound > 0)
 				createInnerCornerPolys(lBound,rBound,centerVtx,vtxPerCorner[first],newVtxOrder);
 
@@ -1218,7 +1218,7 @@ void		face::SplitTypeOne()
 				creator->changeNormals(id,newVtxOrder, false,true);
 
 
-			//letzten Vtx von [3] runterschmeißen, damit kein Face doppelt erstellt wird
+			//letzten Vtx von [3] runterschmeissen, damit kein Face doppelt erstellt wird
 			vtxPerCorner[last].remove(vtxPerCorner[last].length()-1);
 			newVtxOrder.clear();
 
@@ -1543,7 +1543,7 @@ MIntArray	face::getCornerEdgeNachbarIDs(MIntArray& nachbarSave,int FirstCornerID
 	int l = vtxPerCornerLength;
 	for(i = 0; i < l; i++)
 	{
-		//hier könnte es fehler geben: wahrscheinlich muss flag am Ende abgezogen werden, damit's funzt
+		//hier koennte es fehler geben: wahrscheinlich muss flag am Ende abgezogen werden, damit's funzt
 		if(nachbarIDs[(i+offset)%nl] >= 0)
 		{
 			nachbarSave.append(nachbarIDs[(i+offset)%nl]);
@@ -2111,7 +2111,7 @@ int		face::getType()
 		}
 		else
 		{
-			type = -1;		//-1 Typ blockt alle slideAnfragen, muss extra bearbeitet werden, weil navigation hier nur ohne corneredges möglich
+			type = -1;		//-1 Typ blockt alle slideAnfragen, muss extra bearbeitet werden, weil navigation hier nur ohne corneredges moeglich
 		}
 	}
 	numNachbarn = realNachbarCount;
@@ -2129,7 +2129,7 @@ int		face::getType()
 }
 
 //----------------------------------------------------------
-int		face::doesVtxExist(int inID)
+int		face::dsVtxExist(int inID)
 //----------------------------------------------------------
 {
 			////cout<<"BIN IN DOES VtX EXIST"<<endl;
@@ -2272,7 +2272,7 @@ int		face::findNextValidNachbarLocID(int index)
 void	face::pokeFace()
 //----------------------------------------------------------
 {
-	//geht durch die VtxList und erstellt soviele Quads wie möglich
+	//geht durch die VtxList und erstellt soviele Quads wie moeglich
 	int centerVtx = creator->createCenterVtx(id);
 
 
@@ -2508,11 +2508,11 @@ void	face::createDirections(dData& data)
 //-------------------------------------------------
 {
 	//Type in Data bedenken: wenn Data von gleichgestelltem Face, bleibt sie unverändert erhalten und Face nimmt sie an
-	//CORNERS WERDEN NICHT VERTAUSCHT: SIE FUNGIEREN ALS BOUNDARY FÜR DIE DIRECTION
+	//CORNERS WERDEN NICHT VERTAUSCHT: SIE FUNGIEREN ALS BOUNDARY FUER DIE DIRECTION
 	
 	//WENN DIE DIRECTION GEGEN DIE GENERELLE RICHTUNG DER VTX IST; DANN <<isFlipped>> WERT in <<data>> true setzen
 
-	//Directions können nur von Typ 1 und typ 2 Control erzeugt werden
+	//Directions koennen nur von Typ 1 und typ 2 Control erzeugt werden
 
 	switch(type)
 	{
@@ -2787,7 +2787,7 @@ void	face::processCornerEdges(MIntArray& processedVtx,MIntArray& newVtxCount,MIn
 	//Zum schluss noch den processedVtx Array richtigstellen mit hilfe tmpCornerStarts
 	//letztes element ist anzahl der CornerEdges
 	processedVtx.append(numCorners);
-	//letztes Element von tmpcornerstarts ist unnötig
+	//letztes Element von tmpcornerstarts ist unnoetig
 	cornerCount = numCorners - 1;
 	for(i = cornerCount; i != 0 ;i--)
 	{
@@ -2874,7 +2874,7 @@ MIntArray	face::createCompleteCornerEdgeArray(int cornerStartID,int l,int i,MInt
 void	face::splitType4()
 //----------------------------------------------------------
 {
-	//!!!!!!!BEACHTEN: DIESE PROCEDUR (FACESPLIT) AUFRÜSTEN; SO DASS SIE NICHT NUR MIT 4CORNERCOUNTS UMGEHEN KANN
+	//!!!!!!!BEACHTEN: DIESE PROCEDUR (FACESPLIT) AUFRUESTEN; SO DASS SIE NICHT NUR MIT 4CORNERCOUNTS UMGEHEN KANN
 	 // durch nachbarIDs iterieren und Punkte sammeln
 
 							//!!!!!!!BEACHTEN: Nur in zweierschritten durchsteppen: {lokaleID,AbsoluteID}{L,A}usw
@@ -2895,15 +2895,15 @@ void	face::splitType4()
 	MIntArray newVtxCount(4,0);	//muss initialiseirt werden mit 4,0
 	
 	//cout<<"Bin vor ProcessCornerEdges"<<endl;
-	//Macht die ganze Arbeit und erstellt Vertizen, wenn nötig
+	//Macht die ganze Arbeit und erstellt Vertizen, wenn noetig
 	processCornerEdges(processedVtx,newVtxCount,cornerData);	//newVtxCount pro Corner
 
 	//printArray(processedVtx," = PROCESSEDVtx");
 	//printArray(cornerData," = CornerDATA");
 	
 
-	//jetzt durchs temparray steppen und Faces erstellen, möglichst quads
-	//zuerst Schätzung einholen, wieviele Quads und triangles erstellt werden können, dies ermäglicht eine gewisse Einteilung der Vtx
+	//jetzt durchs temparray steppen und Faces erstellen, moeglichst quads
+	//zuerst Schätzung einholen, wieviele Quads und triangles erstellt werden koennen, dies ermäglicht eine gewisse Einteilung der Vtx
 
 	
 	//l = processedVtx.length();
@@ -2967,7 +2967,7 @@ void	face::splitType4()
 
 		creator->changeNormals(id,newVtxOrder, false, true);
 
-	//letzten Vtx von [3] runterschmeißen, damit kein Face doppelt erstellt wird
+	//letzten Vtx von [3] runterschmeissen, damit kein Face doppelt erstellt wird
 	vtxPerCorner[last].remove(vtxPerCorner[last].length()-1);
 	newVtxOrder.clear();
 	
@@ -2990,7 +2990,7 @@ void	face::splitType4()
 	vtxPerCorner[second].remove(0);
 
 	
-	//Jetzt Faces zwischen den Bounds erstllen, falls nötig
+	//Jetzt Faces zwischen den Bounds erstllen, falls noetig
 	if(rBound-lBound > 0)
 		createInnerCornerPolys(lBound,rBound,centerVtx,vtxPerCorner[first],newVtxOrder);
 	
@@ -3123,7 +3123,7 @@ void	face::createInnerCornerPolys(int lBound,int rBound,int centerVtx,MIntArray&
 {
 
 	int	add = 2;
-	//Jetzt Faces zwischen den Bounds erstllen, falls nötig
+	//Jetzt Faces zwischen den Bounds erstllen, falls noetig
 	for(int i = lBound;i < rBound; )
 	{
 		newVtxOrder.clear();
@@ -3162,7 +3162,7 @@ void 	face::createVtx(MIntArray& tmpFaceVtx,int startLocID, int endLocID,int rea
 	//erstmal Checken, ob nachbar schon Vtx erstellt hat oder den eigenen Slot gesetzt hat -> im Grunde braucht man den Nachbarn gar nicht zu fragen, da er den eigenen Slot setzt
 	int newVtxID;
 	////cout<<"CREATE_VTX: "<<"Existiert Vtx Check: startLocID = "<<realStartLocID<<endl;
-	//int existingVtx = nachbarn[realStartLocID]->doesVtxExist(id);
+	//int existingVtx = nachbarn[realStartLocID]->dsVtxExist(id);
 	bool	useSlide = false; //useSlide wird von folgender GatherSlideInfo gesetzt
 	//createVtx sucht automatisch nach geeigneten SlideWerten und gibt entsprechende werte an "newVtxBetweenIDs"
 //	bool tmpSlide;	//nur zum testen, später muss dann <<useSlide>> benutzt werden
@@ -3173,7 +3173,7 @@ void 	face::createVtx(MIntArray& tmpFaceVtx,int startLocID, int endLocID,int rea
 		dData	bakDat = data;
 	//	printData("PreSlideDATA: ",data);
 		useSlide = gatherSlideData(data);
-	//	cout<<"SLIDEDATEN FÜR FACE "<<id<<endl;
+	//	cout<<"SLIDEDATEN FUER FACE "<<id<<endl;
 	//	cout<<"SLIDE ERLAUBT? "<<useSlide<<endl;
 	//	printData("FinalSlideDATA: ",data);
 		if(!useSlide)
@@ -3208,7 +3208,7 @@ void 	face::createVtx(MIntArray& tmpFaceVtx,int startLocID, int endLocID,int rea
 	}
 	else
 	{
-		//wenn Vtx schon existiert, wurden auch schon slideWerte hinzugefügt, wenn möglich, dies hier also nicht machen
+		//wenn Vtx schon existiert, wurden auch schon slideWerte hinzugefügt, wenn moeglich, dies hier also nicht machen
 		
 		
 		//Um UVs zu erzeugen, muss hier extra der creator aufgerufen werden
@@ -3235,9 +3235,9 @@ int		face::processMultiVtxNachbar(MIntArray& tmpFaceVtx,int vertsZwischenIDs,int
 //--------------------------------------------------------------------------------------------------------------------
 {
 	//Gibt 1 zurück, wenn er neuen Vtx erstellt hat
-	//!!!!!!!!!!!!!!!!!!!AUFRÜSTEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//!!!!!!!!!!!!!!!!!!!AUFRUESTEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//Diese Methode kann momentan noch nicht mit SLIDE umgehen
-	//!!!!!!!!!!!!!!!!!!!AUFRÜSTEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//!!!!!!!!!!!!!!!!!!!AUFRUESTEN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	int		nIDLength = vtx.length() ;//- 1;	//hier gleich letzten Flag abziehen
 	int		madeNewVtx = 0;
@@ -3261,14 +3261,14 @@ int		face::processMultiVtxNachbar(MIntArray& tmpFaceVtx,int vertsZwischenIDs,int
 		data.endAbsID = vtx[(middleVtx + 1)%nIDLength];
 
 		useSlide = gatherSlideData(data);
-	//	cout<<"SLIDEDATEN FÜR FACE(MULTI_VTX) "<<id<<endl;
+	//	cout<<"SLIDEDATEN FUER FACE(MULTI_VTX) "<<id<<endl;
 	//	cout<<"SLIDE ERLAUBT? "<<useSlide<<endl;
 	//	printData("FinalSlideDATA: ",data);
 
 		//es ist ungerade, also mittelsten Vtx hinzufügen, aber die davor erstmal auf Array tun, dann newVtx, dann die Danach
 		for(int a = startLocID+1; a < myL; a++)
 		{
-			//jedes mal auf bereichsüberschreitungen achten und Flags ausschließen
+			//jedes mal auf bereichsüberschreitungen achten und Flags ausschliessen
 			mA = a % nIDLength;
 			
 			
@@ -3329,7 +3329,7 @@ int		face::processMultiVtxNachbar(MIntArray& tmpFaceVtx,int vertsZwischenIDs,int
 
 		for(int a = startLocID+1; a < myL; a++)
 		{
-			//jedes mal auf bereichsüberschreitungen achten und Flags ausschließen
+			//jedes mal auf bereichsüberschreitungen achten und Flags ausschliessen
 			mA = a % nIDLength;
 			
 			
@@ -3364,7 +3364,7 @@ bool	face::gatherSlideData(dData& data)
 //-------------------------------------------------
 {
 	//Generell sind 2 Dinge zu beachten: Man müsste den IdentifikationsCode für die SlideDirektinosquelle speichern, 
-	//um im Nachhinein unberechtigt erstellte Slides (weil z.B die andere Seite blockiert ist (code -1) ) entfernen zu können
+	//um im Nachhinein unberechtigt erstellte Slides (weil z.B die andere Seite blockiert ist (code -1) ) entfernen zu koennen
 	//Zweitens muss die fty zuerst die ControlFaces herausfiltern und diese zuerst Engagen, damit nicht die eine Seite von Face
 	//direction von anderer quelle erhält als die andere Seite
 	dData bakData,tmpData;
@@ -3374,13 +3374,13 @@ bool	face::gatherSlideData(dData& data)
 	int errCode;
 	switch(type)
 	{
-	case -1:	//gibt nur false zurück, da slide nicht möglich ist
+	case -1:	//gibt nur false zurück, da slide nicht moeglich ist
 		{
 			return false;
 		}
 	case 4:
 		{
-		//Typ 4 gibt einfach false zurück, außerdem verändert es dData nicht
+		//Typ 4 gibt einfach false zurück, ausserdem verändert es dData nicht
 		return false;
 		}
 	case 3:
@@ -3532,7 +3532,7 @@ bool	face::gatherSlideData(dData& data)
 	case 1:
 		{
 			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			//MERKE: TYP 1 SPLIT IST ETWAS AUFWENDIGER; DA GEGENÜBERLIEGENDE SEITE NICHT IN "NACHBARN" AUFGEFÜHRT IST
+			//MERKE: TYP 1 SPLIT IST ETWAS AUFWENDIGER; DA GEGENUEBERLIEGENDE SEITE NICHT IN "NACHBARN" AUFGEFUEHRT IST
 			//		SPLIT MUSS EXTRAREGEL ERHALTEN
 			//ist grundsätzlich befugt, SlideDirections zu erstellen, wird aber von jedem anderen controlFace überstimmt
 			tmp = isDirectionStored(data);
@@ -3585,7 +3585,7 @@ int		face::requestDirections(dData& data)
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//Zum schluss von Request muss noch die direction selbst aus den gewonnenen daten extrahiert werden
 	//für den fall, dass zurückgegebene Vtx nicht mit den gegebenen übereinstimmen (WESHALB AM ANFANG EINES REQUESTS
-	//AUCH ERST NOCH EIN BACKUP VON DATA GEMACHT WERDEN MUSS FÜR DEN SPÄTEREN VERGLEICH
+	//AUCH ERST NOCH EIN BACKUP VON DATA GEMACHT WERDEN MUSS FUER DEN SPÄTEREN VERGLEICH
 	dData locData,tmpData;		//bakData = BackupData für späteren vergleich
 	int tmp;
 	int code;
@@ -3620,7 +3620,7 @@ int		face::requestDirections(dData& data)
 				return 1;
 			}
 
-			//darf selbst entscheiden in Richtung mit beiden nachbarn. convertToOpposite muss ERCode ausgeben können
+			//darf selbst entscheiden in Richtung mit beiden nachbarn. convertToOpposite muss ERCode ausgeben koennen
 			locData = convertData(data,errCode);
 			
 			//printData("DATA CONVERTED TYPE 3: ",locData);
@@ -3720,7 +3720,7 @@ int		face::requestDirections(dData& data)
 				}
 				else
 				{
-					tmp = isDirectionStored(locData);	//hat die daten bereits geflipped, wenn nötig
+					tmp = isDirectionStored(locData);	//hat die daten bereits geflipped, wenn noetig
 					if(tmp)
 					{
 						//data wurde bereits entsprechend angepasst
@@ -3894,7 +3894,7 @@ dData	face::convertData(dData& data, int& errCode)
 
 	//die Corners müssen noch in die richtige Reihenfolge gebracht werden, damit convert to opposite 
 	//richtig funzt
-	//außerdem muss gecheckt werden, ob <<isFlipped>> relativ zu diesem Face korrekt ist, wenn ja, ändern
+	//ausserdem muss gecheckt werden, ob <<isFlipped>> relativ zu diesem Face korrekt ist, wenn ja, ändern
 
 	myData.startLocCorner = findVtxIndex(myData.startAbsCorner);
 
@@ -3959,7 +3959,7 @@ dData	face::convertData(dData& data, int& errCode)
 int		face::convertToOpposite(dData& dataa)
 //-------------------------------------------------
 {
-	//Rückgabewert ist ErrCode: -2 == plötzlich mindestens 2 Nachbarn pro CornerEdge -->OBSOLETE
+	//Rückgabewert ist ErrCode: -2 == ploetzlich mindestens 2 Nachbarn pro CornerEdge -->OBSOLETE
 							//	in dem Fall müssten die gefundenen Nachbarn analysiert und eventuell engaged werden, so dass
 							//	sie nen slidewert sich selbst erstellen, alles von dieser Procedur aus
 
@@ -3967,7 +3967,7 @@ int		face::convertToOpposite(dData& dataa)
 	//!Problematisch wirds generell, wennŽs mehrere Nachbarn an der gefundenen CornerEdge gibt
 	//DIESE METHODE GEHT DAVON AUS; DAS SICH DER <<isFlipped>> WERT AKTUELL IST; SICH ALSO AUF DIESES FACES BEZIEHT 
 
-	//WENN DATA VON MULTIVTX FACE, DANN IST DAS FÜR CONVERT TO OPPPOSITE KEIN PROBLEM, DA DIESE METHODE HAUPTSÄCHLICH
+	//WENN DATA VON MULTIVTX FACE, DANN IST DAS FUER CONVERT TO OPPPOSITE KEIN PROBLEM, DA DIESE METHODE HAUPTSÄCHLICH
 	//VON CORNEREDGES AUSGEHT; WELCHE JA AUCH BEI MULTIVTX FACES KORREKT IST
 	int tmp;
 	int nStartVtx,nEndVtx;		//start/endVtx des gefundenen Nachbarn
@@ -3994,7 +3994,7 @@ int		face::convertToOpposite(dData& dataa)
 		}
 	case 4:
 		{
-			//erst die StartIDs der Übernächsten Corners finden
+			//erst die StartIDs der UEbernächsten Corners finden
 			findOppositeCorner(dataa.endLocCorner,2,currentCorner,nextCorner);
 			break;
 		}
@@ -4010,10 +4010,10 @@ int		face::convertToOpposite(dData& dataa)
 		numCVtx = getCornerEdgeVtxCount(currentCorner,nextCorner);
 		numCNachbarn = getNumCornerEdgeNachbarn(currentCorner,numCVtx); 
 
-//wenn mehr als 1 nachbar oder kein nachbar (bei typ 3 möglich), dann blocken, ansonsten Start/EndVtx herausfinden
+//wenn mehr als 1 nachbar oder kein nachbar (bei typ 3 moeglich), dann blocken, ansonsten Start/EndVtx herausfinden
 			if(numCNachbarn > 1 || numCNachbarn == 0)
 			{
-				//cout<<"CONVERT TO OPPOSITE: KEINE GÜLTIGE OPPOSITE! ABBRUCH!"<<endl;
+				//cout<<"CONVERT TO OPPOSITE: KEINE GUELTIGE OPPOSITE! ABBRUCH!"<<endl;
 				return -1;
 			}
 			else
@@ -4050,7 +4050,7 @@ int		face::convertToOpposite(dData& dataa)
 					dataa.isFlipped = false;
 				}
 				
-				//jetzt noch alles dem DatenObjekt zuweisen ( WOBEI DIE LOKALEN IDS EIGENTLICH NICHT GESETZT WERDEN MÜSSEN)
+				//jetzt noch alles dem DatenObjekt zuweisen ( WOBEI DIE LOKALEN IDS EIGENTLICH NICHT GESETZT WERDEN MUESSEN)
 				//dataa.startLocID = nStartVtx;
 				dataa.startAbsID = vtx[nStartVtx];
 				

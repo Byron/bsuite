@@ -102,25 +102,25 @@ using std::vector;
 
 
 // Typedefs
-typedef	std::pair<double, int> wp;		//!< == WeightPair - double als Key, int als dazugehörige localID fürs PositionArray des vtxSets
+typedef	std::pair<double, int> wp;		//!< == WeightPair - double als Key, int als dazugehrige localID fuers PositionArray des vtxSets
 
 
 namespace BPT
 {
 
-	/** Die softTransformationEngine implementiert eine generische Klasse, welche die weiche Transformation von Vertizen ermöglicht
+	/** Die softTransformationEngine implementiert eine generische Klasse, welche die weiche Transformation von Vertizen ermglicht
 
 	@remarks
-		Die STE kann leicht an beliebige nodes gehäftet werden, so dass diese softTransformationFähigkeiten 
-		erhält.
+		Die STE kann leicht an beliebige nodes gehftet werden, so dass diese softTransformationFhigkeiten 
+		erhlt.
 
 	@par
-		Sie unterstützt 2 Modi: 
+		Sie unterstuetzt 2 Modi: 
 	*		-Transformation anhand von parentVtx 
 	*		-Transformation anhand einer Matrix
 
 	@par
-		Integriert wird sie mithilfe von Macros (leider nötig aufgrund von Limitationen), welche in Macros.h definiert sind.
+		Integriert wird sie mithilfe von Macros (leider ntig aufgrund von Limitationen), welche in Macros.h definiert sind.
 	  
 	*/
 	
@@ -158,17 +158,17 @@ namespace BPT
 		// Werden von der abgeleiteten Node definiert (eindeutig)
 
 		//---------------------------
-		//	ÖFFENTLICHE METHODEN
+		//	OEFFENTLICHE METHODEN
 	public:
 		//---------------------------
 
 		MStatus	extractNonstaticData(	const MPlug& plug, 
 										MDataBlock& data);					//!< liest die Atttribute der SoftTransformationEngine, 
-																			//!< so dass alle methoden darauf zugreifen können - nur die, die sich ständig verändern können
+																			//!< so dass alle methoden darauf zugreifen knnen - nur die, die sich stndig verndern knnen
 																			
 		MStatus	extractStaticData(const MPlug& plug, MDataBlock& data);		//!< liest die VtxOrigPos, so vorhanden, und das VtxSet
 
-		void	doTweak(MDataBlock& data);									//!< führt die eigentliche Transformation durch und setzt outWeights
+		void	doTweak(MDataBlock& data);									//!< fuehrt die eigentliche Transformation durch und setzt outWeights
 
 		void	setVtxSet(MDataBlock& data);								//!< erstellt aus den Daten eine ComponentList 
 
@@ -204,7 +204,7 @@ namespace BPT
 		private:
 		// **********************
 		
-		meshStatus	getMeshStatus();				//!< Gibt den gegenwärtigen status des meshes zurück
+		meshStatus	getMeshStatus();				//!< Gibt den gegenwrtigen status des meshes zurueck
 
 		bool		nodeStatusAllowsDrawing();		//!< Analysiert den status der BPTNode und entscheidet, ob gezeichnet werden darf
 
@@ -228,7 +228,7 @@ namespace BPT
 	private:
 		//---------------------------
 
-		bool	rebuildTweakArrays();					//!< Baut sämtliche Arrays neu auf, die für die gewichtete Transformation benötigt werden
+		bool	rebuildTweakArrays();					//!< Baut smtliche Arrays neu auf, die fuer die gewichtete Transformation bentigt werden
 		
 		void	recalculateTweakScaleFactors( );		//!< Resampled die linearen Weights
 
@@ -245,7 +245,7 @@ namespace BPT
 		void	generateEdgeWeights(const MIntArray& vtxSet, 
 									uint ringNumber, 
 									MItMeshVertex& inVertIter,
-									int minID = -1);	//!< berechnet und setzt die weights für einen growRing
+									int minID = -1);	//!< berechnet und setzt die weights fuer einen growRing
 
 		// EdgeLength
 		void	copyArrayPartial(	MIntArray& copyTo, 
@@ -271,14 +271,14 @@ namespace BPT
 
 
 		//---------------------------
-		//	ÖFFENTLICHE VARIABLEN
-	public:	// - werden von idleEvent aus geändert
+		//	OEFFENTLICHE VARIABLEN
+	public:	// - werden von idleEvent aus gendert
 		//---------------------------
 
 		bool	mayCreateIdleEvent;
 
 		//---------------------------
-		//	Geschützte VARIABLEN
+		//	Geschuetzte VARIABLEN
 	protected:
 		//---------------------------
 
@@ -292,14 +292,14 @@ namespace BPT
 
 
 		
-		//* Hält die Daten, welche die Vertizen betreffen
+		//* Hlt die Daten, welche die Vertizen betreffen
 		struct	vertexData
 		{
-			MIntArray	vtxSet;		//!< Vertizen, die gewählt sind - von denen der Falloff ausgehen soll
+			MIntArray	vtxSet;		//!< Vertizen, die gewhlt sind - von denen der Falloff ausgehen soll
 
-			MIntArray	potVtx;		//!< Potentielle Vertex - die Vtx, die durch die SoftSelection transformiert werden dürfen
+			MIntArray	potVtx;		//!< Potentielle Vertex - die Vtx, die durch die SoftSelection transformiert werden duerfen
 			
-			MPointArray	vtxOrigPos;	//!< originalPositionen der Vertizen im VtxSet - wird benötigt, um direction zu errechnen, PosCache
+			MPointArray	vtxOrigPos;	//!< originalPositionen der Vertizen im VtxSet - wird bentigt, um direction zu errechnen, PosCache
 			
 		
 		}	vd;
@@ -307,18 +307,18 @@ namespace BPT
 
 
 
-		//* Hält die TweakDaten
+		//* Hlt die TweakDaten
 		struct	tweakData
 		{
 			MIntArray vtx;					//!< TweakVtx - Alle VertexIDs, die durch die softSelection transformiert werden sollen
 
 			vector<MIntArray> pVtxPosID;	//!< Index in das vtxOrigPos Array, um die originalPosition zu erhalten
 		
-			vector<MDoubleArray> weights;	//!< Array mit den Weights, per Vtx, die die Stärke der Transformation bestimmen - sie sind bereits resampled
+			vector<MDoubleArray> weights;	//!< Array mit den Weights, per Vtx, die die Strke der Transformation bestimmen - sie sind bereits resampled
 
 			vector<MDoubleArray> bWeights;	//!< BasicWeigths - lineare Wichtungen anhand der distanz zum ParentVtx
 
-			MVectorArray normals;			//!< Enhält die normalWectoren, und deren länge kodiert die Größe des Faces - so wird speicher gespart zu moderaten CPU kosten
+			MVectorArray normals;				
 
 			MVectorArray pNormals;			//!< ParentNormals, aufbau/kodierung wie die normals
 
@@ -331,14 +331,14 @@ namespace BPT
 		}	td;
 
 
-		//* nodeData - hält alle attribute der Node
+		//* nodeData - hlt alle attribute der Node
 		struct	nodeData			
 		{
 			double	distance;		//!< radius des falloffs
 
-			double	push;			//!< push/pullWert - entlang der normale des Faces, wahlweise relativ zur größe des Faces oder nicht
+			double	push;			//!< push/pullWert - entlang der normale des Faces, wahlweise relativ zur grsse des Faces oder nicht
 
-			bool	pushSizeRelative;	//!< Relativ zur Größe des Faces oder nicht?
+			bool	pushSizeRelative;	//!< Relativ zur Grsse des Faces oder nicht?
 
 			short	fType;			//!< Typ des Falloffs (smooth, linear ... )
 
@@ -354,15 +354,15 @@ namespace BPT
 
 			bool	useMatrixRotation;	//!< Wenn an, dann wird die matrix verwendet, um die tweakVtx zu transformieren
 
-			MObject	outMesh;		//!< das gegenwärtige Mesh - outMesh
-			MObject	inMesh;			//!< das gegenwärtige Mesh - inMesh
+			MObject	outMesh;		//!< das gegenwrtige Mesh - outMesh
+			MObject	inMesh;			//!< das gegenwrtige Mesh - inMesh
 
-			MMatrix matrix;			//!< Matrix, für rotation/translations/Skalierung - nur für softTransformationNode
+			MMatrix matrix;			//!< Matrix, fuer rotation/translations/Skalierung - nur fuer softTransformationNode
 
 		}	nd;
 
 
-		/** Diese Struct hält die Daten, welche in der DrawMethode gerufen werden
+		/** Diese Struct hlt die Daten, welche in der DrawMethode gerufen werden
 
 		*/
 		struct	drawData
@@ -370,21 +370,26 @@ namespace BPT
 			MColor	vtxColor1;		//!< Erste VtxFarbe
 			MColor	vtxColor2;		//!< Zweite VtxFarbe
 
-			float	pointSize;		//!< Größe der VertexPoints
+			float	pointSize;		//!< Grsse der VertexPoints
 
 			meshStatus	mstat;		//!< Status des Meshes
 
-			GLuint	list;			//!< Speicher für die display List
+			GLuint	list;			//!< Speicher fuer die display List
+			
+			drawData()
+				: vtxColor1(0.0f, 0.0f)
+				, vtxColor2(0.0f, 0.0f)
+			{}
 
 		} dd;
 
 
-		//!< Diese struct hält einen cache, umd die edgeDistanceParameterChanges effizienter verarbeiten zu können
+		//!< Diese struct hlt einen cache, umd die edgeDistanceParameterChanges effizienter verarbeiten zu knnen
 		struct	edgeCache
 		{	
 			
 			// VARIABLEN		
-			MIntArray	ringCounts;							//!< Hält die Zahl an Vertizen pro ring - um einen Zugriff zu ermöglichen
+			MIntArray	ringCounts;							//!< Hlt die Zahl an Vertizen pro ring - um einen Zugriff zu ermglichen
 
 
 		} ec;
@@ -400,7 +405,7 @@ namespace BPT
 		bool			isMatrixMode;		//!< Ist true, wenn eine TransformationMatrix vorhanden ist, und diese zur transformation verwendet werden soll
 
 
-		// Jetzt kommen die backup variablen, um zwischen zwei Zyclen vergleichen zu können
+		// Jetzt kommen die backup variablen, um zwischen zwei Zyclen vergleichen zu knnen
 		double	lastDistance;
 		short	lastFType;
 		long	lastMaxWeights;
@@ -411,16 +416,16 @@ namespace BPT
 		double	maxScale;
 		
 
-		MDoubleArray wa;		//!< WeightArray für die normalisierten weights, welches für die visualisierung verwendet wird
+		MDoubleArray wa;		//!< WeightArray fuer die normalisierten weights, welches fuer die visualisierung verwendet wird
 
 		// ---------------------------------------------------------------------------------------------------------------------------------------------------------
 		// MObjects, weil pro plugin nur ein statisches MObject mit dem selben namen existieren darf pro node.
-		// Da hier mehrere Nodes dieselbe STE Basis haben, sind die statischen MObjects nicht mehr einzigartig und müssen demnach von der 
+		// Da hier mehrere Nodes dieselbe STE Basis haben, sind die statischen MObjects nicht mehr einzigartig und muessen demnach von der 
 		// abgeleiteten Klasse definiert werden
 		// ---------------------------------------------------------------------------------------------------------------------------------------------------------
 
-		MObject	outMesh;		//!< Dies ist ein handle zum outMeshAttr - dies ist leider nötig, da das outMeshAttr nen einzigartigen Namen haben muss und deshalb
-								//!< von der übergeordneten Node definiert werden muss
+		MObject	outMesh;		//!< Dies ist ein handle zum outMeshAttr - dies ist leider ntig, da das outMeshAttr nen einzigartigen Namen haben muss und deshalb
+								//!< von der uebergeordneten Node definiert werden muss
 		MObject inMesh;
 
 		MObject inMatrix;

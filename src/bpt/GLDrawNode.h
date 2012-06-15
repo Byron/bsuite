@@ -42,7 +42,7 @@
 
 
 
-// Diese Node enthält alles was man braucht, um mit openGl zu zeichnen
+// Diese Node enthlt alles was man braucht, um mit openGl zu zeichnen
 //
 #include <GL/glu.h>
 
@@ -51,12 +51,12 @@ namespace BPT
 {
 
 
-/* *	Hierbei handelt es sich um eine abstrakte Klasse, welche sich bei Byronimo ( dem Verteiler für drawEvents )
+/* *	Hierbei handelt es sich um eine abstrakte Klasse, welche sich bei Byronimo ( dem Verteiler fuer drawEvents )
 		registriert.
 
 		@remarks
-			So wird es einer normalen dependNode ermöglicht, in den viewPort zu zeichnen.
-			All dies geschieht intern, so dass keine Fehlerträchtigen connections gemacht werden müssen
+			So wird es einer normalen dependNode ermglicht, in den viewPort zu zeichnen.
+			All dies geschieht intern, so dass keine Fehlertrchtigen connections gemacht werden muessen
 */
 
 //#################################################
@@ -72,8 +72,8 @@ namespace BPT
 public:
 //------------------------------
 	
-	/** Registriert sich bei den BGlobals mit seinem Pointer, so dass von dort aus dann drawCommands über
-		den Pointer an die abgeleitete Klasse gesendet werden können.
+	/** Registriert sich bei den BGlobals mit seinem Pointer, so dass von dort aus dann drawCommands ueber
+		den Pointer an die abgeleitete Klasse gesendet werden knnen.
 	*/
 	GLDrawNode(){
 					// BGlobals::drawNodeQueue.insert(this);

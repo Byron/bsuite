@@ -62,7 +62,7 @@ public:
 //HAUPT METHODEN	
 //-------------------------------------
 //
-	bool	engage();	//!< startet den eigentlichen splitVorgang, gibt true zurück, wenn alles geklappt hat
+	bool	engage();	//!< startet den eigentlichen splitVorgang, gibt true zurueck, wenn alles geklappt hat
 
 
 public:
@@ -77,12 +77,12 @@ public:
 	void		setNachbarn(face*	inNachbarn,int index);
 	
 	bool		isClean();
-	int			whichType();								//!< gibt einfach den Typ des Faces zurück.
+	int			whichType();								//!< gibt einfach den Typ des Faces zurueck.
 
-	int			getType();									//!< analysiert die NodeDaten und erstellt daraus seine TypeID, gibt TypeID zurück
+	int			getType();									//!< analysiert die NodeDaten und erstellt daraus seine TypeID, gibt TypeID zurueck
 
 
-	int			doesVtxExist(int myID);						//!< Fragendes Face gibt seine ID und erhält die ID des vorhanden Vtx zurück bzw -1
+	int			dsVtxExist(int myID);						//!< Fragendes Face gibt seine ID und erhlt die ID des vorhanden Vtx zurueck bzw -1
 	void		setVtxExists(int myID,int absVtxID);		//!< nachdem Face Vtx erstellt hat, wird das Nachbarface davon in Kentnis gesetzt
 	
 	const MIntArray	getNachbarUVArray() const {return newUVs;};
@@ -95,7 +95,7 @@ public:
 //
 	bool		modifyType3(int& startCornerLocID,int& endCornerLocID);		//!< macht aus typ3 nen typ2normal, wenn an die alone edge auch typ3 grenzt
 	void		convertType3ToType2(int startCornerLocID,int endCornerLocID);
-	bool		modifyType3EdgeCheck(dData& data);							//!< gibt true zurück, wenn aloneEdge gemeinsam ist, ansonsten false;
+	bool		modifyType3EdgeCheck(dData& data);							//!< gibt true zurueck, wenn aloneEdge gemeinsam ist, ansonsten false;
 
 
 
@@ -207,19 +207,19 @@ private:
 //-------------------------------------
 //SLIDING
 //-------------------------------------
-//alle methoden, die sich um das Slding kümmern
+//alle methoden, die sich um das Slding kuemmern
 
-	bool		gatherSlideData(dData&	data);	//!< gibt true zurück, wenn slide aktiviert werden kann
+	bool		gatherSlideData(dData&	data);	//!< gibt true zurueck, wenn slide aktiviert werden kann
 	void		flipData(dData& data);			//!< flipt abs VtxIDs
-	int			isDirectionStored(dData& data);	//!< check auf gespeicherte Directions, wenn ja, gibts true zurück, flipped data automatisch, wenn nötig
-	void		storeDirection(dData& data,int code);	//!< speichert die übergebene Daten
-	void		createDirections(dData& data);	//!< erzeugt directionData für diesen Nachbarn, je nach controlFace
+	int			isDirectionStored(dData& data);	//!< check auf gespeicherte Directions, wenn ja, gibts true zurueck, flipped data automatisch, wenn ntig
+	void		storeDirection(dData& data,int code);	//!< speichert die uebergebene Daten
+	void		createDirections(dData& data);	//!< erzeugt directionData fuer diesen Nachbarn, je nach controlFace
 
 
-	int			convertToOpposite(dData& data);	//!< schreibt data so um, dass sie auf der gegenüberliegenden Edge liegt, die Direction bleibt erhalten
-	dData		convertData(dData& data,int& errCode);		//!< konvertiert Abs VtxIDs zu eigenen Lokalen VtxIDs und gibt data Obj zurück
-	int			requestDirections(dData& data);	//!< gibt Code zurück, der die Quelle der Direction definiert
-	face*		findOppositeNachbar(int myID);	//!< gibt facePtr zu gegenüberliegendem Nachbarn zurück, wenn vorhanden ansonsten NULL,
+	int			convertToOpposite(dData& data);	//!< schreibt data so um, dass sie auf der gegenueberliegenden Edge liegt, die Direction bleibt erhalten
+	dData		convertData(dData& data,int& errCode);		//!< konvertiert Abs VtxIDs zu eigenen Lokalen VtxIDs und gibt data Obj zurueck
+	int			requestDirections(dData& data);	//!< gibt Code zurueck, der die Quelle der Direction definiert
+	face*		findOppositeNachbar(int myID);	//!< gibt facePtr zu gegenueberliegendem Nachbarn zurueck, wenn vorhanden ansonsten NULL,
 	void		findOppositeCorner(int startCornerID,int iterCount,int& newStart, int& newEnd);
 
 
@@ -231,9 +231,9 @@ private:
 
 	void		refillNachbarArray(int start,int end);
 
-	int			findNachbarIDIndex(int inID);	//!< gibt die lokale ArrayID von der gegebenen ID zurück
-	int			findLastNachbarVtx(int firstVtx);	//!< gibt den letzten NachbarFaceVtx zurück
-	int			findNextValidNachbarLocID(int index);	//!< input ist index der übergeordneten iteration durchs nachbarArray
+	int			findNachbarIDIndex(int inID);	//!< gibt die lokale ArrayID von der gegebenen ID zurueck
+	int			findLastNachbarVtx(int firstVtx);	//!< gibt den letzten NachbarFaceVtx zurueck
+	int			findNextValidNachbarLocID(int index);	//!< input ist index der uebergeordneten iteration durchs nachbarArray
 	
 	int			validateThisCornerLocID(int index);
 	int			findNextValidCornerLocID(int index);
@@ -265,14 +265,14 @@ private:
 	//////////////////////
 	//DATENELEMENTE
 	//////////////////////
-	MIntArray	vtx;			//!< hält alle FaceVtx in Reihenfolge
+	MIntArray	vtx;			//!< hlt alle FaceVtx in Reihenfolge
 	MIntArray	corners;
 	int			newVtx[20];		//!< neu angelegte Vertizen pro Nachbar
 	
 	/** neue UVs pro Nacbar, pro UVSet: Codiert:
 	
 	Xn*numUVSets = lokale ID des neuen Vtx (relativ zu newVtx[20])
-	Xn*numUVSets +(1 bis numUVSets) =	neue UVIndices oder -1, wenn face in diesem UVSet keine UVs hatte - für jedes UVSet muss aber
+	Xn*numUVSets +(1 bis numUVSets) =	neue UVIndices oder -1, wenn face in diesem UVSet keine UVs hatte - fuer jedes UVSet muss aber
 	ein Eintrag sein
 	
 	@par
@@ -282,7 +282,7 @@ private:
 
 
 	
-	MIntArray	nachbarIDs;		//!< werden erstmal gespeichert, um dann später die nachbarPointer von der fty zu erhalten
+	MIntArray	nachbarIDs;		//!< werden erstmal gespeichert, um dann spter die nachbarPointer von der fty zu erhalten
 	face*		nachbarn[20];	//!< syncron zu NachbarIDs
 	bool		clean;
 	bool		isControlTwo;
@@ -291,8 +291,8 @@ private:
 	int			slideCodes[20];
 	bool		isFlippedArray[20];		//!< hier wird gespeichert, ob die Daten relativ zur richtung des faces vertauscht sind
 
-	int			numNachbarn;	//!< speichert die maximale zahl der nachbarn pro corner(ev. unnötig, aber vielleicht relevant für Type -1)
-	int			numCorners;		//!< wird für PokeSingleFace benutzt
+	int			numNachbarn;	//!< speichert die maximale zahl der nachbarn pro corner(ev. unntig, aber vielleicht relevant fuer Type -1)
+	int			numCorners;		//!< wird fuer PokeSingleFace benutzt
 	int			type;
 	int			id;				//!< die eigene FaceID
 

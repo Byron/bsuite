@@ -31,10 +31,10 @@
 namespace BPT
 {
 
-/** Implementation einer BitArray Klasse zum effizienten Handlen von gro�en bool datenmengen
+/** Implementation einer BitArray Klasse zum effizienten Handlen von grossen bool datenmengen
 
   @remarks
-	Diese Klasse wurde speziell f�r die Zusammenarbeit mit MIntArrays entwickelt und ist optimiert f�r speed
+	Diese Klasse wurde speziell fuer die Zusammenarbeit mit MIntArrays entwickelt und ist optimiert fuer speed
 	
 */
 
@@ -48,7 +48,7 @@ public:
 
 	BPT_BA();												//!< setzt alle elemente 0
 	
-	BPT_BA(ULONG initialSize, bool initialValue = false);	//!< initialisiert BA mit gegebener größe, und setzt alle bits auf initialValue
+	BPT_BA(ULONG initialSize, bool initialValue = false);	//!< initialisiert BA mit gegebener groesse, und setzt alle bits auf initialValue
 	
 	/** Konstruktor
 	@param
@@ -86,8 +86,8 @@ public:
 	ULONG			getTrueCount()	const {return numTrue;};
 	ULONG			getFalseCount()	const {return (highBound - lowBound) - numTrue; };
 
-	ULONG			getFirstBitIndex() const;	//!< diese Methode vorsichtig einsetzen, da sie einen Runup benötigt, um das erste bit zu finden
-	ULONG			getLastBitIndex() const;	//!< diese Methode vorsichtig einsetzen, da sie einen Runup benötigt, um das letzte bit zu finden
+	ULONG			getFirstBitIndex() const;	//!< diese Methode vorsichtig einsetzen, da sie einen Runup benoetigt, um das erste bit zu finden
+	ULONG			getLastBitIndex() const;	//!< diese Methode vorsichtig einsetzen, da sie einen Runup benoetigt, um das letzte bit zu finden
 
 
 	bool			expand		(ULONG  expandBy, 
@@ -96,25 +96,25 @@ public:
 	bool			contract	(ULONG  contractBy);				//!< array um x bits verkleinern
 	
 	bool			setLength	(ULONG  newLength, 
-								 bool valueOfNewBits = false);		//!< arraygröße auf x Bits festsetzen, bool wird neuen bits zugewiesen, wenn vorhanden
+								 bool valueOfNewBits = false);		//!< arraygroesse auf x Bits festsetzen, bool wird neuen bits zugewiesen, wenn vorhanden
 
 
 	//SICHERE METHODEN:	Machen Rangecheck und BitCheck
 	void			getIntArray		(MIntArray& inResult) const;	//!< gibt intArray zurück mit indices, die im BA true waren
 
 	bool			findMatching	(MIntArray& operand, 
-									 MIntArray& emptyResult	);		//!< findet Übereinstimmungen zu dem übergebenen IntArray (SICHER dank vollem rangeCheck)
+									 MIntArray& emptyResult	);		//!< findet UEbereinstimmungen zu dem übergebenen IntArray (SICHER dank vollem rangeCheck)
 	
 	bool			remove( MIntArray& operand );					//!< entfernt das übergebene Array vom Bitarray 
-																	//!< (setzt die gefundenen Bits False, wenn möglich) - SICHER
+																	//!< (setzt die gefundenen Bits False, wenn moeglich) - SICHER
 
 	bool			add (  MIntArray& operand );					//!< fügt das übergebene intarray zum BitArray hinzu, aber erweitert es nicht
-																	//!< (setzt die gefundenen Bits True, wenn möglich) - SICHER
+																	//!< (setzt die gefundenen Bits True, wenn moeglich) - SICHER
 
 	bool			add (	MIntArray& operand,
 							ULONG operandMax = 0,
 							ULONG operandMinSize = 0     );			//!< -->wenn man diesen Wert setzt, muss er den index nicht selbst suchen
-																	//!< fügt das übergebene intarray zum BitArray hinzu und erweitert es, wenn nötig
+																	//!< fügt das übergebene intarray zum BitArray hinzu und erweitert es, wenn noetig
 	
 	bool			isFlagSet (long index) const;					//!< BitFlag abrufen als Bool ->SICHER
 
@@ -145,7 +145,7 @@ public:
 /** findet die Zahl an trueBits heraus. 
  Diese Methode sollte nach einer BAmitBA Aktion
  gerufen werden, da diese die numTrue verlieren und sich (um zeit zu sparen) nicht
- automatisch synchronisieren ->GIBT NUMTRUE ZURÜCK 
+ automatisch synchronisieren ->GIBT NUMTRUE ZURUECK 
 */
 ULONG	syncNumTrue();										
 
@@ -173,7 +173,7 @@ bool	minus(const BPT_BA& rhs, BPT_BA& result);				//!< - OP
 	
 /*! 
 BitFlag abrufen als bool.	
-Daten können nicht direkt gesetzt werden, da sie eigentlich keine Bools sind 
+Daten koennen nicht direkt gesetzt werden, da sie eigentlich keine Bools sind 
 */
 bool				operator [] (long index) const;	
 
@@ -233,11 +233,11 @@ private:
 ULONG		lowBound;	//!< da unter Umständen auch mehr Bits bearbeitet werden, als "offiziell" im Array gespeichert werden, muss im nachhinein noch dafür gesorgt
 						//!< werden, dass diese Bits wieder 0 gesetzt werden - dies geschieht mit lowBound, um zu wissen, wo die untere Grenze ist
 
-ULONG		highBound;	//!< größe des Arrays in bit, die für Werte vorgesehen sind (array ist ja im grunde immer größer als size und ist vielfaches von 32)
+ULONG		highBound;	//!< groesse des Arrays in bit, die für Werte vorgesehen sind (array ist ja im grunde immer groesser als size und ist vielfaches von 32)
 						//!< Highbound war früher Size, ist mit der neuen Benennung allerdings konsistenter
 
 ULONG		offset;		//!< offset ist die Zahl in Bit, die das Array nach links verschoben ist -> immer vielFaces von 32!; 
-ULONG		numChunks;	//!< Zahl der Longs im Array (da sizeOf ptr nur die Größe des Ptrs gibt -> vielleicht sollte man ihn mal dereferenzieren?)
+ULONG		numChunks;	//!< Zahl der Longs im Array (da sizeOf ptr nur die Groesse des Ptrs gibt -> vielleicht sollte man ihn mal dereferenzieren?)
 
 ULONG		numTrue;	//!< zahl der true gesetzten Flags -> wird immer entsprechend aktualisiert (bei verwendung mit IntArrays)
 						//!< auf diese Weise kann man BA wie normalen Array benutzen

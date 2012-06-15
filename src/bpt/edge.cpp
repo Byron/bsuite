@@ -103,7 +103,7 @@ void	edge::setNachbarn(edge* inNachbarn00,edge* inNachbarn01,edge* inNachbarn10,
 void edge::setNachbar(int seite,int richtung, edge* nachbarPtr)
 //---------------------------------------------------------
 {
-	//überschreibschutz test
+	//ueueberschreibschutz test
 	if(nachbarn[seite][richtung] == 0)
 		nachbarn[seite][richtung] = nachbarPtr;
 }
@@ -192,11 +192,11 @@ bool		edge::borderThere(int requesterID,edge* lastEdge )
 //--------------------------------------------------------------------------------------------------------------
 {
 
-	//clean = false; //Ob sich eine Edge aktiviert oder nicht hängt jetzt vom smallFaceClean wert ab
+	//clean = false; //Ob sich eine Edge aktiviert oder nicht hueuengt jetzt vom smallFaceClean wert ab
 
 	if(id == requesterID)
-	{//wir sind wieder am anfang angekommen - normalerweise könnte man jetzt die eigentlich position ermitteln, allerdings
-		//könnte es auch sein, dass man hierher nie kommt da der loop durch borders gestoppt wurde. Aus dem grund macht das
+	{//wir sind wieder am anfang angekommen - normalerweise kueuennte man jetzt die eigentlich position ermitteln, allerdings
+		//kueuennte es auch sein, dass man hierher nie kommt da der loop durch borders gestoppt wurde. Aus dem grund macht das
 		//die aufrufende prozedur
 
 		return false;
@@ -314,7 +314,7 @@ void	edge::printAllData()
 //--------------------------
 {
 	cout<<"------------------------------------------------------"<<endl;
-	cout<<"Drucke Daten für EDGE: <<<<   "<<id<<"   >>>>"<<endl;
+	cout<<"Drucke Daten fueuer EDGE: <<<<   "<<id<<"   >>>>"<<endl;
 	cout<<"------------------------------------------------------"<<endl;
 	cout<<endl;
 	cout<<"Vtx sind: "<<vtxIDs[0]<<" - "<<vtxIDs[1]<<endl;
@@ -350,8 +350,8 @@ void		edge::initFaceData(int extraDirection)
 //-------------------------------------
 {
 
-	//MERKE: es kann sein, das diese prozedur zur herstellung von faces für nSel edges verwendet wird.
-	//in dem fall darf "dir" nicht verändert werden, und man muss das die übergebene direction nehmen
+	//MERKE: es kann sein, das diese prozedur zur herstellung von faces fueuer nSel edges verwendet wird.
+	//in dem fall darf "dir" nicht verueuendert werden, und man muss das die ueuebergebene direction nehmen
 	
 
 	int myDir;
@@ -381,7 +381,7 @@ void		edge::initFaceData(int extraDirection)
 	creator->getFaceVtxIDs(thisFaceID, faceData[myDir]->faceVertices);
 
 	INVIS(printArray(faceData[myDir]->faceVertices, " = faceDataVERTICES"));
-	//creato checkt, ob normalen überhaupt gewünscht
+	//creato checkt, ob normalen ueueberhaupt gewueuenscht
 	creator->getFaceNormalIDs(thisFaceID, faceData[myDir]->normalIndices);
 
 
@@ -423,8 +423,8 @@ void		edge::initFaceData(int extraDirection)
 
 		if( nEdge != 0 )
 		{
-			//diese prozedur prüft selbständig, ob das übergebene Face geteilt ist, und weist nur dann den Ptr zu
-			//ergo: ich muss hier nichts prüfen
+			//diese prozedur prueueft selbstueuendig, ob das ueuebergebene Face geteilt ist, und weist nur dann den Ptr zu
+			//ergo: ich muss hier nichts prueuefen
 			nEdge->setThisFaceData(thisFaceID, faceData[myDir]);
 
 		}
@@ -468,8 +468,8 @@ int			edge::C_fixNewVtxUV(int origVtx,int refVtx, edgeFaceData* faceData)
 		return origVtx;
 	}
 	
-	//es muss auch dafür gesorgt werden, dass die entsprechenden UVs eingetragen werden
-	//diese müssen unbedingt vorn ins Array eingefügt werden, damit RecreateFaces richtig funktioniert (welches ja einfach durch vtxChange geht und IDs austauscht)
+	//es muss auch dafueuer gesorgt werden, dass die entsprechenden UVs eingetragen werden
+	//diese mueuessen unbedingt vorn ins Array eingefueuegt werden, damit RecreateFaces richtig funktioniert (welches ja einfach durch vtxChange geht und IDs austauscht)
 	MIntArray vtxChangeBak, UVChangeBak;
 	vtxChangeBak = faceData->vtxChange;
 	UVChangeBak = faceData->UVChange;
@@ -485,7 +485,7 @@ int			edge::C_fixNewVtxUV(int origVtx,int refVtx, edgeFaceData* faceData)
 		faceData->vtxChange[0] = origVtx;
 		faceData->vtxChange[1] = origVtx;
 		
-		//jetzt das Backup hinten ranhängen
+		//jetzt das Backup hinten ranhueuengen
 		creator->helper.addIntArrayToLHS(faceData->vtxChange, vtxChangeBak);
 		
 		//nun dasselbe mit UVChange
@@ -501,14 +501,14 @@ int			edge::C_fixNewVtxUV(int origVtx,int refVtx, edgeFaceData* faceData)
 		//jetzt das UVCahnge array ersetzen
 		faceData->UVChange = UVIDs;
 		
-		//und nun noch das Backup hinten ranhängen
+		//und nun noch das Backup hinten ranhueuengen
 		creator->helper.addIntArrayToLHS(faceData->UVChange, UVChangeBak);
 		
 		return origVtx;
 	}
 	else
 	{//es handelt sich um einen durch den Nachbarn verschobenen origVtx, so dass man jetzt einen neuen Vtx erzeugen muss an Stelle des origVtx
-		//die neuen Datan m�ssen als newVtx eingetragen werden an den Anfang, weil ja ein tmpFace erzeugt werden muss mit den entsprechenden infos aus den 2
+		//die neuen Datan muessen als newVtx eingetragen werden an den Anfang, weil ja ein tmpFace erzeugt werden muss mit den entsprechenden infos aus den 2
 		//(normalerweilse vorhandenen faceDatas)
 		
 		int thisNewVtx = edge::creator->newVtx(creator->getVtxPoint(origVtx));
@@ -518,7 +518,7 @@ int			edge::C_fixNewVtxUV(int origVtx,int refVtx, edgeFaceData* faceData)
 		faceData->vtxChange[0] = thisNewVtx;
 		faceData->vtxChange[1] = thisNewVtx;
 		
-		//jetzt das Backup hinten ranhängen
+		//jetzt das Backup hinten ranhueuengen
 		creator->helper.addIntArrayToLHS(faceData->vtxChange, vtxChangeBak);
 		
 		//nun dasselbe mit UVChange
@@ -540,7 +540,7 @@ int			edge::C_fixNewVtxUV(int origVtx,int refVtx, edgeFaceData* faceData)
 		//jetzt das UVCahnge array ersetzen
 		faceData->UVChange = UVIDs;
 		
-		//und nun noch das Backup hinten ranhängen
+		//und nun noch das Backup hinten ranhueuengen
 		creator->helper.addIntArrayToLHS(faceData->UVChange, UVChangeBak);
 
 		
@@ -556,16 +556,16 @@ void		edge::addVtxChange( int newVtx, edge* orsl )
 //---------------------------------------------------------------------------------------
 {
 
-	//gilt nur für "newVtx"
+	//gilt nur fueuer "newVtx"
 
 	//Diese Methode wird nur gerufen, wenn 
-	//a)									der Vtx wirklich Neu ist - also zum ersten mal erstellt wurde //dies wird aßerhalb gecheckt
+	//a)									der Vtx wirklich Neu ist - also zum ersten mal erstellt wurde //dies wird aueueerhalb gecheckt
 	//b)									die benachbarten edges kein Face teilen (so dass sie 2 separate datenfaces haben
-	//c)									wenn die nur ein nachbar methode gerufen wird, muss interpoliert werden zwischen 2 samples für newVtx
+	//c)									wenn die nur ein nachbar methode gerufen wird, muss interpoliert werden zwischen 2 samples fueuer newVtx
 
-	// kümmert sich auch um die Berechnung der UVs
+	// kueuemmert sich auch um die Berechnung der UVs
 
-	//fügt die Vertizen, die aus Intersection zwischen zwei edges entstanden sind, in Array ein
+	//fueuegt die Vertizen, die aus Intersection zwischen zwei edges entstanden sind, in Array ein
 	
 	//erstmal eine echte SelEdge erstellen
 	
@@ -592,18 +592,18 @@ void		edge::addVtxChange( int newVtx, edge* orsl )
 
 	//VERTIZEN BEARBEITEN
 
-	//zuersteinmal neuehn Vtx zu diesem Face hinzufügen
+	//zuersteinmal neuehn Vtx zu diesem Face hinzufueuegen
 	faceData[dir]->vtxChange.append(vtxIDs[side]);
 	faceData[dir]->vtxChange.append(newVtx);
 
-	int nDir = -1;	//hält die dir äquivalente Richtung (zu dir) auf der anderen edge (orsl), ist nur definiert, wenn shareFace = false
+	int nDir = -1;	//hueuelt die dir ueuequivalente Richtung (zu dir) auf der anderen edge (orsl), ist nur definiert, wenn shareFace = false
 
-	if(!shareFace /*& !existed*/)	//Vtx auf keinen Fall doppelt hinzufügen //wenn der Vtx bereits exisiterte, muss einfach nur ein Slide errechnet werden
-					//MERKE: der neue Vtx soll trotzdem zum face hinzugefügt werden, selbst wenn es eigentlich kein neuer Vtx ist (->Chamfer), damit man später die UVs ohne extraChecks holen kann
+	if(!shareFace /*& !existed*/)	//Vtx auf keinen Fall doppelt hinzufueuegen //wenn der Vtx bereits exisiterte, muss einfach nur ein Slide errechnet werden
+					//MERKE: der neue Vtx soll trotzdem zum face hinzugefueuegt werden, selbst wenn es eigentlich kein neuer Vtx ist (->Chamfer), damit man spueueter die UVs ohne extraChecks holen kann
 	{
 		int uid = (this->getUIDs())[side*2+dir];
 		const int* nuID = orsl->getUIDs();
-		//jetzt die korrekte richtung für orsl herausfinden, indem man durchs nachbarArray parsed und ptr vergleicht
+		//jetzt die korrekte richtung fueuer orsl herausfinden, indem man durchs nachbarArray parsed und ptr vergleicht
 		for(int i = 0; i < 2; i++)
 		{
 			for(int a = 0; a < 2; a++)
@@ -639,7 +639,7 @@ outOfIf:;
 
 		int seite[2] = {side,-1},richtung[2] = {dir,-1};	//seite/richtung, von this und orsl aus gesehen
 	
-		int origVtx = vtxIDs[side];		//wird als referenz benötigt 
+		int origVtx = vtxIDs[side];		//wird als referenz benueuetigt 
 
 
 		edgeFaceData*	tmpFace[2] = {0, 0};
@@ -648,7 +648,7 @@ outOfIf:;
 			shareFace = true;
 
 
-		if(shareFace )	//kommt in seltenen Situationen vor, dass orsl nicht gew�hlt ist
+		if(shareFace )	//kommt in seltenen Situationen vor, dass orsl nicht gewuehlt ist
 		{//also wird nur this und orsl verwendet
 
 			tmpFace[0] = tmpFace[1] = faceData[dir];
@@ -657,7 +657,7 @@ outOfIf:;
 		{//folglich muss es auch mindestens eine unSelEdge zwischen ihnen (this/orsl) geben, welche dann stattessen verwendet werden muss
 		
 
-			orsl->getValidRichtung(this,seite[1], richtung[1], (getUIDs())[side*2+dir] );	//wenn es NICHT nurEinNachbar ist, dann ist UID eh -1 überall, und es funzt trotzdem
+			orsl->getValidRichtung(this,seite[1], richtung[1], (getUIDs())[side*2+dir] );	//wenn es NICHT nurEinNachbar ist, dann ist UID eh -1 ueueberall, und es funzt trotzdem
 			//hier wird mit der unSelEdge begonnen, von orsl aus
 
 
@@ -679,12 +679,12 @@ outOfIf:;
 		
 		
 
-		MIntArray validator[2];	//->jedes Face erhält einen Validator, : hält info pro UVSet: -1 == keine UVs, , 0 == hat UV, 1 == hat UV und teilt diese mit dem anderen Face
-		MFloatArray newUVPos[2];//hält de entsprechnenden UVPositionen pro Face ( U gefolgt von V) pro UVSet
+		MIntArray validator[2];	//->jedes Face erhueuelt einen Validator, : hueuelt info pro UVSet: -1 == keine UVs, , 0 == hat UV, 1 == hat UV und teilt diese mit dem anderen Face
+		MFloatArray newUVPos[2];//hueuelt de entsprechnenden UVPositionen pro Face ( U gefolgt von V) pro UVSet
 		
 
 
-		//diese Arrays sind immer vollständig gefüllt, weshalb man ihre Größe mit einem Mal setzen kann
+		//diese Arrays sind immer vollstueuendig gefueuellt, weshalb man ihre Grueueueuee mit einem Mal setzen kann
 		for(f = 0; f < faceCount; f++)
 		{
 			validator[f].setLength(creator->numUVSets);
@@ -737,7 +737,7 @@ outOfIf:;
 		
 		//jetzt die UVPos des der origUVs holen, pro face
 		MIntArray origUVs[2];
-		MFloatArray origUVPos[2];	//Hält die Positionen des origUVs
+		MFloatArray origUVPos[2];	//Hueuelt die Positionen des origUVs
 		
 		for(f = 0; f < faceCount; f++)
 		{
@@ -751,9 +751,9 @@ outOfIf:;
 
 		//jetzt die eigentlichen Ergebnisse verarbeiten
 		if(shareFace)
-		{//sie teilen ein Face, also kann man jetzt einfach die neuen UVs erstellen und den Slide hinzufügen 
+		{//sie teilen ein Face, also kann man jetzt einfach die neuen UVs erstellen und den Slide hinzufueuegen 
 			
-			//wenn dieses Face keine UVs hat, dann gleich abbrechen > in diesem Fall wird später auch keiner darauf zugreifen
+			//wenn dieses Face keine UVs hat, dann gleich abbrechen > in diesem Fall wird spueueter auch keiner darauf zugreifen
 			if(!hasUVs[0])
 				return;
 
@@ -769,7 +769,7 @@ outOfIf:;
 			}
 			else
 			{//dies KANN ein chamfer fall sein, wenn ein originalVtx verschoben wurde, anstatt einen neuen Vtx and dieser Position zu erstellen
-				//einfach die alten UVs als neue UVs angeben, und slide hinzufügen
+				//einfach die alten UVs als neue UVs angeben, und slide hinzufueuegen
 				newUVIds = origUVs[0];
 
 				creator->addUVSlide(newUVPos[0],origUVPos[0], newUVIds);
@@ -777,7 +777,7 @@ outOfIf:;
 				C_IChangedUV[side] = true;	//damit man bestimmen kann, ob neue UVs zu erstellen sind oder nicht
 			}
 
-			//jetzt das UVIDs Array neu aufbauen, so dass es den Formvorschriften von "face" genügt
+			//jetzt das UVIDs Array neu aufbauen, so dass es den Formvorschriften von "face" genueuegt
 			//[X] = origID, [X+1] = newID, pro UVSet
 			MIntArray UVIDs(creator->numUVSets*2);
 			for(i = 0; i < creator->numUVSets; i++)
@@ -786,40 +786,40 @@ outOfIf:;
 				UVIDs[i*2+1] = newUVIds[i];
 			}
 
-			//zum Face hinzufügen
+			//zum Face hinzufueuegen
 			creator->helper.addIntArrayToLHS(tmpFace[0]->UVChange, UVIDs);
 
 
-			if(!orsl->isSelected() && nSelNachbarn[side][dir] != 0)	//extrapfad f�r absolute ausnahmesituation
-			{//jetzt  selbs das Face herausfinden, welches die nSelEdge exclusiv besitzt, und dieses ver�ndern �ber changeSideFace
+			if(!orsl->isSelected() && nSelNachbarn[side][dir] != 0)	//extrapfad fuer absolute ausnahmesituation
+			{//jetzt  selbs das Face herausfinden, welches die nSelEdge exclusiv besitzt, und dieses veruendern ueber changeSideFace
 				
 				MIntArray nFaces = nSelNachbarn[side][dir]->getFaces();	//hat auf jeden Fall 2 Faces
 
 				int validFace = (nFaces[0] == faceIDs[dir]) ? nFaces[1] : nFaces[0] ;
 				
-				//nun das Face ver�ndern
+				//nun das Face veruendern
 				edge::creator->changeSideFace(origVtx, newVtx, validFace, newUVIds);
 
 			}
 
 		}
 		else
-		{//also erstmal herausfinden, ob sich irgendwoe UVs teilen zwischen den faces. Wenn ja, dann diese UVs extra behandeln
+		{//also erstmal herausfinden, ob sich irgendw UVs teilen zwischen den faces. Wenn ja, dann diese UVs extra behandeln
 
-			MIntArray newValidator(creator->numUVSets, -1);	//hält infos über geteilte UVs zwischen den Faces
+			MIntArray newValidator(creator->numUVSets, -1);	//hueuelt infos ueueber geteilte UVs zwischen den Faces
 			MIntArray newSharedUVIDs;
 
 			//nur wenn zwischen this und orsl nur eine unsel edge ist, lohnt sich eine erweiterte Suche 
-			//da die Faces ansonsten sowieso keine UVs teilen können
+			//da die Faces ansonsten sowieso keine UVs teilen kueuennen
 
-			if(onlyOneNSelNachbar[side*2+dir] && newVtx != vtxIDs[side] && (hasUVs[0] & hasUVs[1]) )	//nur wenn beide Face UVs haben, hat das hier überhaupt nen sinn
+			if(onlyOneNSelNachbar[side*2+dir] && newVtx != vtxIDs[side] && (hasUVs[0] & hasUVs[1]) )	//nur wenn beide Face UVs haben, hat das hier ueueberhaupt nen sinn
 		//	if( (hasUVs[0] & hasUVs[1]) )
 			{
 				
 				UINT r = 0;
-				bool found = false;	//nur wenn überhaupt eine derartige UV gefunden wurde, soll der creator bemüht werden
+				bool found = false;	//nur wenn ueueberhaupt eine derartige UV gefunden wurde, soll der creator bemueueht werden
 				
-				MIntArray otherUVs[2];	//hält die UVs des anderen Vtx, welcher der nSelGeraden von this gehört
+				MIntArray otherUVs[2];	//hueuelt die UVs des anderen Vtx, welcher der nSelGeraden von this gehueuert
 				int otherVtx = (origVtx == nSelNachbarn[side][dir]->vtxIDs[0]) ? nSelNachbarn[side][dir]->vtxIDs[1] : nSelNachbarn[side][dir]->vtxIDs[0];
 
 				otherUVs[0] = tmpFace[0]->getEdgeVtxUVs(otherVtx);
@@ -827,10 +827,10 @@ outOfIf:;
 
 				for(i = 0; i < creator->numUVSets; i++)
 				{
-					//nur wenn beide Faces UVs haben, überhaupt genaueren Vergleich machen
+					//nur wenn beide Faces UVs haben, ueueberhaupt genaueren Vergleich machen
 					if(  (validator[0][i] == 0 && validator[1][i] == 0) 
 						&& 
-						( origUVs[0][i] == origUVs[1][i]) //)	//es reicht, wenn dieser Typ Face am origVtx zusammenhängt ->doch nicht
+						( origUVs[0][i] == origUVs[1][i]) //)	//es reicht, wenn dieser Typ Face am origVtx zusammenhueuengt ->doch nicht
 						&& 
 						( otherUVs[0][i] == otherUVs[1][i]) )
 					//	|| !onlyOneNSelNachbar[side*2+dir] )	//wenn man das hier anmacht, dann werden wenigr UVs erstellt, aber diese reichen dann eventuell nicht, um verzerrungsfrei zu sein
@@ -839,7 +839,7 @@ outOfIf:;
 						//erstmal Flag setzen in newValidator
 						newValidator[r++] = 1;
 
-						//dann die Flags im originalValidator -1 setzen, damit später nicht nochma UVs dafür erzeugt werden
+						//dann die Flags im originalValidator -1 setzen, damit spueueter nicht nochma UVs dafueuer erzeugt werden
 						validator[0][i] = validator[1][i] = -1;
 
 
@@ -867,7 +867,7 @@ outOfIf:;
 					//Slide
 					creator->addUVSlide(newUVPos[0],origUVPos[0],newSharedUVIDs);
 
-					//Das hinzufügen zu den Faces wird dann später gemacht
+					//Das hinzufueuegen zu den Faces wird dann spueueter gemacht
 
 				}
 			}//if(onlyOneNSelNachbar[side*2+dir])
@@ -876,7 +876,7 @@ outOfIf:;
 			//vorbereitung der edges, damit man gut auf sie zugreifen kann
 			edge* edgeTmp[2] = {this, orsl};
 			
-			//jetzt die ungeshareten UVs bearbeiten - pro face erstmal bestimmen, ob überhaupt UVs vorhanden sind, und diese dann erstellen
+			//jetzt die ungeshareten UVs bearbeiten - pro face erstmal bestimmen, ob ueueberhaupt UVs vorhanden sind, und diese dann erstellen
 			for(f = 0; f < 2; f++)
 			{
 
@@ -907,7 +907,7 @@ outOfIf:;
 		
 					
 					
-					//jetzt die UVSlides hinzufügem
+					//jetzt die UVSlides hinzufueuegem
 					creator->addUVSlide(newUVPos[f], origUVPos[f], newUVIDs);
 					
 				}
@@ -915,7 +915,7 @@ outOfIf:;
 					continue;
 
 				
-				//zuletzt noch die sharedUVIDs zusammentun mit den normalen newUVIDs, damit die Faces alle nötigen infos erhalten
+				//zuletzt noch die sharedUVIDs zusammentun mit den normalen newUVIDs, damit die Faces alle nueuetigen infos erhalten
 				if(newSharedUVIDs.length() > 0)
 				{
 					for(i = 0; i < creator->numUVSets; i++)
@@ -926,7 +926,7 @@ outOfIf:;
 					}
 				}
 				
-				//jetzt das UVIDs Array neu aufbauen entsprechend der Regeln und die UVs zum face hinzufügen
+				//jetzt das UVIDs Array neu aufbauen entsprechend der Regeln und die UVs zum face hinzufueuegen
 				MIntArray UVIDs(creator->numUVSets*2);
 				for(i = 0; i < creator->numUVSets; i++)
 				{
@@ -962,9 +962,9 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 	//regatherData = true;
 	newUVPos.setLength(creator->numUVSets * 2);
 
-	//ich baue mir mein eigenes Face anhand der OriginalDaten im Creator -> Diese sind unverändert (haben keine EdgeUVs, die direkt auf einer edge liegen, und mir dann die Werte versauen)
+	//ich baue mir mein eigenes Face anhand der OriginalDaten im Creator -> Diese sind unverueuendert (haben keine EdgeUVs, die direkt auf einer edge liegen, und mir dann die Werte versauen)
 	if(regatherData)
-	{//diese funktion ist deaktiviert, wenn diese methode von nSelEdge gerufen wird, da diese bereits gute Daten �bergibt
+	{//diese funktion ist deaktiviert, wenn diese methode von nSelEdge gerufen wird, da diese bereits gute Daten uebergibt
 		edgeFaceData* tmpFace = new edgeFaceData(thisFace->id);
 		
 		creator->getFaceVtxIDs(tmpFace->id, tmpFace->faceVertices);
@@ -977,7 +977,7 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 	MPointArray positions;
 	creator->getVtxPositions(thisFace->faceVertices, positions);
 
-	MFloatArray			UVPositions;	//hält die positionen aller UVs aller UVs aller UVSets dieses Faces
+	MFloatArray			UVPositions;	//hueuelt die positionen aller UVs aller UVs aller UVSets dieses Faces
 	edge::creator->getUVPositions(thisFace->UVIndices, UVPositions);
 
 	UINT l = thisFace->faceVertices.length();
@@ -985,19 +985,19 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 
 	INVIS(creator->helper.printArray(thisFace->UVIndices, " = UVIndices"));
 
-	MDoubleArray		weights(l*creator->numUVSets);		//die gewichtungen der errechneten Vtx positionen ergeben sich aus der entfernung des neuen Vtx zur edge, relativ zur länge der edge
-	MPointArray			tNewUVPos(l*creator->numUVSets);	//hält die errechneten Punkte für UV passend zum newVtx
+	MDoubleArray		weights(l*creator->numUVSets);		//die gewichtungen der errechneten Vtx positionen ergeben sich aus der entfernung des neuen Vtx zur edge, relativ zur lueuenge der edge
+	MPointArray			tNewUVPos(l*creator->numUVSets);	//hueuelt die errechneten Punkte fueuer UV passend zum newVtx
 //	MFloatVectorArray	newVectors(l*creator->numUVSets);	
 	MDoubleArray		maxWeight(creator->numUVSets,0.0);		//Summe aller weights
 	
 
 	MFloatVector		newVector;
-	MFloatVector		UVVector;	//hält die  UVVectors, die this und orsl entsprechen
+	MFloatVector		UVVector;	//hueuelt die  UVVectors, die this und orsl entsprechen
 	MVector				vectors[3];	//this, orsl, new
 	MVector				normal;		//die Normale am Dreieck, zwischen vtx[i-1] - vtx[i] - vtx[1+1] aufgespannt ist, sollte immer vom face weg zeigen
-	double rl;		//Nächstgelegener Punkt vom newVtx aus gesehen, relativ zur edge
-	double h;		//die länge des vektors der auf AB steht, und am newVtx endet, relativ zu AB
-	bool inside;	//perpDotProdukt des neuen Vektors (AN) mit AB als Referenzwert f�r die Richtung
+	double rl;		//Nueuechstgelegener Punkt vom newVtx aus gesehen, relativ zur edge
+	double h;		//die lueuenge des vektors der auf AB steht, und am newVtx endet, relativ zu AB
+	bool inside;	//perpDotProdukt des neuen Vektors (AN) mit AB als Referenzwert fuer die Richtung
 	
 	double tmp, length;	// == newLength, newAngle
 	
@@ -1019,7 +1019,7 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 
 		INVIS(double test9 = vectors[1].length());
 
-		length = vectors[0].length();	//zwischenspichern der länge, weil die noch oft gebraucht wird
+		length = vectors[0].length();	//zwischenspichern der lueuenge, weil die noch oft gebraucht wird
 		
 		rl	= (cos(vectors[0].angle(vectors[1])) * vectors[1].length()) / length;
 		h	= sqrt(( pow(vectors[1].length(),2.0) - pow((rl * length),2.0) + DELTA )) / length;	//Satz des pytagoras - Hypotenuse - kathete 1 == kathete 2
@@ -1051,7 +1051,7 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 		
 		for(n = 0; n < creator->numUVSets; n++)
 		{
-			//wenn überhapt UVs vorhanden
+			//wenn ueueberhapt UVs vorhanden
 			if(!thisFace->UVRelOffsets)
 			{
 				continue;
@@ -1067,12 +1067,12 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 			
 			newVector = UVVector * rl;
 			
-			//länge des vektors zischenspeichern
+			//lueuenge des vektors zischenspeichern
 			length = UVVector.length();
 			
-			//UVVektor umstellen, so dass ein neuer senkrechter winkel entsteht. Die richtung ist abhängig von "inside"
+			//UVVektor umstellen, so dass ein neuer senkrechter winkel entsteht. Die richtung ist abhueuengig von "inside"
 			
-			//erst CCW um 90° drehen
+			//erst CCW um 90ueue drehen
 			tmp = UVVector.x;
 			UVVector.x = -UVVector.y;
 			UVVector.y = tmp;
@@ -1086,7 +1086,7 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 			}
 
 			
-			//jetzt den vektor normalisieren, und ihn entsprechend verlängern anhand der lengthratio der höhe
+			//jetzt den vektor normalisieren, und ihn entsprechend verlueuengern anhand der lengthratio der hueuehe
 			UVVector.normalize();
 			UVVector = UVVector  * (length  * h);
 
@@ -1113,11 +1113,11 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 
 	
 
-	//jetzt müssen die errechneten UVPositionen nur noch gewichtet werden
+	//jetzt mueuessen die errechneten UVPositionen nur noch gewichtet werden
 	MPoint tmpPos;
 	
-	double fWeight;	//hält den entgültigen betrag des weights
-	double nmw = 0.0;//hält die Summe aller neuen Weights - wird zum schluss als divisor verwendet
+	double fWeight;	//hueuelt den entgueueltigen betrag des weights
+	double nmw = 0.0;//hueuelt die Summe aller neuen Weights - wird zum schluss als divisor verwendet
 	double inverse;
 	for(i = 0; i < creator->numUVSets;i++)
 	{
@@ -1133,8 +1133,8 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 
 		for(x = 0; x < l; x++)
 		{	
-			//ich will das inverse dieser weights - je näher das weight bei 0, desto estärker ist es. 
-			//Diese klasulierung da untern sorgt dafür, dass alle invertierten weights nach der normalisierung ach wieder 1 ergeben
+			//ich will das inverse dieser weights - je nueueher das weight bei 0, desto estueuerker ist es. 
+			//Diese klasulierung da untern sorgt dafueuer, dass alle invertierten weights nach der normalisierung ach wieder 1 ergeben
 			INVIS(double preweight = weights[r+x];)
 
 			weights[r+x] /= maxWeight[i];	//normalisieren auf 1
@@ -1161,7 +1161,7 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 
 	}
 
-	if(regatherData)	//löschen ist nur erlaubt, wenn das Face auch wirklich lokal erstellt wurde
+	if(regatherData)	//lueueschen ist nur erlaubt, wenn das Face auch wirklich lokal erstellt wurde
 		delete thisFace;
 
 }
@@ -1174,7 +1174,7 @@ bool	edge::doUVsDiffer(int checkVtx,
 							MIntArray* outTwo)
 //--------------------------------------------------------------
 {
-	//vergleicht die UVs der Faces, und gibt true zur�ck, wenn sie sich in irgendeinem Set unterscheiden
+	//vergleicht die UVs der Faces, und gibt true zurueck, wenn sie sich in irgendeinem Set unterscheiden
 	
 	MIntArray*  vtxUVs[2] = {(outOne == 0)? new MIntArray():outOne,(outTwo == 0)? new MIntArray():outTwo};
 
@@ -1194,8 +1194,8 @@ bool	edge::doUVsDiffer(int checkVtx,
 
 //-----------------------------------------------------------------------------------------------------------------------
 int			edge::C_checkForEdgeVtx( const edge* requester,		//ptr zum 
-									 int UID,					//uniqueID - wird immer benötigt, da diese methode nur gerufen wird wenn nurEinNAchbar = true
-									 bool	isSeparated,		/*Flag: ist true, wenn die methode von edge gerufen wird, derem UVs nicht zusammen hängen*/
+									 int UID,					//uniqueID - wird immer benueuetigt, da diese methode nur gerufen wird wenn nurEinNAchbar = true
+									 bool	isSeparated,		/*Flag: ist true, wenn die methode von edge gerufen wird, derem UVs nicht zusammen hueuengen*/
 									 const MPoint& startPos,			/*zwischen startPosition und endPosition wird der edgeVtx erstellt*/
 									 const MPoint& endPos	)
 //------------------------------------------------------------------------------------------------------------------------
@@ -1205,14 +1205,14 @@ int			edge::C_checkForEdgeVtx( const edge* requester,		//ptr zum
 	int s, r;
 	getValidRichtung(requester, s, r, UID);
 
-	//wenn infaceData 0 ist, dann einfach die gegenwärtige edgeIDs zurückgeben. Der Requester macht dann alles weitere
+	//wenn infaceData 0 ist, dann einfach die gegenwueuertige edgeIDs zurueueckgeben. Der Requester macht dann alles weitere
 	//dies bedeutet auch, dass diese edge bereits evaluiert wurde
 	if(isSeparated)
 	{
 		return edgeVtx[s];
 	}
 	else
-	{//dieser Zweig ist aufwendiger: Eine edge, welche nicht über getrennte UVs verfügt will wissen, ob diese edge eventuell edgeIDs erstellt hat/erstellen muss
+	{//dieser Zweig ist aufwendiger: Eine edge, welche nicht ueueber getrennte UVs verfueuegt will wissen, ob diese edge eventuell edgeIDs erstellt hat/erstellen muss
 		if(edgeVtx[s] == -1 && faceData[1] != 0)
 		{//es sind keine edgeVtx vorhanden, also checken, ob man welche erstellen muss. Das aber auch nur, wenn diese edge noch nicht evaluiert hat
 			if(!clean)
@@ -1232,10 +1232,10 @@ int			edge::C_checkForEdgeVtx( const edge* requester,		//ptr zum
 						MFloatArray newUVPos;
 						MIntArray newUVs;
 						
-						//okay - jetzt einen neuen edgeVtx erzeugen mithilge der übergebenen Positionen
+						//okay - jetzt einen neuen edgeVtx erzeugen mithilge der ueuebergebenen Positionen
 						edgeVtx[s] = creator->newVtx( startPos + 0.5*(endPos - startPos) );
 						
-						//nun die UVs erzeugen für`s eigene Face
+						//nun die UVs erzeugen fueuer`s eigene Face
 						faceData[0]->insertEdgeVtx(vtxIDs[s], edgeVtx[s], (isFlipped[0]) ? ( (s == 0) ? false : true) : ((s == 0) ? true : false) ) ;
 						faceData[1]->insertEdgeVtx(vtxIDs[s], edgeVtx[s], (isFlipped[1]) ? ( (s == 0) ? false : true) : ((s == 0) ? true : false));
 						
@@ -1258,10 +1258,10 @@ int			edge::C_checkForEdgeVtx( const edge* requester,		//ptr zum
 						faceData[1]->assignUV(edgeVtx[s], newUVs);
 						
 						
-						//jetzt noch slide hinzufügen, damit die Position des edgeVtx wirklich immer in der Mitte 
+						//jetzt noch slide hinzufueuegen, damit die Position des edgeVtx wirklich immer in der Mitte 
 						edge::creator->addSlideAndNormal(vtxIDs[s], edgeVtx[s], faceIDs);
 						
-						//FERTIG //MERKE: Um normalen kümmert sich das Face automatisch
+						//FERTIG //MERKE: Um normalen kueuemmert sich das Face automatisch
 						
 						
 					}
@@ -1286,7 +1286,7 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 //-----------------------------------------------------------------------------------------------------------------
 {
 	//UVs werden ebenfalls von dieser prozedur behandelt -  das ist effizienter
-	//allerdings nur, wenn es explizit gesagt wird, was in den meisten Fällen so ist. Nur für Normals werden ne Ausnahme gemacht
+	//allerdings nur, wenn es explizit gesagt wird, was in den meisten Fueuellen so ist. Nur fueuer Normals werden ne Ausnahme gemacht
 	
 	
 
@@ -1296,8 +1296,8 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 
 	bool orslSelected = orsl->isSelected();	//gibt an, ob die andere edge selected ist
 
-	//nun dafür sorgen, dass orsl auch wirklich jedes Face defniert - egal ob selected oder nicht
-	//es kann nämlich auch sein, dass die faceDataPropagation nicht weit genug war
+	//nun dafueuer sorgen, dass orsl auch wirklich jedes Face defniert - egal ob selected oder nicht
+	//es kann nueuemlich auch sein, dass die faceDataPropagation nicht weit genug war
 	
 	for(i = 0; i < orsl->faceIDs.length(); i++)
 	{
@@ -1316,7 +1316,7 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 	//jetzt die locID herausfinden, die das face anzeigt, welches mit der selEdge geteilt wird (und zwar relativ zum array der unSelEdge)
 	if(!orslSelected)
 	{
-		// in diesem Fall ist match auf jeden Fall gefüllt, da es sich bei orsl dann um eine endEdge handeln muss
+		// in diesem Fall ist match auf jeden Fall gefueuellt, da es sich bei orsl dann um eine endEdge handeln muss
 		for(i = 0; i < orsl->faceIDs.length(); i++)
 		{
 			for( a = 0; a < faceIDs.length(); a++)
@@ -1331,25 +1331,25 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 	}
 	
 	
-	//Da die übergebene edge nicht zwangsweise jene sein muss, zu der der statische "side" wert passt, muss erstmal die richtige seite des origVertizes
+	//Da die ueuebergebene edge nicht zwangsweise jene sein muss, zu der der statische "side" wert passt, muss erstmal die richtige seite des origVertizes
 	//herausgefunden werden;
 
 	
-	//hier nur edgeVtx einfügen, wenn es sich wirkich um einen neuen Vtx handelt (könnte bei Chamfer der Fall sein).
-	//Achtet man nicht darauf, wird in Vtx doppelt vorhanden sein, und das Face wäre defekt
+	//hier nur edgeVtx einfueuegen, wenn es sich wirkich um einen neuen Vtx handelt (kueuennte bei Chamfer der Fall sein).
+	//Achtet man nicht darauf, wird in Vtx doppelt vorhanden sein, und das Face wueuere defekt
 	bool notExists = (vtxIDs[side] == newVtx) ? false : true;
 	
 
 	
 	//VERTIZEN BEARBETIEN
-	int validStart;					//validStart enthält die ID des ORIGVtx , welcher am nächsten an dem edgeVtx dran ist (laut MeshTopologie)
+	int validStart;					//validStart enthueuelt die ID des ORIGVtx , welcher am nueuechsten an dem edgeVtx dran ist (laut MeshTopologie)
 	int validEnd;
-	int realValidEnd;				// ==  ValidEnd - Speicher für den Originalwert - er wird für UVs benötigt, da diese immer die eigentliche Edg als referenz nehmen müssen
+	int realValidEnd;				// ==  ValidEnd - Speicher fueuer den Originalwert - er wird fueuer UVs benueuetigt, da diese immer die eigentliche Edg als referenz nehmen mueuessen
 	
-	//jetzt müssen die Vertizen gefunden werden, die die edge bilden für den neuen EdgeVtx, genannt frameVtx
+	//jetzt mueuessen die Vertizen gefunden werden, die die edge bilden fueuer den neuen EdgeVtx, genannt frameVtx
 	if(this == orsl)	//hier muss nicht auf nen bereits existenten Vtx gecheckt werden,da dieser Zweig NIE von Chamfer durchlaufen wird
-	{//aha, der neue Vtx liegt auf der gegenwärtigen edge, also ist side ausschlaggebend für den origVtx
-		//dieser neue Vtx muss dann in beide Faces eingefügt werden
+	{//aha, der neue Vtx liegt auf der gegenwueuertigen edge, also ist side ausschlaggebend fueuer den origVtx
+		//dieser neue Vtx muss dann in beide Faces eingefueuegt werden
 		//MERKE: Wenn auf der anderen Seite bereits ein edgeVtx erstellt wurde, muss dieser als endVtx verwendet werden!
 
 
@@ -1359,7 +1359,7 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 		realValidEnd = validEnd;
 
 		if(orsl->faceData[0]->verifyStartEndVtx(validStart, validEnd))
-		{//wenn diese Prozedur die Vtx geflipped hat, dises umkehren. Ihr eigentlicher Sinn besteht darin, validEnd zu aktualisieren, wenn nötig
+		{//wenn diese Prozedur die Vtx geflipped hat, dises umkehren. Ihr eigentlicher Sinn besteht darin, validEnd zu aktualisieren, wenn nueuetig
 			int tmp = validEnd;
 			validEnd = validStart;
 			validStart = tmp;
@@ -1367,7 +1367,7 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 
 		if(!edgeVtxExisted)	
 		{ 
-			//hier muss man nict aufs zurüclgegebene IntArray achten, (denke ich)
+			//hier muss man nict aufs zurueueclgegebene IntArray achten, (denke ich)
 		
 			faceData[0]->insertEdgeVtx(validStart, validEnd ,newVtx);
 			
@@ -1381,7 +1381,7 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 
 	}
 	else
-	{//also ist edge ein nachbar, so dass man die gültige Seite (und damit den OrigVtx) ertmal finden muss
+	{//also ist edge ein nachbar, so dass man die gueueltige Seite (und damit den OrigVtx) ertmal finden muss
 		//MERKE: Man muss hier nicht checken, ob "nurEinNachbar" zutrifft, da diese eh niemals edgeVtx bekommen
 		
 		isNGVtx = true;
@@ -1410,7 +1410,7 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 outOfLoops:
 		
 		if(orsl->faceData[0]->verifyStartEndVtx(validStart, validEnd))
-		{//wenn diese Prozedur die Vtx geflipped hat, dises umkehren. Ihr eigentlicher Sinn besteht darin, validEnd zu aktualisieren, wenn nötig
+		{//wenn diese Prozedur die Vtx geflipped hat, dises umkehren. Ihr eigentlicher Sinn besteht darin, validEnd zu aktualisieren, wenn nueuetig
 			int tmp = validEnd;
 			validEnd = validStart;
 			validStart = tmp;
@@ -1418,14 +1418,14 @@ outOfLoops:
 
 
 		if(!edgeVtxExisted )	//notExisted bezieht sich hier auf die ID es neuen Vtx
-		{//MERKE: Wenn der Vtx bereits existierte, muss er nicht mehr hinzugefügt werden. Das einzig wichtige ist, dass die UVs einen Slide erhalten
-			//->er muss sehr wohl hinzugefügt werden, damit bei der Erstellung der Faces (wo ja ein passendes FaceData objekt neu aufgebaut wird)
-			//die UVs gefunden werden könnn mit getNewVtxUV
+		{//MERKE: Wenn der Vtx bereits existierte, muss er nicht mehr hinzugefueuegt werden. Das einzig wichtige ist, dass die UVs einen Slide erhalten
+			//->er muss sehr wohl hinzugefueuegt werden, damit bei der Erstellung der Faces (wo ja ein passendes FaceData objekt neu aufgebaut wird)
+			//die UVs gefunden werden kueuennn mit getNewVtxUV
 			
 			
 			if(orslSelected)
-			{//wenn die andere Edge selected ist, dann kann der edgeVtx ganz normal hinzugefügt werden
-				//der origVtx ist jetzt also  VtxIDs[i] - jetzt einfach für alle faces den Vtx einfügen
+			{//wenn die andere Edge selected ist, dann kann der edgeVtx ganz normal hinzugefueuegt werden
+				//der origVtx ist jetzt also  VtxIDs[i] - jetzt einfach fueuer alle faces den Vtx einfueuegen
 
 				
 				orsl->faceData[0]->insertEdgeVtx(validStart, validEnd, newVtx);
@@ -1438,7 +1438,7 @@ outOfLoops:
 			else
 			{//in diesem Fall muss zwischen selSharedFace und dem anderen (falls voranden, unterschieden werden
 				
-				//in das Face, was der unselEdge gehört, muss der newVtx als edgeVtx eingefügt werden
+				//in das Face, was der unselEdge gehueuert, muss der newVtx als edgeVtx eingefueuegt werden
 
 				if( orsl->faceData[1 - selSharedFaceLocID] != 0 && notExists)
 				{
@@ -1446,8 +1446,8 @@ outOfLoops:
 					
 				}
 				
-				//Das Face welches mit selEdge geteilt wird, muss den "edgeVtx" als newVtx erhaltem - ebenso dann später mit den UVs
-				//hier müssen auf jeden Fall edgeRelative werte zugewiesen werden - deshalb wird immer ERValidStart verwendet
+				//Das Face welches mit selEdge geteilt wird, muss den "edgeVtx" als newVtx erhaltem - ebenso dann spueueter mit den UVs
+				//hier mueuessen auf jeden Fall edgeRelative werte zugewiesen werden - deshalb wird immer ERValidStart verwendet
 
 				
 				orsl->faceData[selSharedFaceLocID]->vtxChange.append(validStart);
@@ -1466,11 +1466,11 @@ outOfLoops:
 	
 	if(orsl->faceData[0]->hasUVs() || (orsl->faceData[1] != 0 && orsl->faceData[1]->hasUVs()) )
 	{
-		//jetzt die UVsPositionen für jede Richtung errechnen und für jedes UVSet
-		//wenn der edgeVtxExisted Flag gesetzt wurde, dann müssen die Positionen mit den bereits vorhandenen gemittelt werden
-		//MERKE: Ich greife einfach immer über den "orsl" ptr auf die Daten zu, welcher sich ja entweder auf "this" bezieht oder auf die nachbar edge
+		//jetzt die UVsPositionen fueuer jede Richtung errechnen und fueuer jedes UVSet
+		//wenn der edgeVtxExisted Flag gesetzt wurde, dann mueuessen die Positionen mit den bereits vorhandenen gemittelt werden
+		//MERKE: Ich greife einfach immer ueueber den "orsl" ptr auf die Daten zu, welcher sich ja entweder auf "this" bezieht oder auf die nachbar edge
 		
-		//vorher noch zusehen, dass die validStartIDs stimmen, für den Fall, das !edgeVtxExisted und die insertEdgeVtx methode nicht gerufen wurde, die das ja eigentlich macht
+		//vorher noch zusehen, dass die validStartIDs stimmen, fueuer den Fall, das !edgeVtxExisted und die insertEdgeVtx methode nicht gerufen wurde, die das ja eigentlich macht
 	//	if(edgeVtxExisted)
 	//		faceData[0]->verifyStartEndVtx(validStart, validEnd);
 		//->muss nicht sein, da dis vor der eigentlich wichtigen insertVx prozedur sowieso nochmal gecheckt wird
@@ -1483,11 +1483,11 @@ outOfLoops:
 		MVector		direction = creator->getVtxPoint(realValidEnd) - startPoint;
 		
 
-		double r = (newVtxPos - startPoint).length() / direction.length();	//hier müssen keine weiteren Checks vorgenommen werden, da dieser punkt garantiert auf der edge liegt
+		double r = (newVtxPos - startPoint).length() / direction.length();	//hier mueuessen keine weiteren Checks vorgenommen werden, da dieser punkt garantiert auf der edge liegt
 		
 		
 		
-		//UVDaten holen (werden immer für alle UVSets zurückgegeben, inkusive UVPositionen
+		//UVDaten holen (werden immer fueuer alle UVSets zurueueckgegeben, inkusive UVPositionen
 		MIntArray startUVs[2];
 		MFloatArray startUVPos[2];
 		
@@ -1504,7 +1504,7 @@ outOfLoops:
 		
 		
 		if(orsl->faceData[1] != 0)
-		{//die UVDaten fürs 2. face holen
+		{//die UVDaten fueuers 2. face holen
 			startUVs[1] = orsl->faceData[1]->getEdgeVtxUVs(validStart);
 			creator->getUVPositions(startUVs[1], startUVPos[1]);
 			
@@ -1512,7 +1512,7 @@ outOfLoops:
 			creator->getUVPositions(endUVs[1], endUVPos[1]);
 		}
 		else
-		{//arrays müssen immer gefüllt sein (wenn auch mit - 1), also die jetzt nachholen
+		{//arrays mueuessen immer gefueuellt sein (wenn auch mit - 1), also die jetzt nachholen
 			
 			startUVs[1] = endUVs[1] = MIntArray(creator->numUVSets, -1);
 		}
@@ -1520,8 +1520,8 @@ outOfLoops:
 		
 		
 		
-		MIntArray edgeUVs[2];	//dieses Array hält alle UVs des edgeVtx (falls er existierte) - ansonsten wird es nicht benötigt, sondern nur das newUVIds Array
-		MFloatArray edgeUVPos[2];	//dieses Array hält die Positionen der edgeUVs, für den Fall, dass sie schon vorhanden sind
+		MIntArray edgeUVs[2];	//dieses Array hueuelt alle UVs des edgeVtx (falls er existierte) - ansonsten wird es nicht benueuetigt, sondern nur das newUVIds Array
+		MFloatArray edgeUVPos[2];	//dieses Array hueuelt die Positionen der edgeUVs, fueuer den Fall, dass sie schon vorhanden sind
 		
 		if(edgeVtxExisted)
 		{
@@ -1537,7 +1537,7 @@ outOfLoops:
 			}
 		}
 		else if(!notExists)
-		{//also müssen die origUVs nen slide erhalten. Dies bedeutet, dass die edgeUVs beschrieben werden müssen mit den IDs der OrigUVs
+		{//also mueuessen die origUVs nen slide erhalten. Dies bedeutet, dass die edgeUVs beschrieben werden mueuessen mit den IDs der OrigUVs
 			edgeUVs[0] = startUVs[0];
 
 			if(orsl->faceData[1] != 0)
@@ -1550,11 +1550,11 @@ outOfLoops:
 		
 		
 		UINT l = orsl->faceIDs.length();
-		MFloatArray newUVPos[2];	//hält die positionen der neu zu erstellenden UVSets pro face - es wird allerdings für beide faces zwischengespeichert
-									//damit in besonderen Fällen weniger gerechnet weren muss
-		UINT z, x;					//für iteration
+		MFloatArray newUVPos[2];	//hueuelt die positionen der neu zu erstellenden UVSets pro face - es wird allerdings fueuer beide faces zwischengespeichert
+									//damit in besonderen Fueuellen weniger gerechnet weren muss
+		UINT z, x;					//fueuer iteration
 
-			//2)jetzt herausfinden, ob die beiden angrenzenden Faces UVs die UVs für start und endVtx teilen
+			//2)jetzt herausfinden, ob die beiden angrenzenden Faces UVs die UVs fueuer start und endVtx teilen
 		for(i = 0; i < l; i++)
 		{
 			for(UINT n = 0; n < creator->numUVSets; n++)
@@ -1573,13 +1573,13 @@ outOfLoops:
 				}
 				
 				
-				//speichert die erstellten positionen, Kodiert: N = l; l*2+0 = UPos für UV des l'ten Faces
+				//speichert die erstellten positionen, Kodiert: N = l; l*2+0 = UPos fueuer UV des l'ten Faces
 				MFloatArray resultPos(2);	
 				z = 0;
 				
 				
 				
-				//jetzt die UVPositionen für dieses UVset für das entsprechende Face erstellen	
+				//jetzt die UVPositionen fueuer dieses UVset fueuer das entsprechende Face erstellen	
 				
 				
 				resultPos[z++] = ( startUVPos[i][n*2] + r*(endUVPos[i][n*2] - startUVPos[i][n*2]) );	// == UPosition
@@ -1591,7 +1591,7 @@ outOfLoops:
 				//jetzt die Resultate richtig zuweisen: entweder mitteln, oder neuen UV erstellen
 				
 				//wenn der edgeVtx bereits exisitiert hat, muss auch die UV bereits existiert haben
-				//ich berechne das einfach für jedes Face entsprechend, ungeachtet der Tatsache, dass sie eventuell bereits UVs teilen - ist einfacher und spart reichlich "ifs"
+				//ich berechne das einfach fueuer jedes Face entsprechend, ungeachtet der Tatsache, dass sie eventuell bereits UVs teilen - ist einfacher und spart reichlich "ifs"
 				
 				
 				if(edgeVtxExisted)
@@ -1601,7 +1601,7 @@ outOfLoops:
 					
 				}
 				else
-				{//neue UVPositionen in newUVArray übertragen
+				{//neue UVPositionen in newUVArray ueuebertragen
 					newUVPos[i].append(resultPos[0]);
 					newUVPos[i].append(resultPos[1]);
 				}
@@ -1620,16 +1620,16 @@ outOfLoops:
 		
 		
 		
-		//Jetzt müssen die neuen UVPositionen nur noch verarbeitet werden: entweder werden daraus neue UVs erstellt, oder es werden die Positionen der existierenden UVs verändert
+		//Jetzt mueuessen die neuen UVPositionen nur noch verarbeitet werden: entweder werden daraus neue UVs erstellt, oder es werden die Positionen der existierenden UVs verueuendert
 		//dies hier geschieht pro face
 		
 		
-		if(edgeVtxExisted | !notExists)	//hier her, wenn die ID breits existierte, um damit korrekt umgehen zu können
+		if(edgeVtxExisted | !notExists)	//hier her, wenn die ID breits existierte, um damit korrekt umgehen zu kueuennen
 		{//also den Creator anweisen, die edgeUVPos mit den neuen Positionen auszustatten
 			//dies ist NICHT redundant, da die neue EdgeVtx position nicht zwangsweise am selben Platz liegen muss!
 			
 
-			//UVSlide wurde in diesem Fall auch schon hinzugefügt, allerdings mit den alten Werten - jetzt muss man die newUVPos noch aktualisieren
+			//UVSlide wurde in diesem Fall auch schon hinzugefueuegt, allerdings mit den alten Werten - jetzt muss man die newUVPos noch aktualisieren
 			//oder man packt den Slide einfach nochmal raf, was bedeutet, dass der Punkt mehrfaach transformiert wird, aber immerhin mit den richtigen Werten
 			//so wirds beim Slide auch gemacht momentan
 			creator->addUVSlide(newUVPos[0],startUVPos[0], edgeUVs[0]);
@@ -1638,7 +1638,7 @@ outOfLoops:
 				creator->addUVSlide(newUVPos[1],startUVPos[1], edgeUVs[1]);
 
 			
-			//Man muss die Positionen setzen, damit addVtxChange auf aktuelle UV positionen für die edgeVTx zugreifen kann
+			//Man muss die Positionen setzen, damit addVtxChange auf aktuelle UV positionen fueuer die edgeVTx zugreifen kann
 			//MERKE: Diese Operation darf nur erfolgen, wenn der newVtx wirklich neu ist
 			if(notExists)
 			{
@@ -1650,7 +1650,7 @@ outOfLoops:
 			}
 			else
 			//SpezialFall: Wenn man sich im chamfermode befindet kommt man nur in diesen Zweig, wenn ein vohandener Vtx veschoben wird und nun als newVtx fungiert
-			//in diesem Fall müssen die UVs des origVtx als UVChange eingetragen werden
+			//in diesem Fall mueuessen die UVs des origVtx als UVChange eingetragen werden
 			{
 				l = startUVs[selSharedFaceLocID].length();
 				MIntArray UVIDs(l*2);
@@ -1670,7 +1670,7 @@ outOfLoops:
 		{
 			//zuert aber herausfinden, wo (in welchen UVSets) die Faces die UVs Teilen.-> geht nur, wenn orsl 2 faces hat
 
-			MIntArray shareUVs(creator->numUVSets, -1);	//1, wenn das UVSet zwei verbundene Faces hat, -1 andernfalls - hält später auch die neuen geshareten UVs
+			MIntArray shareUVs(creator->numUVSets, -1);	//1, wenn das UVSet zwei verbundene Faces hat, -1 andernfalls - hueuelt spueueter auch die neuen geshareten UVs
 			
 
 			if( (l == 2)  )	
@@ -1688,7 +1688,7 @@ outOfLoops:
 
 						shareUVs[x] = 1;
 						
-						//startUVs nun auf -1 setzen, damit dort später nicht nochmal UVs erzeugt werden, wenn der Pass kommt, welcher nur die unShared UVs erzeugt
+						//startUVs nun auf -1 setzen, damit dort spueueter nicht nochmal UVs erzeugt werden, wenn der Pass kommt, welcher nur die unShared UVs erzeugt
 						startUVs[0][x] = startUVs[1][x] = -1;
 
 						found = true;
@@ -1712,7 +1712,7 @@ outOfLoops:
 			//nun die restlichen UVs erzeugen
 			for(i = 0; i < l; i++)
 			{
-				//nun soll der creator erstmal neue UVs erzeugen (ungeteilt) und diese dann zurückgeben
+				//nun soll der creator erstmal neue UVs erzeugen (ungeteilt) und diese dann zurueueckgeben
 				
 				MIntArray newUVs = creator->createUVs(startUVs[i], newUVPos[i]);
 
@@ -1726,7 +1726,7 @@ outOfLoops:
 
 				
 				
-				//jetzt auch gleich slide hinzufügen
+				//jetzt auch gleich slide hinzufueuegen
 
 				
 
@@ -1737,11 +1737,11 @@ outOfLoops:
 
 				if(orslSelected)
 				{
-					//diese neuen UVPositionen müssen jetzt noch in faceData gepackt werden
+					//diese neuen UVPositionen mueuessen jetzt noch in faceData gepackt werden
 					orsl->faceData[i]->assignUV(newVtx, newUVs);
 				}
 				else
-				{//wenn es sich bei dem gegenwärtigen Face um das mit der selEdge geteilte handelt, dann müssen die UVs als UVChange eingetragen werden , ansonsten
+				{//wenn es sich bei dem gegenwueuertigen Face um das mit der selEdge geteilte handelt, dann mueuessen die UVs als UVChange eingetragen werden , ansonsten
 					//als edgeVtxUVChange
 					
 					if(i == selSharedFaceLocID)
@@ -1764,27 +1764,27 @@ outOfLoops:
 						
 						
 						z = 0;
-						MIntArray newVtxUVs(creator->numUVSets*2, -1);			//hält die UVs für den newVtx: Xn*2 = alte UV (-1 falls nicht existent), Xn*2+1 = neue UV
+						MIntArray newVtxUVs(creator->numUVSets*2, -1);			//hueuelt die UVs fueuer den newVtx: Xn*2 = alte UV (-1 falls nicht existent), Xn*2+1 = neue UV
 						for(x = 0; x < creator->numUVSets; x++)
 						{
 							if(newUVs[x] == -1)
-							{//für dieses UVSet hat der newVtx keine UV, also 2 mal -1 einfügen bzw r um 2 eröhen
+							{//fueuer dieses UVSet hat der newVtx keine UV, also 2 mal -1 einfueuegen bzw r um 2 erueuehen
 								z += 2;
 								continue;
 							}
 							
-							//ansonsten die entsprechnende origUV aufsuchen und hinzufügen
+							//ansonsten die entsprechnende origUV aufsuchen und hinzufueuegen
 							newVtxUVs[z++] = orsl->faceData[i]->UVIndices[orsl->faceData[i]->UVAbsOffsets[x] + locIDnewUV];
 							newVtxUVs[z++] = newUVs[x];
 							
 						}
 						
-						//jetzt einfach die UVs an UVChange anhängen
+						//jetzt einfach die UVs an UVChange anhueuengen
 						creator->helper.addIntArrayToLHS(orsl->faceData[i]->UVChange, newVtxUVs);
 						
 					}
 					else
-					{//es ist das Face, welches aussschließlich der unSelEdge gehört
+					{//es ist das Face, welches aussschlieueuelich der unSelEdge gehueuert
 						orsl->faceData[i]->assignUV(newVtx, newUVs);
 					}
 					

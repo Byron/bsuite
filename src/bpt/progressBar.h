@@ -63,7 +63,7 @@ public:
 	// --------------------------------------------------
 
 //-----------------------
-//öffentliche Methoden
+//ffentliche Methoden
 public:
 //-----------------------
 
@@ -73,7 +73,7 @@ public:
 	void set( int progress );
 	// --------------------------
 
-	/** Vergrößert den Progress um 1
+	/** Vergrssert den Progress um 1
 	*/
 	// ----------------
 	void increment( );

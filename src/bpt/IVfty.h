@@ -59,7 +59,7 @@ using std::list;
 namespace BPT
 {
 
-/** Diese Klasse kümmert sich um das Einfügen von vertizen ins mesh, lässt diese arbeit aber nur über einen VtxWorker machen
+/** Diese Klasse kuemmert sich um das Einfuegen von vertizen ins mesh, lsst diese arbeit aber nur ueber einen VtxWorker machen
 	
 */
 
@@ -176,7 +176,7 @@ private:
 	void	modifySelectionList();
 
 
-	void	cleanUp();			//!< lÃ¶scht ptr und setzt variablen zurÃ¼ck
+	void	cleanUp();			//!< loescht ptr und setzt variablen zurÃ¼ck
 
 
 //---------------
@@ -221,13 +221,13 @@ private: //UVSLIDE ARRAYS
 private:	//SLIDE ARRAYS
 //--------------------------
 
-	MDoubleArray*				normalScale;		//!< doubles, die die Normalen anhand der zugrundeliegenden faceGrÃ¶ÃŸe skalieren
+	MDoubleArray*				normalScale;		//!< doubles, die die Normalen anhand der zugrundeliegenden faceGroesse skalieren
 	MDoubleArray*				slideScale;			//!< skaliert die richtungsvektoren auf die kleinste gemeinsame lÃ¤nge herunter
 	MVectorArray*				slideDirections;	//!< richtungsvector von start zu end
 	MVectorArray*				slideNormals;		//!< normalen vektoren
 	MPointArray*				slideStartPoints;	//!< startPoints
 	MPointArray*				slideEndPoints;		//!< endpoints
-	MIntArray*					slideIndices;		//!< indices, die geslided werden kÃ¶nnen 
+	MIntArray*					slideIndices;		//!< indices, die geslided werden koennen 
 	MIntArray*					maySlide;			//!< nur true oder false
 	MDagPath					meshPath;
 

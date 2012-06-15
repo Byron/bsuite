@@ -61,7 +61,7 @@ namespace BPT
 	/** Diese Klasse definiert eine Node, welche eine neue TriangulationFunction definiert
 	
 	  @remarks
-		Die Funktion wird hauptsächlich von der softTransformationEngine verwendet, um die 
+		Die Funktion wird hauptschlich von der softTransformationEngine verwendet, um die 
 		Deformation der Meshes im shadedMode zu beschleunigen
 	*/
 

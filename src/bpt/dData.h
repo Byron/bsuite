@@ -43,7 +43,7 @@ public:
 	dData(int startLoc,int endLoc, int cStartLoc,int cEndLoc,int startAbs,int endAbs,int cStartAbs,int cEndAbs,int type,int requester,int inNachbarID);
 	virtual ~dData();
 
-	//reine ContainerKlasse, enthält nur einige Variablen
+	//reine ContainerKlasse, enthlt nur einige Variablen
 
 	int	startLocID;
 	int	endLocID;
@@ -57,10 +57,10 @@ public:
 	int startAbsCorner;
 	int	endAbsCorner;
 	
-	int typeInfo;	//enthält den Typ des originalRequesters, so dass DirectionControl Nodes entscheiden können, wie sie sich verhalten
-	int	nachbarID;	//enthält die LocID des nachbarn, welcher um ne direction gefragt werden könnte. Wenn convertData/ToOpposite aufgerufen, verändern sie diesen Wert entsprechend
-					//nachbarID sollte lokaler Wert sein (ob das überhaupt benötit wird ? JA - wenn mehrere Nachbarn pro CornerEdge)
-	int requesterID;	//ist die ID des ursprünglichen Auftraggebers: in Loops muss dieser Vergleich dafür sorgen, dass Schleifen unmöglich werden
+	int typeInfo;	//enthlt den Typ des originalRequesters, so dass DirectionControl Nodes entscheiden knnen, wie sie sich verhalten
+	int	nachbarID;	//enthlt die LocID des nachbarn, welcher um ne direction gefragt werden knnte. Wenn convertData/ToOpposite aufgerufen, verndern sie diesen Wert entsprechend
+					//nachbarID sollte lokaler Wert sein (ob das ueberhaupt bentit wird ? JA - wenn mehrere Nachbarn pro CornerEdge)
+	int requesterID;	//ist die ID des urspruenglichen Auftraggebers: in Loops muss dieser Vergleich dafuer sorgen, dass Schleifen unmglich werden
 					//und ist absID
 	bool isFlipped;
 

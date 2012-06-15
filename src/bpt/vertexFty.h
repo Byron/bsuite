@@ -39,7 +39,7 @@ using std::list;
 namespace BPT
 {
 
-/** Diese Klasse ist in der Lage, die selektierten Vertizen zu verbinden wenn m�glich
+/** Diese Klasse ist in der Lage, die selektierten Vertizen zu verbinden wenn mglich
 	
 */
 
@@ -69,7 +69,7 @@ public:
 private:
 //------------------
 	
-	//ConditionChecks für connect, können auf ptr gespeichert werden
+	//ConditionChecks für connect, koennen auf ptr gespeichert werden
 	bool	isSelected				(UCHAR value);
 	bool	gimmeFalse				(UCHAR value);
 
@@ -102,7 +102,7 @@ private:
 //------------------
 
 #ifdef DEBUG
-	BPT_Helpers		helper;			//!< helper - wird nur für printArray benötigt
+	BPT_Helpers		helper;			//!< helper - wird nur für printArray benoetigt
 #endif
 
 	meshCreator*	ftyCreator;
@@ -111,7 +111,7 @@ private:
 
 	int				spin;			//!< default ist 0
 
-	double			refValue;		//!< hält die Größe des Faces, welches gerade bearbeitet wird
+	double			refValue;		//!< hält die Groesse des Faces, welches gerade bearbeitet wird
 
 //----------
 //KONSTANTEN

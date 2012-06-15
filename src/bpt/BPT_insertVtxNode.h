@@ -86,7 +86,7 @@ using std::endl;
 namespace BPT
 {
 
-/** Node, welche Vertizen einfügen und diese miteinander verbinden kann durch neue edges
+/** Node, welche Vertizen einfuegen und diese miteinander verbinden kann durch neue edges
 	
 */
 
@@ -134,14 +134,14 @@ public:
 
 
 	static	MObject		IVslide;		
-	static	MObject		IVnormal;		//!<wert für bewegung entlang der normale
+	static	MObject		IVnormal;		//!<wert fuer bewegung entlang der normale
 	
-	static	MObject		IVselEdgeIDs;	//!<speichert die gewählten edges
-	static	MObject		IVselVertIDs;	//!<speichert die Vertizen, die gewählt waren
+	static	MObject		IVselEdgeIDs;	//!<speichert die gewhlten edges
+	static	MObject		IVselVertIDs;	//!<speichert die Vertizen, die gewhlt waren
 	
 	
 	static	MObject		IVslideRelative;	//!<bool ob relativer Slide oder absolut
-	static	MObject		IVnormalRelative;	//!<normalslide relativ zur facegröße oder nicht?
+	static	MObject		IVnormalRelative;	//!<normalslide relativ zur facegrsse oder nicht?
 
 	static	MObject		IVwhichSide;	//!<von welcher Seite soll der Slide ausgene?
 	
@@ -175,10 +175,10 @@ public:
 	//
 	static	MTypeId		IVid;
 
-	MIntArray			validIndices;		//!<wird von factory zuwückgegeben - IDs die ausgewählt werden sollen
+	MIntArray			validIndices;		//!<wird von factory zuwueckgegeben - IDs die ausgewhlt werden sollen
 
 
-	MCallbackId			eID;				//!<callbackID für selectionCallback
+	MCallbackId			eID;				//!<callbackID fuer selectionCallback
 
 
 
@@ -189,7 +189,7 @@ public:
 private:
 	bool meshDirty;
 	
-	int	lastCount;		//!<hält den letzten count und verhindert, 
+	int	lastCount;		//!<hlt den letzten count und verhindert, 
 						//!<dass evaluiert wird mit dem seben countWert
 
 	int lastSpin;

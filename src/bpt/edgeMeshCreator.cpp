@@ -63,7 +63,7 @@ void		edgeMeshCreator::updateFaceData(edgeFaceData* faceData)
 	faceData->UVIndices.clear();
 	getFaceUVs(faceData->id, faceData->UVIndices, faceData->UVRelOffsets);
 	
-	//die AbsOffsets müssen auch neu aufgebaut werden - ist erst bei mehreren UVSets nötig, UVSet 0 hat immer Offset von 0
+	//die AbsOffsets müssen auch neu aufgebaut werden - ist erst bei mehreren UVSets noetig, UVSet 0 hat immer Offset von 0
 	UINT l = faceData->faceVertices.length();
 	UINT count = 0;
 	
@@ -75,7 +75,7 @@ void		edgeMeshCreator::updateFaceData(edgeFaceData* faceData)
 	
 	
 
-	//auf useNormals muss nicht gecheckt werden, da das von dieser proedur gemacht wird
+	//auf useNormals muss nicht gecheckt werden, da das von dieser prdur gemacht wird
 	getFaceNormalIDs(faceData->id, faceData->normalIndices);
 
 
@@ -167,7 +167,7 @@ void	edgeMeshCreator::changeEndFace(int origID,int newID[],int directions[], edg
 	newFaceIDs.append(newID[1]);
 	
 	
-	//jetzt erstma das neue Face erstellen auf die herkömmliche variante
+	//jetzt erstma das neue Face erstellen auf die herkoemmliche variante
 	//merke:dies ist abhängig von der Art der UVs zwischen den Faces. Wenn also keine passeden UVs vorhanden, dann muss 
 	//der triangulations algo gerufen werden, weshalb hier dann kein face erstellt werden darf
 
@@ -248,7 +248,7 @@ void	edgeMeshCreator::changeEndFace(int origID,int newID[],int directions[], edg
 			tNewUVs[r++] = UVSave[2][x];
 			tNewUVs[r++] = UVSave[3][x];
 			
-			//tnewIDs umkehren, wenn nötig
+			//tnewIDs umkehren, wenn noetig
 			if(d[0] == -1)
 				helper.invertArray(tNewUVs);
 			
@@ -387,7 +387,7 @@ void	edgeMeshCreator::changeSideFace(int origVtx, int newVtxID, int faceID, MInt
 	int offset = getValidAbsoluteOffset(faceID);
 	int count = offset + (*offsets)[faceID];
 	
-	int newVtxLocID;		//hält den faceRelativen index des newVtxID, wird von UVs benötigt, um schneller arbeiten zu können
+	int newVtxLocID;		//hält den faceRelativen index des newVtxID, wird von UVs benoetigt, um schneller arbeiten zu koennen
 	//ZUERST DEN ORIGVTX IN FACEARRAY MIT DEM NEWVTX TAUSCHEN
 	int i;
 	for(i = offset; i < count; i++)	
@@ -423,7 +423,7 @@ void	edgeMeshCreator::changeSideFace(int origVtx, int newVtxID, int faceID, MInt
 
 	//newUVIDs wie folgt kodiert: es hat numUVSets einträge, und -1, wenn face dort kein UVs hat
 	
-	//jetzt jede UV in jedem UVSet verändern, wenn möglich
+	//jetzt jede UV in jedem UVSet verändern, wenn moeglich
 	
 	//iteratoren
 	std::list<MIntArray>::iterator iterCounts			= UVCounts->begin();
@@ -538,7 +538,7 @@ void	edgeMeshCreator::changeEndFace(int origID,int newID, int direction, edgeFac
 				
 				
 				
-				createPoly(newFaceIDs, faceData);	//alles nötige bezüglich der normalen und UVs wird von dieser Methode übernommen
+				createPoly(newFaceIDs, faceData);	//alles noetige bezüglich der normalen und UVs wird von dieser Methode übernommen
 				
 				
 				//jetzt noch den originalVtx entfernen: Man muss bedenken, dasss der NewVtx bereits ins originalFace eingefügt wurde
@@ -608,7 +608,7 @@ void	edgeMeshCreator::insertVtx(const edgeFaceData* faceData, int origID, int ne
 				
 				//methode hat den nachteil, dass sie den ReVtx nochmal auf`s neue sucht, aber was solls
 				
-				//erst jetzt den Vtx hinzufügen, damit die UVs aktualisiert werden können
+				//erst jetzt den Vtx hinzufügen, damit die UVs aktualisiert werden koennen
 				//tmpFace.insertEdgeVtx(origID, refVtx, newID, inFaceDir);	//diese Prozedur kümmert sich auch um de Normalen 
 				tmpFace.insertEdgeVtx(origID, newID, faceDir);	
 				
@@ -677,7 +677,7 @@ void	edgeMeshCreator::removeVtx(int vtxID, int faceID)
 		
 		UINT locID;
 		
-		//erstmal die durch vtx erzeugt hardEdge entfernen, wenn möglich
+		//erstmal die durch vtx erzeugt hardEdge entfernen, wenn moeglich
 		if(helper.getLocIndexMod2(vtxID,normalIDs, locID))
 		{
 			normalIDs.remove(locID);
@@ -694,7 +694,7 @@ void	edgeMeshCreator::removeVtx(int vtxID, int faceID)
 			}
 		}
 		
-		//jetzt die aktualisierten normalIDs ins große" array übertragen
+		//jetzt die aktualisierten normalIDs ins grosse" array übertragen
 		updateNormalArraysWith(normalIDs, faceID);
 		
 		//fertig
@@ -766,7 +766,7 @@ void	edgeMeshCreator::changePolyVtxIDs(const edgeFaceData* faceData)
 	int change = faceData->faceVertices.length() - l;	//change muss in jedem Fall bereits hier gesetzt werden, da es nach der changeVtx prozedur sowieso gleich faceVertices.length() ist
 
 
-	//diesse Prozedur nimmt die Daten aus der FaceData und aktualisiert damit das Face im großen DatenArray
+	//diesse Prozedur nimmt die Daten aus der FaceData und aktualisiert damit das Face im grossen DatenArray
 
 	meshCreator::changePolyVtxIDs(faceData->id,faceData->faceVertices);
 
@@ -895,7 +895,7 @@ void	edgeMeshCreator::createPoly(const edgeFaceData* data)
 		
 		//wenn das face dieses UVSets nicht gemapt ist, abbruch
 		if(!data->UVRelOffsets[a])
-		{//vorm abbruch aber boch die OffsetsArrays aktualisieren und erhöhen
+		{//vorm abbruch aber boch die OffsetsArrays aktualisieren und erhoehen
 			(*UVCountsIter).append(0);
 			(*UVAOIter).append( (*UVAOIter)[((*UVAOIter).length()-1)] );
 			
@@ -914,7 +914,7 @@ void	edgeMeshCreator::createPoly(const edgeFaceData* data)
 			newUVs[r++] = data->UVIndices[x];
 		}
 			
-		//jetzt noch die neuen UVs hinzufügen, gleichzeitig die Iters erhöhen
+		//jetzt noch die neuen UVs hinzufügen, gleichzeitig die Iters erhoehen
 		helper.addIntArrayToLHS(*UVIDIter, newUVs);
 		(*UVCountsIter).append(l);
 		(*UVAOIter).append( (*UVAOIter)[((*UVAOIter).length()-1)] + l );
@@ -981,7 +981,7 @@ void	edgeMeshCreator::createPoly(MIntArray& vtxIDs, edgeFaceData* faceData)
 		
 		//wenn das face dieses UVSets nicht gemapt ist, abbruch
 		if(!faceData->UVRelOffsets[a])
-		{//vorm abbruch aber boch die OffsetsArrays aktualisieren und erhöhen
+		{//vorm abbruch aber boch die OffsetsArrays aktualisieren und erhoehen
 			(*UVCountsIter).append(0);
 			(*UVAOIter).append( (*UVAOIter)[((*UVAOIter).length()-1)] );
 			
@@ -1000,7 +1000,7 @@ void	edgeMeshCreator::createPoly(MIntArray& vtxIDs, edgeFaceData* faceData)
 			
 			//man muss jetzt beide Arrays nach dem entsprechenden Vtx durchsuchen.
 			//man kann hier nicht direkt nach newVtx und edgeVtx unterteilen, da sie beide Ids haben
-			//die größer sind als der initialVtxCount
+			//die groesser sind als der initialVtxCount
 			
 			
 			
@@ -1031,8 +1031,8 @@ outOfInnerLoop:;
 			   
 		}
 		
-		INVIS(helper.printArray(newUVs, " == NEWUVS F�RS GERADE ERSTELLTE FACE"));
-		//jetzt noch die neuen UVs hinzufügen, gleichzeitig die Iters erhöhen
+		INVIS(helper.printArray(newUVs, " == NEWUVS FUERS GERADE ERSTELLTE FACE"));
+		//jetzt noch die neuen UVs hinzufügen, gleichzeitig die Iters erhoehen
 		helper.addIntArrayToLHS(*UVIDIter, newUVs);
 		(*UVCountsIter).append(l);
 		(*UVAOIter).append( (*UVAOIter)[((*UVAOIter).length()-1)] + l );
@@ -1130,7 +1130,7 @@ void	edgeMeshCreator::recreateOriginalFace(edgeFaceData* origFace)
 {
 	//in dieser Prozedur wird das OriginalFace (siehe FaceID der FaceData) anhand der newVtx und der UVs in UVChange wiederhergestellt
 	
-	//man könnte auch die changeSideFace prozedur verwenden, allerdings kann diese pro aufruf nur einen Vtx ändern, und würde deshalb bei jedem ruf
+	//man koennte auch die changeSideFace prozedur verwenden, allerdings kann diese pro aufruf nur einen Vtx ändern, und würde deshalb bei jedem ruf
 	// die getValidAbs offset prozeduren verwenden, was Zeit verschwendet
 	INVIS(cout<<"ÄNDERE ENDFACE: "<<origFace->id<<endl);
 	INVIS(helper.printArray(origFace->vtxChange, " = vtxChange"));
@@ -1180,7 +1180,7 @@ void	edgeMeshCreator::recreateOriginalFace(edgeFaceData* origFace)
 
 				(*faceVtxIDs)[i] = newVtxID;
 				
-				newVtxLocID = i - vOffset;				//wird später für schnellen UVLookup benötigt
+				newVtxLocID = i - vOffset;				//wird später für schnellen UVLookup benoetigt
 
 				notFound = false;
 
@@ -1191,7 +1191,7 @@ void	edgeMeshCreator::recreateOriginalFace(edgeFaceData* origFace)
 		if(notFound)
 		{
 			//wenn er diesen Vtx nicht finden konnte, dann wurde er wahrscheinlich vorher schon verändert von einer FaceData instanz, die das selbe Face bezeichnete
-			//dies kann vorkommen bei bestimmten konstellationen von endEdges uns selEdges, die sich ein großes nGon teilen, ohne dabei miteinander verbunden zu sein
+			//dies kann vorkommen bei bestimmten konstellationen von endEdges uns selEdges, die sich ein grosses nGon teilen, ohne dabei miteinander verbunden zu sein
 			continue;		//um weiteren overhead zu vermeiden, mit dem nächsten Vtx weitermachen
 		}
 		
@@ -1213,7 +1213,7 @@ void	edgeMeshCreator::recreateOriginalFace(edgeFaceData* origFace)
 		
 
 			
-			//jetzt jede UV in jedem UVSet verändern, wenn möglich
+			//jetzt jede UV in jedem UVSet verändern, wenn moeglich
 			
 			//iteratoren
 			std::list<MIntArray>::iterator iterCounts			= UVCounts->begin();
@@ -1313,7 +1313,7 @@ void	edgeMeshCreator::addSlide(int startID,int endID)
 
 	MVector direction = end - start;
 
-//	->MUSS DEAKTIVIERT SEIN; WENN UVS FÜR SIDEFACES RICHTIG FUNZEN SOLLEN ->geh jetzt auch so, da posTmp verwendet wird - muss aber immer noch nicht an sein
+//	->MUSS DEAKTIVIERT SEIN; WENN UVS FUER SIDEFACES RICHTIG FUNZEN SOLLEN ->geh jetzt auch so, da posTmp verwendet wird - muss aber immer noch nicht an sein
 //	(*vtxPoints)[endID] = end - slide*direction;
 
 
@@ -1376,7 +1376,7 @@ void	edgeMeshCreator::addSlideAndNormal(int startID, int newVtx, MPoint& positio
 
 	MVector direction = end - start;
 
-//habe ich rausgenommen, um bug zu beheben ->MUSS DEAKTIVIERT SEIN; WENN UVS FÜR SIDEFACES RICHTIG FUNZEN SOLLEN -> siehe oben
+//habe ich rausgenommen, um bug zu beheben ->MUSS DEAKTIVIERT SEIN; WENN UVS FUER SIDEFACES RICHTIG FUNZEN SOLLEN -> siehe oben
 //	if(newVtx < initialVtxCount)	//"alte" neue Vtx müssen sofort gesetzt werden
 //        		(*vtxPoints)[newVtx] = position;	//->problem, wenn origVtx zuerst gesetzt wird, da dann der newVtx verschoben ist
 													//origVtx werden jetzt zuletzt verschoben
@@ -1399,7 +1399,7 @@ void	edgeMeshCreator::addSlideAndNormal(int startID, int newVtx, MPoint& positio
 MPoint		edgeMeshCreator::getSlideStartPoint(int vtxID)
 //-----------------------------------------------------------------------
 {
-	//sucht im slideIndicesArray nach dem passende Vtx, und gibt die dazugehörige startposition zurück, was der endposition entspricht
+	//sucht im slideIndicesArray nach dem passende Vtx, und gibt die dazugehoerige startposition zurück, was der endposition entspricht
 
 	UINT l = slideIndices->length();
 	for(UINT i = 0; i < l; i++)
@@ -1418,7 +1418,7 @@ MPoint		edgeMeshCreator::getSlideStartPoint(int vtxID)
 void	edgeMeshCreator::getUVSlideStartPoint(const MIntArray& UVIDs, MFloatArray& outPos)
 //-----------------------------------------------------------------------
 {
-	//sicherstellen, dass outPos die richtige l�nge hat
+	//sicherstellen, dass outPos die richtige lnge hat
 	outPos.setLength(numUVSets * 2);
 
 	//holt die UVPositionen aus dem UVSlideArray
@@ -1600,7 +1600,7 @@ void	edgeMeshCreator::addUVSlide(const MFloatArray& startPositions,const MFloatA
 //-----------------------------------------------------------------------------------------------------------------------------------
 {
 
-	//Diese Prozedur kann so erstmal nur einen UVIndex pro UVSt eintragem , könnte aber falls nötig leicht umgerüstet werden, um x pro UVSet verarbeiten zu können
+	//Diese Prozedur kann so erstmal nur einen UVIndex pro UVSt eintragem , koennte aber falls noetig leicht umgerüstet werden, um x pro UVSet verarbeiten zu koennen
 	
 
 //ITERATOREN

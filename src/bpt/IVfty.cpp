@@ -38,7 +38,7 @@ IVfty::IVfty(void):	maxStandardScale(1.0),
 					slideIndices(0),
 					maySlide(0),
 
-					spin(0)	//nur zur Sicherheit, is aber eigentlich unnötig
+					spin(0)	//nur zur Sicherheit, is aber eigentlich unnoetig
 //---------------------------------------------------------------
 {
 }
@@ -160,7 +160,7 @@ MStatus		IVfty::doIt()
 	//grundsätzlich muss diese prozedur im SelectMode sein - um dies sicherzustellen, jedes mal in den selectModegehen
 //	MGlobal::executeCommand("setToolTo selectSuperContext",false,false);
 
-	cleanUp();		//wird gerufen, damit die Ptr gelöscht werden für den Fall, dass nur count geändert wurde
+	cleanUp();		//wird gerufen, damit die Ptr geloescht werden für den Fall, dass nur count geändert wurde
 	
 	//slidePathes werden einzeln gepeichert, so dass vor der topologieänderung noch geprüft werden kann, wie sich separate pathes zueinander Verhalten
 
@@ -193,9 +193,9 @@ MStatus		IVfty::doIt()
 
 
 	if(options[9])
-	{//connectVertces benötigt eine VtxListe, welche jetzt erstellt wird - es sind nur neue Vertizen
+	{//connectVertces benoetigt eine VtxListe, welche jetzt erstellt wird - es sind nur neue Vertizen
 		
-		UINT l = creator.getLastVtxID() + 1 - initialVtxCount;	//+1, da creator die letzte ID wiedergibt, wie aber die gegenwärtige VtxZahl benötigen
+		UINT l = creator.getLastVtxID() + 1 - initialVtxCount;	//+1, da creator die letzte ID wiedergibt, wie aber die gegenwärtige VtxZahl benoetigen
 		MIntArray vtxList(l);
 		
 		l += initialVtxCount;
@@ -232,7 +232,7 @@ MStatus		IVfty::doIt()
 							maySlide	);
 
 	//an dieser Stelle muss unbedingt noch ein Eintrag zum slideIndices Array hinzugefügt werden, der den 
-	//letzten index bezeichnet (dies wird in slideprocedur benötigt)
+	//letzten index bezeichnet (dies wird in slideprocedur benoetigt)
 	slideIndices->append(creator.getLastVtxID() + 1);	//PLUS 1: slideRoutine geht davon aus, das dies der Minindex einer 
 														//anderen edge ist, und subtrahiert 1, damit se ihren maxIndex erhält
 
@@ -269,7 +269,7 @@ void	IVfty::insertVertices(		IVMeshCreator&	 creator,
 									MIntArray&		 invalidPathes	)
 //---------------------------------------------------------------------
 {
-	//Ungültige pfade werden einfach gleichmäßig gesplittet entsprechend des counts
+	//Ungültige pfade werden einfach gleichmässig gesplittet entsprechend des counts
 	
 	//gültige Pfade werden gesplittet unter Verwendung des count und slide attributes sowie der startEndIDs
 
@@ -366,7 +366,7 @@ void	IVfty::trenneEdgePathes(	list<MIntArray>& validPathes,
 
 	while(allEdges.getTrueCount() > 0)
 	{
-		//der äußere Loop sorgt dafür, dass garantiert jede gewählte Edge zugeordnet wird
+		//der äussere Loop sorgt dafür, dass garantiert jede gewählte Edge zugeordnet wird
 		
 		//Variablen zurücksetzen
 		isValidPath = true;
@@ -382,7 +382,7 @@ void	IVfty::trenneEdgePathes(	list<MIntArray>& validPathes,
 		{
 
 			if(!allEdges[ startEdges[i] ])
-			{//wenn edge zu loop gehörte, dann könnte sie bereits bearbeitet worden sein, und muss folglich nicht zweimal bearbeitet werden
+			{//wenn edge zu loop gehoerte, dann koennte sie bereits bearbeitet worden sein, und muss folglich nicht zweimal bearbeitet werden
 				continue;
 			}
 			else
@@ -485,7 +485,7 @@ void	IVfty::trenneEdgePathes(	list<MIntArray>& validPathes,
 					allEdges.findMatching(containedEdges, match);
 
 
-					//wenn match größer 1, dann wird der Pfad ungültig und es müssen keine directions mehr geholt werden
+					//wenn match groesser 1, dann wird der Pfad ungültig und es müssen keine directions mehr geholt werden
 					if(match.length() == 1)
 					{//es ist weiterhin gültiger pfad, also lastFace setzen, currentEdge und direction auf Arrays packen
 					 //,currentEdge setzen und sie aus allEdges array entfernen
@@ -497,7 +497,7 @@ void	IVfty::trenneEdgePathes(	list<MIntArray>& validPathes,
 						partialPath.append(currentEdge);
 						
 						if(isValidPath)
-						{//nur wenn der pfad gültig ist, wird überhaupt diretion benötigt
+						{//nur wenn der pfad gültig ist, wird überhaupt diretion benoetigt
 							edgeIter.setIndex(currentEdge,tmp);
 							polyIter.setIndex(currentFace,tmp);
 							polyIter.getVertices(faceVerts);
@@ -521,7 +521,7 @@ void	IVfty::trenneEdgePathes(	list<MIntArray>& validPathes,
 						break;
 					}
 					else
-					{//also ist match größer 1 - dieser macht alles folgende ungültig; die überschüssigen Edges sind neue StartEdges
+					{//also ist match groesser 1 - dieser macht alles folgende ungültig; die überschüssigen Edges sind neue StartEdges
 					 //currentFace kommt in startFaces, pfad ist ungültig ,->abbruch
 						for( UINT u = 0; u < match.length(); u++ )
 						{
@@ -613,7 +613,7 @@ MStatus	stat;
 	
 	//dafür sorgen, dass scaling immer den korrekten wert hat
 	if(maxStandardScale == 1.0)
-	{//findet den größten normalscalewert und setzt damit maxStandardScale	
+	{//findet den groessten normalscalewert und setzt damit maxStandardScale	
 		maxStandardScale = 0.0;
 
 		for(int i = 0; i < l; i++)
@@ -832,7 +832,7 @@ void	IVfty::doUVSlide(MObject& mesh)
 	//unsigned int numUVSets = UVSetNames.length();
 	unsigned int numUVSets = 1;		//da er e nur auf einem UVSet arbeiten kann ... 
 
-	//lokaö#le float kopie von slide, um ständiges konvertieren zu vermeiden;
+	//lokaoe#le float kopie von slide, um ständiges konvertieren zu vermeiden;
 	float fSlide = slide;
 
 	//iteratoren
@@ -847,7 +847,7 @@ void	IVfty::doUVSlide(MObject& mesh)
 
 	UINT minUVID, maxUVID;		//tmpVariablen
 	UINT	c2n = 0, c2n1 = 1;	//counter für i*2 und i*2+n (verhindert, dass man das jedes mal ausrechnen muss
-								//und wird ausschließlich mit IDsArray verwendet
+								//und wird ausschliesslich mit IDsArray verwendet
 	
 	double	tf;				//tmpValue für factor * r, damt das nicht zweimal berechnet werden muss
 	double	factor = 1.0 / (count + 1);	//factor für positionsberechnung
@@ -871,7 +871,7 @@ void	IVfty::doUVSlide(MObject& mesh)
 
 		if(!isSlideRelative)
 		{
-			//erstmal den ScaleFactor errechnen, wenn nötig
+			//erstmal den ScaleFactor errechnen, wenn noetig
 			
 
 			if(scale.length() == 0)

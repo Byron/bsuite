@@ -53,7 +53,13 @@ MObject	visualizeMeshNode::vtxWeights;
 #endif
 
 
-visualizeMeshNode::visualizeMeshNode():listNeedsUpdate(true), wasInCompute(false), list(450000) {}
+visualizeMeshNode::visualizeMeshNode()
+	: listNeedsUpdate(true)
+	, wasInCompute(false)
+	, list(450000)
+	, vtxColor(0.0f, 0.0f)
+	, vtxColor2(0.0f, 0.0f)
+	{}
 visualizeMeshNode::~visualizeMeshNode() {}
 
 //-----------------------------------------------------------------------
@@ -101,7 +107,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 
 	MPlug		plug(thisNode, drawingEnabled) ;
 	
-	//soll überhaupt etwas gezeichnet werden?
+	//soll ueberhaupt etwas gezeichnet werden?
 	bool doDraw;
 	plug.getValue(doDraw);
 
@@ -123,7 +129,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 
 	bool	allowBeautyMode = true;
 
-	// Jetzt das Plug auslesen um herauszufinden, ob man schön zeichnen darf oder nicht
+	// Jetzt das Plug auslesen um herauszufinden, ob man schn zeichnen darf oder nicht
 	// TODO
 
 	
@@ -152,9 +158,9 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 
 
 
-	//Farbe holen	-> Diese Schreibweise hat den (hier unbedeutenden) Vorteil, dass Objekte automatisch zerstört werden - sie existieren nur innerhalb der Klammern
+	//Farbe holen	-> Diese Schreibweise hat den (hier unbedeutenden) Vorteil, dass Objekte automatisch zerstrt werden - sie existieren nur innerhalb der Klammern
 	{
-		MColor tmpColor;
+		MColor tmpColor(0.0f, 0.0f);
 		
 
 		plug.setAttribute(vtxColorObj);
@@ -165,7 +171,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 		MFnNumericData	numDataFn(colorObj);
 		numDataFn.getData(tmpColor.r, tmpColor.g, tmpColor.b);
 
-		//wenn sich die Farben verändert haben, dann die liste updaten - und alles neuzeichnen
+		//wenn sich die Farben verndert haben, dann die liste updaten - und alles neuzeichnen
 		if(tmpColor != vtxColor)
 		{
 			vtxColor = tmpColor;
@@ -195,7 +201,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 	plug.getValue(dummy);
 
 
-	//vtxWeights müssen gesetzt sein
+	//vtxWeights muessen gesetzt sein
 	if(vtxWeightArray.length() == 0)
 		return;
 
@@ -210,7 +216,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 
 	visualizeMeshNode::meshStatus mStat = getMeshStatus();
 
-	// Wenn sich der Anezigstatus des Meshes ändert, dann muss die DisplayList neu erstellt werden
+	// Wenn sich der Anezigstatus des Meshes ndert, dann muss die DisplayList neu erstellt werden
 	// Nur um den PolygonOffset zu aktualisieren
 	if(mStat != lastStat)
 	{
@@ -250,14 +256,14 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 		
 
 
-		//Die displayList prüfen
+		//Die displayList pruefen
 		if( (listNeedsUpdate & !wasInCompute) || lastDMode != style )
 		{//neue Liste erzeugen - wird eigentlich nur einmal pro drawAktion gemacht
 			
 			lastDMode = style;
 
 			if( list != 450000 ) 
-				//alte liste löschen
+				//alte liste lschen
 				glDeleteLists(list, 1);
 			
 			list = glGenLists(1);
@@ -338,8 +344,8 @@ void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 				cout<<"StandardRenderMode"<<endl;
 			*/
 
-			MColor tmpColor;
-			double dTmp;		// hält das weight, cache
+			MColor tmpColor(0.0f, 0.0f);
+			double dTmp;		// hlt das weight, cache
 
 			//weights verwenden um Farbe zu skalieren
 			uint numCVs = vertIter.count();
@@ -396,7 +402,7 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 				
 				
 				
-				//Dass muss ausßerhalb der displayList bleiben, weil dieser Wert nicht precompiliert werden darf
+				//Dass muss aussserhalb der displayList bleiben, weil dieser Wert nicht precompiliert werden darf
 				float param1 = 0.45, param2 = 0.55;
 
 				// im DebugMode werden die Params anhand der NodeParameter gesetzt
@@ -442,7 +448,7 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 				uint numPolys = polyIter.count();
 				uint i, x , l;
 				MPoint	point;
-				MColor	tmpCol;
+				MColor	tmpCol(0.0f, 0.0f);
 				MPointArray triPoints;
 				MIntArray	triVtx;
 				//glColor4f(0.0f, 0.0f, 1.0f, 0.2);
@@ -614,7 +620,7 @@ MStatus visualizeMeshNode::initialize()
 
 
 	
-	/* // Dieses Feature ist eigentlich ziemlich unnötig
+	/* // Dieses Feature ist eigentlich ziemlich unntig
 //!!!####################################################
 	//SHOW ORIGINAL MESH
 //!!!####################################################
@@ -684,7 +690,7 @@ MStatus visualizeMeshNode::initialize()
 	
 /*
 //!!!####################################################
-	//IN MATRIX (TRANSFORMATIONMATRIX FÜR DAS VTSSET)
+	//IN MATRIX (TRANSFORMATIONMATRIX FUER DAS VTSSET)
 //!!!####################################################
 	//matrix
 
@@ -696,7 +702,7 @@ MStatus visualizeMeshNode::initialize()
 
 #ifdef DEBUG
 //!!!####################################################
-	//DEBUG PARAMETER: FÜR POLYOFFSET
+	//DEBUG PARAMETER: FUER POLYOFFSET
 //!!!####################################################
 	//matrix
 
@@ -717,7 +723,7 @@ MStatus visualizeMeshNode::initialize()
 
 
 
-	//Attribute hinzufügen
+	//Attribute hinzufuegen
 	//------------------------
 
 	stat = addAttribute (drawingEnabled);
@@ -783,7 +789,7 @@ MStatus visualizeMeshNode::initialize()
 		return stat;}
 	
 
-	// Die Parameter müssen die computeMethod aufrufen
+	// Die Parameter muessen die computeMethod aufrufen
 #ifdef DEBUG
 	
 		stat = attributeAffects(pOffset1Obj, vtxLocations );

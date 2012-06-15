@@ -55,7 +55,7 @@ void		BPT_Helpers::sortArray(MIntArray& array) const
 
 }
 
-/// Erzeugt einen spezifischen Key aus dem Übergebenen string
+/// Erzeugt einen spezifischen Key aus dem UEbergebenen string
 //
 //  ----------------------------------------------------
 ulong	BPT_Helpers::genKey(const MString& string)
@@ -99,7 +99,7 @@ bool		BPT_Helpers::isOnArray(int value,const MIntArray& array) const
 //------------------------------------------------------------------------------
 bool		BPT_Helpers::getLocIndex(int value,const MIntArray& array, UINT& localIndex) const
 //------------------------------------------------------------------------------
-{//wird benötigt für normals (meshCreator)
+{//wird benoetigt für normals (meshCreator)
 	 int l = array.length();
 	
 
@@ -117,7 +117,7 @@ bool		BPT_Helpers::getLocIndex(int value,const MIntArray& array, UINT& localInde
 //------------------------------------------------------------------------------
 bool		BPT_Helpers::getLocIndex(int value,const MIntArray& array, UINT& localIndex, int lowBound, int highBound) const
 //------------------------------------------------------------------------------
-{//wird benötigt für normals (meshCreator)
+{//wird benoetigt für normals (meshCreator)
 
 
 	for(int i = lowBound; i < highBound; i++)
@@ -134,8 +134,8 @@ bool		BPT_Helpers::getLocIndex(int value,const MIntArray& array, UINT& localInde
 //------------------------------------------------------------------------------
 bool		BPT_Helpers::getLocIndexMod2(int value,const MIntArray& array, UINT& localIndex) const
 //------------------------------------------------------------------------------
-{//wird benötigt für normals (meshCreator)
-	//achtet außerdem darauf, dass das Ergebnis durch 2 teilbar ist
+{//wird benoetigt für normals (meshCreator)
+	//achtet ausserdem darauf, dass das Ergebnis durch 2 teilbar ist
 	 int l = array.length();
 
 	for( int i = 0; i < l; i += 2)
@@ -151,8 +151,8 @@ bool		BPT_Helpers::getLocIndexMod2(int value,const MIntArray& array, UINT& local
 //------------------------------------------------------------------------------
 bool		BPT_Helpers::getLocIndexMod2(int value,const MIntArray& array, UINT& localIndex, int lowBound, int highBound) const
 //------------------------------------------------------------------------------
-{//wird benötigt für normals (meshCreator)
-	//achtet außerdem darauf, dass das Ergebnis durch 2 teilbar ist
+{//wird benoetigt für normals (meshCreator)
+	//achtet ausserdem darauf, dass das Ergebnis durch 2 teilbar ist
 
 
 	for(int i = lowBound; i < highBound; i += 2)
@@ -224,7 +224,7 @@ void		BPT_Helpers::arrayRemove(MIntArray& lhs,MIntArray& rhs, bool affectLhsOnly
 
 	if(leftL + rightL < 200 && !affectLhsOnly)
 
-	{//wenn maximal 10000 iterationen vonnöten sind
+	{//wenn maximal 10000 iterationen vonnoeten sind
 
 		int i = 0;
 		int x = 0;
@@ -374,11 +374,11 @@ void		BPT_Helpers::memoryPrune(MIntArray& orig, MIntArray& doppelte)
 	int smallest = 166666666;
 
 //	wenns zu speicherintesiv wird, einfach noch den kleinsten Wert ermitteln
-//	und die ArrayGröße auf [biggest - smallest] stellen.
+//	und die ArrayGroesse auf [biggest - smallest] stellen.
 //	beim zuweisen der Werte = orig[i] - smallest
 //	beim wiedereintragen on orig.append(x + smallest)
 
-//	größtes und kleinstes element holen
+//	groesstes und kleinstes element holen
 	int i;
 	for(i = 0; i < l; i++)
 	{
@@ -420,7 +420,7 @@ void		BPT_Helpers::memoryPrune(MIntArray& orig, MIntArray& doppelte)
 
 	////cout<<l <<" == Länge memArray"<<endl;
 	orig.clear();
-//	nullen rausschmeißen
+//	nullen rausschmeissen
 	for(;i < l; i++)
 		if( (*memArray)[i] != -1)
 			orig.append( (*memArray)[i]);
@@ -450,7 +450,7 @@ void		BPT_Helpers::invertArray(MIntArray& array)
 void		BPT_Helpers::invertArray(MIntArray& array, int lBound, int rBound)
 //-----------------------------------------------------------------
 {
-	//dasselbe wie oben, nur mit variablen zur arbeit au größeren arrays - bzw. der Umkehr von array teilen
+	//dasselbe wie oben, nur mit variablen zur arbeit au groesseren arrays - bzw. der Umkehr von array teilen
 	int l2 = ((rBound - lBound) / 2 ) + lBound + ((rBound - lBound) % 2);
 	int lminus = array.length() - 1;
 	int tmp;
@@ -603,7 +603,7 @@ MIntArray		BPT_Helpers::memoryMatch(MIntArray lhs, MIntArray rhs)
 	i = 0;
 	l = rhs.length();
 
-	//	eventuell versuchr rhs wegen höherer indices als die von
+	//	eventuell versuchr rhs wegen hoeherer indices als die von
 	//	lhs, auf nicht vorhandene memArrayElemente zuzugreifen.
 	//	MIntArray dürfte dies abfangen
 

@@ -95,7 +95,7 @@ MStatus	ByronsPolyToolsNode::connectionBroken( const MPlug& plug, const MPlug& o
 
 	/*
 	MPRINT("-------------------------------")
-	MPRINT("Connection Wird gel√∂scht")
+	MPRINT("Connection Wird gelueuescht")
 	INVIS(cout<<"In Plug: "<<plug.name()<<endl;)
 	INVIS(cout<<"otherPlug: "<<otherPlug.name()<<endl;)
 	INVIS(cout<<"IsSource: "<<asSrc<<endl;)
@@ -127,7 +127,7 @@ MStatus	ByronsPolyToolsNode::connectionBroken( const MPlug& plug, const MPlug& o
 	}
 */
 
-	// Mal die softTransformationEngine prozedur aufrufen - sie k¸mmert sich um die visNode, welche ansonsten verhindern w¸rde, dass die history wirklich gekillt wird
+	// Mal die softTransformationEngine prozedur aufrufen - sie kuemmert sich um die visNode, welche ansonsten verhindern wuerde, dass die history wirklich gekillt wird
 //	return	softTransformationEngine::connectionBroken(plug, otherPlug, asSrc);
 
 //	return MPxNode::connectionBroken(plug,otherPlug,asSrc);
@@ -331,9 +331,9 @@ MStatus		ByronsPolyToolsNode::initialize()
 	MCheckStatus(status, "AddAttrBPTNode");
 		
 
-	// Zuletzt die SoftTransformationAttribute hinzuf¸gen
-	// Per Macro - dirty, aber funktioniert - wie machen die ALIAS Typen das ??? Die leiten auch st‰ndig von einer BaseNode ab, und da gehen dann keine Attribute flˆten
-	// Oder werden unbrauchbar so wie bei mir, so dass im Endeffekt s‰mtliche Attribute ein eindeutiges statisches Attribut haben m¸ssen
+	// Zuletzt die SoftTransformationAttribute hinzufuegen
+	// Per Macro - dirty, aber funktioniert - wie machen die ALIAS Typen das ??? Die leiten auch stuendig von einer BaseNode ab, und da gehen dann keine Attribute flueten
+	// Oder werden unbrauchbar so wie bei mir, so dass im Endeffekt suemtliche Attribute ein eindeutiges statisches Attribut haben muessen
 
 	STE_ADD_ATTRIBUTES(BPT)
 
@@ -360,7 +360,7 @@ bool	ByronsPolyToolsNode::setInternalValue ( const MPlug & plug, const MDataHand
 
 		
 		if( isLimited )
-		{//limits setzen, wenn gew√ºnscht
+		{//limits setzen, wenn gewueuenscht
 			
 			double value = dataHandle.asDouble();
 			
@@ -387,7 +387,7 @@ bool	ByronsPolyToolsNode::setInternalValue ( const MPlug & plug, const MDataHand
 		meshDirty = true; 
 
 
-	// Sich jetzt um die STE internals k¸mmern
+	// Sich jetzt um die STE internals kuemmern
 	//
 	//
 
@@ -410,7 +410,7 @@ void	makeSelection(void* data)
 	MDagPath meshPath;
 	nodePtr->getMeshPath(meshPath);
 
-	if(meshPath.apiType() != MFn::kInvalid && nodePtr->validIndices.length() != 0)	//zur Sicherheit, sollte aber eigentlich nicht m√∂glich sein
+	if(meshPath.apiType() != MFn::kInvalid && nodePtr->validIndices.length() != 0)	//zur Sicherheit, sollte aber eigentlich nicht mueueglich sein
 	{
 		MFnSingleIndexedComponent compFn;
 		
@@ -457,7 +457,7 @@ MStatus ByronsPolyToolsNode::doCompleteCompute(MDataBlock& data)
 
 				MPRINT("MACHE KOMPLETTE BERECHNUNG")
 
-				//gleich zu beginn muss der MeshPath initialisiert werden, damit der MeshPath an die fty √ºbergeben werden kann
+				//gleich zu beginn muss der MeshPath initialisiert werden, damit der MeshPath an die fty ueuebergeben werden kann
 				//dieser Block wird von mehreren nachfolgenden Prozeduren vrwendet und muss erhalten bleiben
 
 				// ****************
@@ -466,7 +466,7 @@ MStatus ByronsPolyToolsNode::doCompleteCompute(MDataBlock& data)
 
 				// Dies wird von der softTransformationEngine gemacht
 				
-				// Diese Methode ist essentiell, da sie zugriff auf alle Attribute ermˆglicht
+				// Diese Methode ist essentiell, da sie zugriff auf alle Attribute ermueglicht
 				softTransformationEngine::gatherAttributeObjects(thisMObject());
 				softTransformationEngine::saveMeshPathes();
 
@@ -597,7 +597,7 @@ MStatus ByronsPolyToolsNode::doCompleteCompute(MDataBlock& data)
 			
 
 				// **************************************************************************************
-				// JETZT DIE INPUT DATEN SETZEN F‹R SOFTTRANSFORMATION NODE
+				// JETZT DIE INPUT DATEN SETZEN FueR SOFTTRANSFORMATION NODE
 				// **************************************************************************************
 
 				int mode = modeHandle.asInt() ;
@@ -606,7 +606,7 @@ MStatus ByronsPolyToolsNode::doCompleteCompute(MDataBlock& data)
 				case 4:	// Chamfer
 				case 5: // SC
 					{
-						// Hier ist es aufwendig: Alle neuen Vtx und jene, die im inMesh die gew‰hlten kanten ausgemacht haben m¸ssen gew‰hlt werden
+						// Hier ist es aufwendig: Alle neuen Vtx und jene, die im inMesh die gewuehlten kanten ausgemacht haben muessen gewuehlt werden
 						// Man kann einfach die SlideIndices verwenden
 						softTransformationEngine::setVtxSet( fBPTfty.getSlideIndices(), data );
 						break;
@@ -632,7 +632,7 @@ MStatus ByronsPolyToolsNode::doCompleteCompute(MDataBlock& data)
 				//------------SELECTION ROUTINE----------------------
 
 
-				//jetzt die Components anw√§hlen
+				//jetzt die Components anwueuehlen
 				
 
 				isSCMode = (mode == 4 || mode == 5)?true:false;
@@ -670,7 +670,7 @@ MStatus ByronsPolyToolsNode::doCompleteCompute(MDataBlock& data)
 								//contained edges holen
 								CC.getContainedEdges(slideIndices,validIndices);
 								
-								//wenn n√∂tig edges in Faces umwandeln
+								//wenn nueuetig edges in Faces umwandeln
 								if(optionsArray[6] == 2)
 								{
 														
@@ -715,7 +715,7 @@ MStatus ByronsPolyToolsNode::doCompleteCompute(MDataBlock& data)
 								
 								if(optionsArray[6] != 2 && polygons.length() > 0)
 								{
-									//fty NH erstellen f√ºr external Boundary
+									//fty NH erstellen fueuer external Boundary
 									BPTfty_NH fty_NH;
 									fty_NH.externalBoundary(validIndices,polygons,newOutMesh);
 									validIndices.insert(1,0);
@@ -805,7 +805,7 @@ MStatus ByronsPolyToolsNode::doCompleteCompute(MDataBlock& data)
 							
 						}
 						else
-						{//verts w√§hlen
+						{//verts wueuehlen
 							validIndices = slideIndices;
 							validIndices.insert(3,0);
 						}
@@ -832,7 +832,7 @@ MStatus		ByronsPolyToolsNode::compute(const MPlug& plug, MDataBlock& data)
 	
 	
 //	FactoryWerte setzen
-//	(hier √ºberall eventuell noch MCheck nutzen f√ºr Debug wenn n√∂tig)
+//	(hier ueueberall eventuell noch MCheck nutzen fueuer Debug wenn nueuetig)
 	MStatus status;
 	
 		MDataHandle stateHandle = data.outputValue(state);
@@ -854,7 +854,7 @@ MStatus		ByronsPolyToolsNode::compute(const MPlug& plug, MDataBlock& data)
 			{
 					
 				// -----------------------------------------------------------------
-				// Erstmal s‰mtliche Parameter holen, die den output beeinflussen
+				// Erstmal suemtliche Parameter holen, die den output beeinflussen
 				// -----------------------------------------------------------------
 
 					cp.mode = data.inputValue(mode).asLong();
@@ -869,7 +869,7 @@ MStatus		ByronsPolyToolsNode::compute(const MPlug& plug, MDataBlock& data)
 					cp.whichSide = data.inputValue(whichSide).asLong();
 
 
-					// Dazu gehˆrt auch die matrix
+					// Dazu gehuert auch die matrix
 					MFnMatrixData	matFn(data.inputValue(BPTinMatrixObj).data());
 					cp.matrix = matFn.matrix();
 
@@ -894,12 +894,12 @@ MStatus		ByronsPolyToolsNode::compute(const MPlug& plug, MDataBlock& data)
 					INVIS(cout<<"---------------"<<endl;)
 
 
-					//jetzt noch die SoftTransformationEngine mit daten best¸cken
+					//jetzt noch die SoftTransformationEngine mit daten bestuecken
 					//------------------------------------------------------------
 					softTransformationEngine::extractStaticData(plug, data);
 
 
-					// DEAKTIVIEREN DER VISUALISIERUNG,  WENN DIE NODE ABGEWƒHLT WIRD - 
+					// DEAKTIVIEREN DER VISUALISIERUNG,  WENN DIE NODE ABGEWueHLT WIRD - 
 					// DIES KANN DANN GETROST ENTFERNT WERDEN
 					//cID = MModelMessage::addCallback(MModelMessage::kActiveListModified,activeListChangedCBOnce,this);
 
@@ -914,7 +914,7 @@ MStatus		ByronsPolyToolsNode::compute(const MPlug& plug, MDataBlock& data)
 				}
 				else //if
 				{
-					// An dieser stelle ist es gut mˆglich, dass die history ge‰ndert wurde
+					// An dieser stelle ist es gut mueglich, dass die history geuendert wurde
 					// Wenn alle parameter der Node gleich geblieben sind, dann ist dies der Fall
 					/* // Macht exceptions ... 
 					if(cp == op)
@@ -924,13 +924,13 @@ MStatus		ByronsPolyToolsNode::compute(const MPlug& plug, MDataBlock& data)
 						
 						MFnMesh inMeshFn(inMeshHandle.asMesh());
 						
-						// jetzt ¸berpr¸fen, ob sich die Topologie im Vergleich zum ersten inMesh ge‰ndert hat 
-						// - wenn nicht, dann die vtxPositionen des inMeshes aufs outMesh ¸bertragen und dann normal mit Slide weitermachen
+						// jetzt ueberpruefen, ob sich die Topologie im Vergleich zum ersten inMesh geuendert hat 
+						// - wenn nicht, dann die vtxPositionen des inMeshes aufs outMesh uebertragen und dann normal mit Slide weitermachen
 					
-						//Absturz nach ein paar durchl‰ufen aus mir eunbekanntem Grund
+						//Absturz nach ein paar durchlueufen aus mir eunbekanntem Grund
 						if(initialVtxCount == inMeshFn.numVertices())
 						{
-							// Topologie mit groﬂer wahrschenlichkeit unver‰ndert, also die VtxPositionen ¸bernehmen, die sich jetzt wahrschenlich ge‰ndert haben
+							// Topologie mit groueer wahrschenlichkeit unveruendert, also die VtxPositionen uebernehmen, die sich jetzt wahrschenlich geuendert haben
 							MPointArray points;
 							inMeshFn.getPoints(points);
 
@@ -939,7 +939,7 @@ MStatus		ByronsPolyToolsNode::compute(const MPlug& plug, MDataBlock& data)
 							meshFn.setPoints(points);
 						}
 						
-						// jetzte die aktualisierten Daten f¸r softTransformationEngine holen
+						// jetzte die aktualisierten Daten fuer softTransformationEngine holen
 						softTransformationEngine::extractStaticData(plug, data);
 
 					}
@@ -947,11 +947,11 @@ MStatus		ByronsPolyToolsNode::compute(const MPlug& plug, MDataBlock& data)
 
 				}
 
-				//es wird generell nach der creation erstmal slide ausgef√ºhrt, damit auch along normal und andere parameter stimmen nach ladeVorgang
+				//es wird generell nach der creation erstmal slide ausgefueuehrt, damit auch along normal und andere parameter stimmen nach ladeVorgang
 
 
 				//jetzt Daten, die slide erzeugen, extrahieren und mit gespeicherten werten vergleichen.
-				//wenn abweichung, wurde also nur einer dieser werte ver√§ndert und slide muss erfolgen
+				//wenn abweichung, wurde also nur einer dieser werte verueuendert und slide muss erfolgen
 
 					
 					
@@ -998,7 +998,7 @@ MStatus		ByronsPolyToolsNode::compute(const MPlug& plug, MDataBlock& data)
 					}
 
 
-					// nun die Tweaks hinzuf¸gen
+					// nun die Tweaks hinzufuegen
 					
 					// erstmal Daten extrahieren
 					softTransformationEngine::extractNonstaticData(plug, data);

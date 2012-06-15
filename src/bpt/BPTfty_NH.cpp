@@ -146,7 +146,7 @@ MStatus	BPTfty_NH::doIt()
 			}
 			else if(polyIDs.length() != 0)
 			{//jetzt muss faceIDs an der reihe sein, da ja eine auswahl vorhanden sein muss, wenn er in fty ist
-				//->diese auswahl können aber auch UVs sein
+				//->diese auswahl koennen aber auch UVs sein
 				growFaceSelection(polyIDs,edgeIter,polyIter.count());
 			}
 			break;
@@ -619,7 +619,7 @@ void	BPTfty_NH::findEdgeLoops(MIntArray& allEdges, MIntArray& edgeLoops)
 
 			INVIS(helper.printArray(tmpLoop," = tmpLoop");)
 			INVIS(helper.printArray(tmpLoop2," = tmpLoop2");)
-			//damit es für die nächste Edge nicht unnötig groß ist
+			//damit es für die nächste Edge nicht unnoetig gross ist
 			stopEdgeLUT.clear();
 			
 		}
@@ -720,7 +720,7 @@ void	BPTfty_NH::findBorderEdges(int startEdge,
 				break; 
 
 			
-			//eigentlich sollte nur eine Edge auf Array sein können
+			//eigentlich sollte nur eine Edge auf Array sein koennen
 			INVIS(if(ces.length() > 1))
 				INVIS(cout<<"WARNING: MEHR ALS EINE BOUNDARYEDGE AUF CES ARRAY!"<<endl;);
 
@@ -845,7 +845,7 @@ MIntArray		BPTfty_NH::findOneWayQuadLoop(int firstEdge,
 	int				checkFrequency;
 
 	if(allEdges.length() >= 5)
-		checkFrequency = ( allEdges.length() - (allEdges.length() % 5) ) / 5;	//checkHäufigkeit abhängig von Größe von auswahl
+		checkFrequency = ( allEdges.length() - (allEdges.length() % 5) ) / 5;	//checkHäufigkeit abhängig von Groesse von auswahl
 	else
 		checkFrequency = 1;	//jeden durchlauf checken, wenn Auswahl kleiner 5
 
@@ -910,7 +910,7 @@ MIntArray		BPTfty_NH::findOneWayQuadLoop(int firstEdge,
 		
 			//beim ersten durchlauf die eventuell vorhandene edge direkt neben der first edge beseitigen
 			//so dass sie von STopSearch nicht mehr gefunden wird
-			//-->Je öfter das durchgeführt wird, desto mehr edges können hintereinander liegen, ohne als stopEdge zu gelten
+			//-->Je oefter das durchgeführt wird, desto mehr edges koennen hintereinander liegen, ohne als stopEdge zu gelten
 			if(dirCount == 1)
 			{
 				for(unsigned int i = 0; i < allEdges.length(); i++)
@@ -975,7 +975,7 @@ bool		BPTfty_NH::stopLoopSearch(MIntArray& loopResult, MIntArray& stopEdges, MIn
 	//noch im stopEdgeLUT nachschlagen, ob bei diesem EdgeLoop dieselbe kante schonmal aufgetreten ist
 
 	l = stopEdgeLUT.length();
-	////cout<<"STOP_EDGE_SEARCH: "<<"Größe LUT:  "<<l<<endl;
+	////cout<<"STOP_EDGE_SEARCH: "<<"Groesse LUT:  "<<l<<endl;
 
 	if(l != 0)
 	{
@@ -995,7 +995,7 @@ bool		BPTfty_NH::stopLoopSearch(MIntArray& loopResult, MIntArray& stopEdges, MIn
 	else
 	{
 		l = loopResult.length();
-		////cout<<"STOP_EDGE_SEARCH: "<<"Größe LOOP_RESULT:  "<<l<<endl;
+		////cout<<"STOP_EDGE_SEARCH: "<<"Groesse LOOP_RESULT:  "<<l<<endl;
 		//kleinsten index von match im loopresult finden
 		UINT i;
 		for(i = 0; i < match.length(); i++)
@@ -1110,7 +1110,7 @@ void		BPTfty_NH::findEdgeRings(MIntArray& allEdges,MIntArray& edgeRings)
 //--------------------------------------------------------------------------------------------------------------------
 {
 	//diese Methode wählt rekursiv edgeRings an. Als neuerung befindet sich der >addToEdgeRingArray<Algo direkt
-	//in der Methode, so dass sie beim eintauchen in die rekursion ihren vorgang wirklich abschließen kann
+	//in der Methode, so dass sie beim eintauchen in die rekursion ihren vorgang wirklich abschliessen kann
 	int l = allEdges.length();
 
 	int edgeCount = 0;
@@ -1235,7 +1235,7 @@ void	BPTfty_NH::findTwoWayRing(int startEdge,
 				polyIter.getEdges(containedEdges);
 				
 				match = helper.matchArray(containedEdges,startEdges);
-				//erstmal die CurrentEdge rausschmeißen
+				//erstmal die CurrentEdge rausschmeissen
 				for(unsigned int a = 0; a < match.length(); a++)
 					if(match[a] == currentEdge)
 					{
@@ -1264,7 +1264,7 @@ void	BPTfty_NH::findTwoWayRing(int startEdge,
 							{
 								if(connectedVtx[x] == edgeVtx[y])
 								{
-									//erstmal alle rausschmeißen, die direkt mit currentEdge verbunden sind
+									//erstmal alle rausschmeissen, die direkt mit currentEdge verbunden sind
 									match.remove(a--);
 								}
 

@@ -75,7 +75,7 @@ void simpleLinkedList<T>::append(T* object)
 	if(size == 0)
 	{
 		linkedNode<T>* node = new linkedNode<T>(object);
-		tail->next = node;	//im nextSlot von tial ist immer die letzte gültige node gespeichert (next ist sozusagen last)
+		tail->next = node;	//im nextSlot von tial ist immer die letzte gueltige node gespeichert (next ist sozusagen last)
 		startPosition = currentPositionPtr = node;
 	}
 	else
@@ -96,11 +96,11 @@ T*& simpleLinkedList<T>::operator[]( int index )
 
 //	if(index >= size || index < 0)
 //	{
-//		cout<<"WARNUNG, Index zu groß, habe ihn korrigiert"<<endl;
+//		cout<<"WARNUNG, Index zu gross, habe ihn korrigiert"<<endl;
 //		index = size - 1;
 //	}
 //	cout<<"SL: Index vs Size: "<<index<<" vs "<<size<<endl;
-	//kein Check, ob index über die vorhandenen slots hinaus geht
+	//kein Check, ob index ueber die vorhandenen slots hinaus geht
 	if(index >= currentPosition)
 	{
 		currentPositionPtr->getIndex(currentPosition,index,tmpNode);
@@ -108,7 +108,7 @@ T*& simpleLinkedList<T>::operator[]( int index )
 		return tmpNode->getValue();
 	}
 	else
-	{//ansonsten wieder von 0 anfangen zu zählen
+	{//ansonsten wieder von 0 anfangen zu zhlen
 		currentPosition = index;
 		startPosition->getIndex(0,index,tmpNode);
 		currentPositionPtr = tmpNode;
@@ -123,14 +123,14 @@ T* simpleLinkedList<T>::operator[]( int index ) const
 {
 //	if(index >= size)
 //{
-	//	cout<<"WARNUNG, Index zu groß, habe ihn korrigiert"<<endl;
+	//	cout<<"WARNUNG, Index zu gross, habe ihn korrigiert"<<endl;
 	//	index = size - 1;
 	//}
 
 //	cout<<"SL: Index vs Size: "<<index<<" vs "<<size<<endl;
 
 	linkedNode<T>* tmpNode = 0;
-	//kein Check, ob index über die vorhandenen slots hinaus geht
+	//kein Check, ob index ueber die vorhandenen slots hinaus geht
 	if(index >= currentPosition)
 	{
 		currentPositionPtr->getIndex(currentPosition,index,tmpNode);
@@ -138,7 +138,7 @@ T* simpleLinkedList<T>::operator[]( int index ) const
 		return tmpNode->getValue();
 	}
 	else
-	{//ansonsten wieder von 0 anfangen zu zählen
+	{//ansonsten wieder von 0 anfangen zu zhlen
 		currentPosition = index;
 		startPosition->getIndex(0,index,tmpNode);
 		currentPositionPtr = tmpNode;

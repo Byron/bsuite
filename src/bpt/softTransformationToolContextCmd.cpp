@@ -105,7 +105,7 @@ MStatus		softTransformationToolCtxCommand::doEditFlags()
 		
 		argData.getFlagArgument("rdc",0,arg);
 		if(!context->changeDistance(arg))
-			MGlobal::displayWarning("You cannot change the distance as long the manipulator doesn't show up");
+			MGlobal::displayWarning("You cannot change the distance as long the manipulator dsn't show up");
 	}
 
 	if(argData.isFlagSet("rmc"))
@@ -113,7 +113,7 @@ MStatus		softTransformationToolCtxCommand::doEditFlags()
 		int arg;
 		argData.getFlagArgument("rmc",0,arg);
 		if(!context->changeMask(arg))
-			MGlobal::displayWarning("You cannot change the maskSize as long the manipulator doesn't show up");
+			MGlobal::displayWarning("You cannot change the maskSize as long the manipulator dsn't show up");
 	}
 
 	return MS::kSuccess;

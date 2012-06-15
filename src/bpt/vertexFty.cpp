@@ -72,7 +72,7 @@ void	vertexFty::doIt()
 	BPT_BA selCheckList(vtxList,true,false,creator.getLastVtxID());	//ArbeitsArray für die folgende Prozedur
 //	BPT_BA selList = selCheckList;									//wird als lookup verwendet, der nicht verändert wird
 
-	//Die einfachste Lösung: Ba aufbauen mit allen Faces, die schon bearbeitet wurden - bedeutet aber auch, dass für jeden SelVtx die 
+	//Die einfachste Loesung: Ba aufbauen mit allen Faces, die schon bearbeitet wurden - bedeutet aber auch, dass für jeden SelVtx die 
 	//verbundenen Faces geholt werden müssen - momentan ist die Sache ziemlich billig (CPU ZEIT)
 	//man müsste zuerst die verbundenen Faces zu allen Vertizen holen, und dese Dann abarbeiten
 
@@ -126,7 +126,7 @@ void	vertexFty::doIt()
 	{
 		cv = vtxList[i];
 		//wenn der gegenwärtige Vtx noch nicht bearbeitet wurde
-		if( ! selCheckList[cv])	//hier lieber operator [] nehmen, da isFlagSet noch nen unnötigen rangecheck macht
+		if( ! selCheckList[cv])	//hier lieber operator [] nehmen, da isFlagSet noch nen unnoetigen rangecheck macht
 		{
 			continue;
 		}
@@ -169,7 +169,7 @@ void	vertexFty::doIt()
 inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int faceID)
 //-----------------------------------------------------------------------------------
 {//matchVtx ist immer gepruned, wenn er hier ankommt
-	//faceID wird nur zum erstellen der neuen Faces benötigt
+	//faceID wird nur zum erstellen der neuen Faces benoetigt
 
 	//jetzt erstmal lookup arrays aufbauen, mit denen gearbeitet wird
 	UINT i;
@@ -210,7 +210,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 
 
 
-	MIntArray	nf(l);							//speicher für neue Faces ('N'ew'F'ace) (temp) - groß genug, um das ganze Face nochmal zu halten (um reallocs zu vermeiden)
+	MIntArray	nf(l);							//speicher für neue Faces ('N'ew'F'ace) (temp) - gross genug, um das ganze Face nochmal zu halten (um reallocs zu vermeiden)
 												//newFaces sind so konfiguriert, dass man mit createPoly und changePoly problemlos neue faces erstellen kann
 	
 	int			x,z;							//verwendet für iterationen,  dis  = distance ->wie weit entfernt von gegenwärtiger position soll gesucht werden?
@@ -241,7 +241,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 	//----------------------------------------------
 	
 	//es soll versucht werden, unabhängig vom startPunkt konsistente Ergebnisse zu erzielen.
-	//dies bedeutet, dass man im forraus nicht genau weiß, wann die Sache beendet sein wird, eventuell
+	//dies bedeutet, dass man im forraus nicht genau weiss, wann die Sache beendet sein wird, eventuell
 	//muss das Face mehrmals durchgearbeitet werden. Wenn "svtd" auf null ist, wurde jeder SelVtx bearbeitet
 
 	//erstmal runup machen zum spinWert
@@ -259,7 +259,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 	}
 
 	for(UINT o = null; o < 2; o++)
-	{//äußere Schleife
+	{//äussere Schleife
 		l3 = null;
 		//for(i = 0; i < l; i++)
 		for(; l3++ != l; i = (i+1)%l)	//damit spin mit einbezogen wird
@@ -303,7 +303,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 
 					}
 
-					//Nach möglichkeit sollten Quads oder nGons erstellt werden, weshalb für den Fall, dass es ein dreieck ist, noch in die andere Richtung
+					//Nach moeglichkeit sollten Quads oder nGons erstellt werden, weshalb für den Fall, dass es ein dreieck ist, noch in die andere Richtung
 					//geschaut wird
 					//->>nein, der User entscheidet durch seine Auswahl, was er haben will - mit spin kann er das dann noch verändern
 
@@ -422,7 +422,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 
 						//letztendlich Face erstellen, wenn alles korrekt
 						if(x == -1)
-						{//wenn op negativ, dann können bounds bleiben wie gehabt
+						{//wenn op negativ, dann koennen bounds bleiben wie gehabt
 							bounds[null] = tsb;			bounds[1] = tsb2;
 							bounds[2] = teb;			bounds[3] = teb2;
 
@@ -469,7 +469,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 		}//for(i = 0; i < l; i++
 
 
-		//wenn er hier hinkommt, dann hat die obige Schleife keinen einstiegspunkt finden können
+		//wenn er hier hinkommt, dann hat die obige Schleife keinen einstiegspunkt finden koennen
 		condition = &vertexFty::gimmeFalse;
 		//da die condition jetzt auf ginmmeFalse umgesetzt wurde, wird beim nächsten durchlauf auf jeden Fall ein passender Vtx gefunden
 		
@@ -600,7 +600,7 @@ inline bool	vertexFty::createFace(UINT tsb, UINT teb, UCHAR* flags, MIntArray& f
 	//diese Methode checkt auch (rechnerisch), ob das übrigbleibende Face korrekt wäre, weshalb hier nur eine abfrage gemacht wird
 	if(!checkFaceIntegrity(result))
 	{
-		//jetzt alle UVFlags, die false gesetzt wurdem, wieder korrigieren und true setzen, damit andere prozeduren noch ein face erstellen können
+		//jetzt alle UVFlags, die false gesetzt wurdem, wieder korrigieren und true setzen, damit andere prozeduren noch ein face erstellen koennen
 		
 		for( i = tsb ; i != teb; i = (i+1)%l)
 		{
@@ -681,7 +681,7 @@ inline bool	vertexFty::createExtraFace(UINT* bounds, UCHAR* flags, MIntArray& fa
 	//diese Methode checkt auch (rechnerisch), ob das übrigbleibende Face korrekt wäre, weshalb hier nur eine abfrage gemacht wird
 	if(!checkFaceIntegrity(result))
 	{
-		//jetzt alle UVFlags, die false gesetzt wurdem, wieder korrigieren und true setzen, damit andere prozeduren noch ein face erstellen können
+		//jetzt alle UVFlags, die false gesetzt wurdem, wieder korrigieren und true setzen, damit andere prozeduren noch ein face erstellen koennen
 		
 		for( i = bounds[null]; i != bounds[1]; i = (i+1)%l)	//auf diese Weise wird bounds[1] nicht mit auf de validListe gesetzt, da es ja schon valid ist
 		{

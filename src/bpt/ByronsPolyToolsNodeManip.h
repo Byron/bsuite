@@ -92,7 +92,7 @@ public:
 
     MDagPath	fDirectionManip;
 	MDagPath	fSideToggle;
-	MDagPath	fAbsToggle;		//toggleManip für abs/relative Slide
+	MDagPath	fAbsToggle;		//toggleManip fuer abs/relative Slide
 	MDagPath	fSlideManip;
 
 

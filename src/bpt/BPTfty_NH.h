@@ -188,7 +188,7 @@ private:	//DATENELEMENTE
 
 	MObject		fMesh;	//!< mesh um darauf zuarbeiten
 	
-	MDagPath	meshPath;	//!< dagPath zum mesh, um die neuen kanten auswählen zu können
+	MDagPath	meshPath;	//!< dagPath zum mesh, um die neuen kanten auswählen zu koennen
 
 
 	int			mode;	//!< welche aktion soll ausgeführt werden?

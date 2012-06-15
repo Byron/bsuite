@@ -113,11 +113,11 @@ public: //****************** ///
 // ////////////////////////////
 
     softTransformationToolCtx();
-	virtual ~softTransformationToolCtx(){};
+	virtual ~softTransformationToolCtx(){}
 
 
 // ///////////////////////////////////
-//		  Überschriebene Methoden ///
+//		  UEberschriebene Methoden ///
 public: //********************** ///
 // ////////////////////////////////
 
@@ -128,8 +128,8 @@ public: //********************** ///
     virtual MStatus doDrag(MEvent &event);
     virtual MStatus doRelease(MEvent &event);
     virtual MStatus doEnterRegion(MEvent &event);
-
-
+	virtual void getClassName(MString &name) const { name = "bpt"; }
+	
 // /////////////////////////////////////
 //		  Öffentliche Hilfsmethoden ///
 private: //************************ ///
@@ -141,7 +141,6 @@ private: //************************ ///
 	bool	getVtxSelection(MIntArray& elements, MPoint& point,MDagPath& selObj, MObject& comps);
 	
 	void	careAboutVNode(bool deleteIt = false);
-
 
 	bool	writeBackTweaks();	//beachtet Undo/redo;
 	bool	generateUndoInfo();	//erzeugt nur die undoInfo für den Command, den eignentlich writeBackTweak hätte machen müssen
@@ -165,7 +164,7 @@ private: //*************** ///
 	MFnAnimCurve	animFn;
 	MDGModifier*	softConnector;	//dient speziell der connection der softNode
 	MDagPath		lastMesh;
-	MSelectionList	lastSelection;	//um auszuschließen, dass er auch bei drags updated
+	MSelectionList	lastSelection;	//um auszuschliessen, dass er auch bei drags updated
 
 	
 	/// Dient der Erzeugung der FastTrgNode, um die Tweaks zu beschleunigen
@@ -186,7 +185,7 @@ private: //*************** ///
 	
 	
 	MPoint		manipPos;
-	bool		emergency;	//tritt auf, wenn mesh gelöscht wird, auf dem man arbeitet
+	bool		emergency;	//tritt auf, wenn mesh geloescht wird, auf dem man arbeitet
 	bool		hasHistory;
 
 

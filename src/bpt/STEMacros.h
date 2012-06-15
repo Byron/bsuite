@@ -18,7 +18,7 @@
 
 
 
-// STE MACROS, die für die Einrichtung der Parameter zuständig sind
+// STE MACROS, die fuer die Einrichtung der Parameter zustndig sind
 // Diese auf jeden Fall aktuell halten, wenn irgendwan neue Parameter hinzukommen sollen
 #	define STE_DEFINE_STATIC_PARAMETERS(prefix)		\
 													\
@@ -233,7 +233,7 @@
 																								\
 																								\
 																								\
-	/*jetzt die Atribute hinzufügen																\
+	/*jetzt die Atribute hinzufuegen																\
 	//-------------------------------*/															\
 																								\
 	status = MPxNode::addAttribute(prefix##vfObj);												\

@@ -73,7 +73,7 @@ public:
 	virtual	bool	isSelected(){return false;};
 
 
-	void			getMaxRecurseCount(UINT* zeroNumber, const edge* startPtr) const;			//!< schaut, mit vievielen nachbarn diese edge verknüpft ist
+	void			getMaxRecurseCount(UINT* zeroNumber, const edge* startPtr) const;			//!< schaut, mit vievielen nachbarn diese edge verknuepft ist
 
 
 	

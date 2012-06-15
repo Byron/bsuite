@@ -80,7 +80,7 @@ endif()
 # MAYA CONFIGURATION
 ######################
 set(DEFAULT_MAYA_VERSIONS 2012 2011 2010 2009 2008)
-set(DEFAULT_MAYA_LIBRARIES Foundation OpenMaya OpenMayaUI OpenMayaAnim OpenMayaRender)
+set(DEFAULT_MAYA_LIBRARIES Foundation OpenMaya OpenMayaAnim OpenMayaRender OpenMayaFX OpenMayaUI)
 
 if(UNIX AND NOT APPLE AND ${CMAKE_CXX_SIZEOF_DATA_PTR} EQUAL 8)
 	set(DEFAULT_MAYA_INSTALL_SUFFIX -x64)

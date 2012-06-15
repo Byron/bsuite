@@ -92,7 +92,7 @@ BPTfty::~BPTfty()
 {//MERKE: die fty mus auch damit klarkommen, dass keine variable richtig initialisiert wude (da zum Beispiel keine OutConenction existiert)
 	
 
-	//{//Alle Arrays löschen
+	//{//Alle Arrays loeschen
 		if(UVSlideStart != 0)
 		{
 			delete UVSlideStart;	
@@ -610,7 +610,7 @@ void	BPTfty::getAllVertexIndices(MIntArray& allIndices)
 void		BPTfty::addNormalSlide(int inVtx,MItMeshVertex& vertIter, MItMeshPolygon& polyIter)
 //------------------------------------------------------------------------------------------------------------------------------------
 {
-	INVIS(cout<<"HABE VTX "<<inVtx<<" HINZUGEFÜGT (NORMAL)"<<endl;)
+	INVIS(cout<<"HABE VTX "<<inVtx<<" HINZUGEFUEGT (NORMAL)"<<endl;)
 
 	int tmp;
 	
@@ -667,7 +667,7 @@ void		BPTfty::addSlideAndNormal(int inVtx,MPointArray& startEnd,MVectorArray& di
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 {
 
-	INVIS(cout<<"HABE VTX "<<inVtx<<" HINZUGEFÜGT (NORMAL&SLIDE)"<<endl;)
+	INVIS(cout<<"HABE VTX "<<inVtx<<" HINZUGEFUEGT (NORMAL&SLIDE)"<<endl;)
 
 	slideIndices->append(inVtx);
 
@@ -790,7 +790,7 @@ int		BPTfty::SMC_getDirection(MIntArray& currentFaces, MPoint& startPos, MIntArr
 
 		//	printArray(directionFaces," = directionFaces SMC");
 			
-			positionsSave.append(vertIter.position() ); //für den zweiten Pass, falls nötig
+			positionsSave.append(vertIter.position() ); //für den zweiten Pass, falls noetig
 			
 			if(helper.matchArray(currentFaces,directionFaces).length() > 0)
 			{	
@@ -1035,14 +1035,14 @@ int		BPTfty::SMC_processLine(int currentVtx,
 			
 			if(index == -1)
 			{
-				MPRINT("Bin an Type3 || Type4 gestoßen, beende Loop")
+				MPRINT("Bin an Type3 || Type4 gestossen, beende Loop")
 				
 				return -2;
 			}
 
 			if(isControlTwo[index])
 			{
-				MPRINT("Bin an Typ2 gestoßen, beende Loop")
+				MPRINT("Bin an Typ2 gestossen, beende Loop")
 				//Diese Methode behandelt diesen Fall, checkt ob flipped oder nicht
 				//selectedVtx eintagen
 				MIntArray selectedVtx;
@@ -1075,7 +1075,7 @@ int		BPTfty::SMC_processLine(int currentVtx,
 		}
 		else
 		{
-			MPRINT("Bin an EndStück gestoßen, beende Loop")
+			MPRINT("Bin an EndStück gestossen, beende Loop")
 			return -1;
 		}
 		
@@ -1130,11 +1130,11 @@ void		BPTfty::SMC_createControlTwoUVSlide(int commonVtx,
 	}
 
 	INVIS(if(startFaces.length() != endFaces.length())\
-		cout<<"ERROR: StartFaces nicht so groß wie endFaces: "<<startFaces.length()<<" zu "<<endFaces.length()<<endl;);
+		cout<<"ERROR: StartFaces nicht so gross wie endFaces: "<<startFaces.length()<<" zu "<<endFaces.length()<<endl;);
 
 	//jetzt durch die Faces durchgehen, checken ob sie UVs haben, und wenn ja, die zu start und endVtx passenden UVs finden und eintragen
 	
-	//erstmal sichergehen, dass die Arrays auch die selbe Größe haben
+	//erstmal sichergehen, dass die Arrays auch die selbe Groesse haben
 	(startFaces.length() < endFaces.length())?endFaces.setLength(startFaces.length()):startFaces.setLength(endFaces.length());
 	
 
@@ -1404,7 +1404,7 @@ void		BPTfty::SMC_createUVSlide(int commonVtx, int startVtx, int endVtx, MItMesh
 
 	//debug
 	INVIS(if( (startFaces.length() != endFaces.length()) ){\
-		cout<<"ERROR IN SMCCREATEUV: STARTFACES NICHT SO GROß WIE ENDFACES"<<endl;\
+		cout<<"ERROR IN SMCCREATEUV: STARTFACES NICHT SO GROss WIE ENDFACES"<<endl;\
 		return;\
 		}\
 		);
@@ -1462,7 +1462,7 @@ void		BPTfty::SMC_createUVSlide(int commonVtx, int startVtx, int endVtx, MItMesh
 			}
 		}
 		else
-		{//endFacesArray flippen wenn nötig
+		{//endFacesArray flippen wenn noetig
 			if(faceMatchLocID == 1)
 			{
 				MPRINT("HABE ENDFACES UMGETAUSCHT")
@@ -1611,7 +1611,7 @@ void		BPTfty::SMC_createUVSlide(int commonVtx, int startVtx, int endVtx, MItMesh
 			//alles wird in 2er paketen eingelagert: ein Paket (startPos, Direction, SlideIndex) pro direction
 			//wenn eine direction nicht gefüllt ist, dann slideIndex -1 setzen (= flag, der überprüft wird)
 			//wenn beide directions nicht vorhanden, dann gar nichts hinzufügen
-			//-->Merke!!: letzteres könnte zu fehlern führen, da nicht mehr überprüft wird, ob das start und endFace tatsächlich übereinanderliegen
+			//-->Merke!!: letzteres koennte zu fehlern führen, da nicht mehr überprüft wird, ob das start und endFace tatsächlich übereinanderliegen
 			//unter bestimmten umständen kann es dannzu fehlverhalten kommen!!
 
 			if(!startFaceHasUVs && !endFaceHasUVs)
@@ -1912,7 +1912,7 @@ void		BPTfty::processUncontrolledLines(MIntArray& linedVtx,
 
 						if(index == -1)
 						{
-							MPRINT("Bin an Type3 || Type4 gestoßen, beende Loop")
+							MPRINT("Bin an Type3 || Type4 gestossen, beende Loop")
 							
 							wasStopped = true;
 							go = false;
@@ -2165,7 +2165,7 @@ MPoint		BPTfty::SMC_getTypTwoEndDirection(int vtxID,
 			}
 		}
 
-	//	connections = 0; //damit er den Ptr nicht löschen kann, falls er das macht ->machta nicht :)
+	//	connections = 0; //damit er den Ptr nicht loeschen kann, falls er das macht ->machta nicht :)
 
 		if(helper.matchArray(faceVerts,unselVtx).length() == 3)
 		{//triangle liegt quer, so dass punkt auf Kante zurückgegeben wird
@@ -2181,7 +2181,7 @@ MPoint		BPTfty::SMC_getTypTwoEndDirection(int vtxID,
 			vertIter.setIndex(faceVerts[1],tmp);
 			MPoint end 	= vertIter.position();
 
-			//endVtx übertragen wenn nötig
+			//endVtx übertragen wenn noetig
 			if(endVtxIDs != 0)
 			{
 				(*endVtxIDs)[0] = faceVerts[0];
@@ -2201,7 +2201,7 @@ MPoint		BPTfty::SMC_getTypTwoEndDirection(int vtxID,
 				{
 					vertIter.setIndex(faceVerts[ (i+2)%l ],tmp );
 
-					//endVtx übertragen wenn nötig
+					//endVtx übertragen wenn noetig
 					if(endVtxIDs != 0)
 					{
 						(*endVtxIDs)[0] = faceVerts[ (i+2)%l ];
@@ -2223,7 +2223,7 @@ MPoint		BPTfty::SMC_getTypTwoEndDirection(int vtxID,
 			{
 				vertIter.setIndex(faceVerts[(i+offset)%l],tmp);
 
-				//endVtx übertragen wenn nötig
+				//endVtx übertragen wenn noetig
 				if(endVtxIDs != 0)
 				{
 					(*endVtxIDs)[0] = faceVerts[(i+offset)%l];
@@ -2282,7 +2282,7 @@ void		BPTfty::processLinedVtx(MIntArray startIDs,
 	MDoubleArray	normalScales;
 
 	MIntArray	selectedVtx;
-	MIntArray newStartIDs;	//hält die neuen StartIds, die dann recursiv für lösung des problems sorgen
+	MIntArray newStartIDs;	//hält die neuen StartIds, die dann recursiv für loesung des problems sorgen
 	
 
 	
@@ -2408,7 +2408,7 @@ void		BPTfty::processLinedVtx(MIntArray startIDs,
 				counter.append(countTmp);
 			}
 			else
-			{//an diesen TwoVtx schließt sich gleich wieder twoVtx an, SonderFall
+			{//an diesen TwoVtx schliesst sich gleich wieder twoVtx an, SonderFall
 				//wenn direction von currentVtx ein selectedVtx von der anderen Edge ist, dann ist die direction nicht flipped
 				//der eigene status wird mit einbezogen
 				MPRINT("CONTROLZWO GRENZT AN")
@@ -2446,7 +2446,7 @@ void		BPTfty::processLinedVtx(MIntArray startIDs,
 					}
 				}
 
-				//da das geklärt ist, den TwoControlVtx noch aufs flippedArray hauen, falls nötig
+				//da das geklärt ist, den TwoControlVtx noch aufs flippedArray hauen, falls noetig
 				if(otherVtxFlipped)
 				{MPRINT("Habe angrenzenden ControlTwo geflipped")
 					isFlippedArray.append(linedVtx[index]);
@@ -2465,7 +2465,7 @@ void		BPTfty::processLinedVtx(MIntArray startIDs,
 		//bevor die Vtx entfernt werden, noch schnell den gegenwärtigen index vom vtx zu holen
 		index = SMC_getIndex(lastVtx,linedVtx);
 
-		int startVtx;	//wird benötigt für die Erstellung des UVSlides
+		int startVtx;	//wird benoetigt für die Erstellung des UVSlides
 		//startPositionen holen, wenn beide Pfade bereits erledigt
 		if(directionDoneCount == 2)
 		{
@@ -2502,7 +2502,7 @@ void		BPTfty::processLinedVtx(MIntArray startIDs,
 		
 
 
-		helper.addIntArrayToLHS(bigVtxRemovals,vtxRemovals);	//vtxRemovals an außenwelt weitergeben
+		helper.addIntArrayToLHS(bigVtxRemovals,vtxRemovals);	//vtxRemovals an aussenwelt weitergeben
 		vtxRemovals.clear();
 
 				//ReturnValues analysieren
@@ -2530,7 +2530,7 @@ void		BPTfty::processLinedVtx(MIntArray startIDs,
 		
 		int endFaceID;
 
-		MIntArray* endVertices = new MIntArray(2,-1);		//enthält 2 slots für die endVertices des control faces. der 2. Slot ist nötig für den Fall
+		MIntArray* endVertices = new MIntArray(2,-1);		//enthält 2 slots für die endVertices des control faces. der 2. Slot ist noetig für den Fall
 											//dass rückgabePosition zwischen zwei verticen liegt (triangle Sonderfall)
 
 		endPos = SMC_getTypTwoEndDirection(lastVtx,
@@ -2584,7 +2584,7 @@ void		BPTfty::processLinedVtx(MIntArray startIDs,
 	//for(controlTwoVtx) ENDE
 
 
-	//jetzt in die rekursion eintauchen, wenn möglich
+	//jetzt in die rekursion eintauchen, wenn moeglich
 	if(newStartIDs.length() > 0)
 	{
 		MPRINT("------------------------------------------------------")
@@ -2657,7 +2657,7 @@ void		BPTfty::processType3(int vtxID, MIntArray& connections, MItMeshVertex& ver
 	if(l > 4)
 	{
 		//zuerst eine gültige startID finden. StartID ist die, deren Winkel zu den anderen beiden selVtx am keinsten ist
-		//da sie mit er größten wahrscheinlichkeit in der echten "Mitte" liegt
+		//da sie mit er groessten wahrscheinlichkeit in der echten "Mitte" liegt
 		MIntArray localSelIDs;	//enthält die IDs der selIDs in reihenfolge
 		MDoubleArray angles;		//enthält die winkel der entprechenden localSeID zu ihren nachbarn(Summe)
 
@@ -2695,7 +2695,7 @@ void		BPTfty::processType3(int vtxID, MIntArray& connections, MItMeshVertex& ver
 		INVIS(cout<<"StartID für diesen Vtx ist: "<<startID<<endl;);
 
 
-		//jetzt winkel mit allen anderen edges bilden und den größtn auswählen
+		//jetzt winkel mit allen anderen edges bilden und den groesstn auswählen
 		//eigentlich müsste man hier den 2d angle nehmen ... 
 
 		angles.setLength(l);
@@ -2712,7 +2712,7 @@ void		BPTfty::processType3(int vtxID, MIntArray& connections, MItMeshVertex& ver
 			}
 		}
 
-		//jetzt den größten winkel finden, dessen dazugehöriger Vtx dann der endpoint ist
+		//jetzt den groessten winkel finden, dessen dazugehoeriger Vtx dann der endpoint ist
 		double biggestAngle = 0.000000001;
 		int biggestID = -1; 
 
@@ -2879,7 +2879,7 @@ void		BPTfty::processType3(int vtxID, MIntArray& connections, MItMeshVertex& ver
 void		BPTfty::processType4Vertex(int vtxID,MIntArray& connections,MIntArray& selVtx,MItMeshVertex& vertIter, MItMeshPolygon& polyIter)
 //---------------------------------------------------------------------------------------------------------------------------------------------
 {
-	//checken, ob irgendwo ein face existiert, bei dem nicht alle faceVtx auch zu selVtx gehören
+	//checken, ob irgendwo ein face existiert, bei dem nicht alle faceVtx auch zu selVtx gehoeren
 	int tmp,startFaceID = -1,startVtx;
 	double scale = 0.0;
 	bool	isSpecialCase = false;
@@ -2973,7 +2973,7 @@ void		BPTfty::processType4Vertex(int vtxID,MIntArray& connections,MIntArray& sel
 
 		helper.arrayRemove(vertices,match);
 
-		//wenn alles richtig war, dann ist vertices mindestens eins groß
+		//wenn alles richtig war, dann ist vertices mindestens eins gross
 		if(vertices.length() > 0)
 		{
 			vertIter.setIndex(vertices[0],tmp);
@@ -2982,7 +2982,7 @@ void		BPTfty::processType4Vertex(int vtxID,MIntArray& connections,MIntArray& sel
 		}
 		else
 		{
-			MPRINT("Fehler in ProcessType4, vertices hat unerwartete größe, weiche aus")
+			MPRINT("Fehler in ProcessType4, vertices hat unerwartete groesse, weiche aus")
 			//einfach einen matchVtx als endVtx nehmen, obwohl das dann zu unerwarteten resultaten führen kann
 
 			endPos = polyIter.center();
@@ -3059,7 +3059,7 @@ bool		BPTfty::getVtxConnectInfo(int vtxID,MIntArray& connections, unsigned int& 
 		else
 		{
 			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			connections[i] = -(validVtx+1);	//auf diese Weise wird zugriff auch auf unselected Vertex ermöglicht
+			connections[i] = -(validVtx+1);	//auf diese Weise wird zugriff auch auf unselected Vertex ermoeglicht
 											//+1, damit die 0 nur für selected vtx steht und eindeutig ist
 			//merke: connections müssen zurückgerechnet werden, wenn man auf unselected zugreifen will!!!
 		}
@@ -3277,7 +3277,7 @@ void		BPTfty::findCornerVtx(MIntArray& corners,MIntArray& faceVerts,MItMeshVerte
 			
 			if(edgeCount >= 4)
 			{
-				////cout<<"FIND_CORNER_VTX: "<<"EdgeCount ist größerGleich 4"<<endl;
+				////cout<<"FIND_CORNER_VTX: "<<"EdgeCount ist groesserGleich 4"<<endl;
 				
 				corners.setLength(i+1);
 				corners[i] = faceVerts[i];
@@ -3338,7 +3338,7 @@ int			BPTfty::findID(MIntArray& matchVtx,MIntArray& faceVerts)
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 	
-	//Diese Variante gibt den Index für den StartVtx für jeden Nachbarn zurück, egal wie groß MatchVtx ist
+	//Diese Variante gibt den Index für den StartVtx für jeden Nachbarn zurück, egal wie gross MatchVtx ist
 	for(int i = 0; i < l; i++)
 	{
 		if(faceVerts[i] == matchVtx[0])
@@ -3620,7 +3620,7 @@ void BPTfty::doUVSlide()
 	//unsigned int numUVSets = UVSetNames.length();
 	unsigned int numUVSets = 1;		//da er e nur auf einem UVSet arbeiten kann ... 
 
-	//lokaö#le float kopie von slide, um ständiges konvertieren zu vermeiden;
+	//lokaoe#le float kopie von slide, um ständiges konvertieren zu vermeiden;
 	float fSlide = slide;
 	
 	//iteratoren
@@ -3647,7 +3647,7 @@ void BPTfty::doUVSlide()
 
 		if(!isRelative)
 		{
-			//erstmal den ScaleFactor errechnen, wenn nötig
+			//erstmal den ScaleFactor errechnen, wenn noetig
 			
 
 			if(scale.length() == 0)
@@ -3961,7 +3961,7 @@ void	BPTfty::doUVSlideSMC()
 	//da mutiUVSets eh nicht funzen
 	unsigned int numUVSets = 1;	
 
-	//lokaö#le float kopie von slide, um ständiges konvertieren zu vermeiden;
+	//lokaoe#le float kopie von slide, um ständiges konvertieren zu vermeiden;
 	float fSlide = slide;
 
 	//iteratoren
@@ -3989,7 +3989,7 @@ void	BPTfty::doUVSlideSMC()
 
 		if(!isRelative)
 		{
-			//erstmal den ScaleFactor errechnen, wenn nötig
+			//erstmal den ScaleFactor errechnen, wenn noetig
 			if(scale.length() == 0)
 			{
 				scale.setLength(l);
@@ -4286,7 +4286,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 		bool		onlyOneNSelEdge[4];	//hält true, wenn nur eine nSeledge pro seite pro richtung
 		//BEGIN
 
-				//erstmal edgeArrays löschen, für den fall, dass vorher abgestürzt ist
+				//erstmal edgeArrays loeschen, für den fall, dass vorher abgestürzt ist
 
 		edge::origVtxDoneBA.setLength(0);
 
@@ -4313,7 +4313,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 		l = allEdges.length();
 
 		if(createOrigVtxLOT)
-		{//diese Variante baut außerdem noch ORIG VTX LOT auf, wird von camfer verwendet -> dies vermeidet redundanz
+		{//diese Variante baut ausserdem noch ORIG VTX LOT auf, wird von camfer verwendet -> dies vermeidet redundanz
 			MIntArray edgeVertices(l*2);	//jede edge hat 2 vertizen
 			a = 0;
 			int VID;	// = vtxID
@@ -4340,7 +4340,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 					{//vertex ist mit 2 oder weniger edges verbunden == er ist winged und edge wird entfernt
 						
 						selEdgesBA.setBitFalse(allEdges[i]);
-						//break;	//dieses Break könnte verhindern, dass ein benötigter Vtx nicht aufs array kommt
+						//break;	//dieses Break koennte verhindern, dass ein benoetigter Vtx nicht aufs array kommt
 					}
 					
 				}
@@ -4469,7 +4469,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 			for(i = 0; i < 2;i++)
 			{
 				isEndEdge = false;
-				//ÜBERPRÜFEN; OB von restlichen connected Edges noch welche selected sind. Wenn nicht, dann is diese edge
+				//UEBERPRUEFEN; OB von restlichen connected Edges noch welche selected sind. Wenn nicht, dann is diese edge
 				// ne endEdge und man muss den ganzen aufwand mit den nonSelectedEdges nicht betreiben
 				//if(helper.matchArray(connectedEdges[i],selEdges).length() == 0)
 
@@ -4490,7 +4490,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 					
 					//matchEdges dürfte nur immer 1 sein. Check, ob das wirklich so ist: SPÄTER RAUSNEHMEN
 					INVIS(if(matchEdges.length() != 1))
-						INVIS(cout<<"FEHLER IN SOLID CHAMFER: MATCH EDGES HAT GRÖßE VON "<<matchEdges.length()<<endl;)
+						INVIS(cout<<"FEHLER IN SOLID CHAMFER: MATCH EDGES HAT GRÖssE VON "<<matchEdges.length()<<endl;)
 					
 					//zuerst prüfen, ob edge selected ist
 					if(!isEndEdge)
@@ -4526,7 +4526,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 							
 								//hier werden keine Daten gesammelt, da diese später sowieso für selected edges 
 								//erzeugt werden, wenn sie an der reihe sind
-								//VERMUTLICH gibt es situationen, wo doch eine mit Vtx und Faces initialisierte Edge benötigt 
+								//VERMUTLICH gibt es situationen, wo doch eine mit Vtx und Faces initialisierte Edge benoetigt 
 								//wird, also lieber noch einbauen (obwohl es dann doppelt gemoppelt wird)
 								
 								INVIS(cout<<"Habe selected OHNE ptr gefunden: "<<matchEdges[0]<<endl;)
@@ -4579,7 +4579,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 							
 							//bearbeiten aller unselected edges
 							//Nun neue unselected edges erstellen an diesem Vtx und nur mit
-							//einer initialisierten seite, bis sie auf selected edge stößt oder edge mit ptr
+							//einer initialisierten seite, bis sie auf selected edge stoesst oder edge mit ptr
 							if(!connectedHasPtr)
 							{
 								MPRINT("Bearbeite unselected ohne Ptr")
@@ -4590,7 +4590,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 								
 								
 								MIntArray					localEdgeIDs;
-								simpleLinkedList<edge>		localEdgePtrs;	//kann in diesem Fall verwendet werden, da sie ihre einheiten nicht löscht, wenn sie selbst gelöscht wird
+								simpleLinkedList<edge>		localEdgePtrs;	//kann in diesem Fall verwendet werden, da sie ihre einheiten nicht loescht, wenn sie selbst geloescht wird
 	
 								//Wegen UVs geht das nicht
 							//	MDoubleArray				arcRatios;		//sync zu localEdgeIDs/Ptrs, hält werte zwischen 0 und 1 (1 = parallel, 0 = orthogonal zu OriginalEdge)
@@ -4714,7 +4714,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 										
 										int seite, richtung;
 									
-										//UNNÖTIG; DA DIE NACHBARN EH WIEDER ÜBERSCHRIEBEN WERDEN; SOBALD DIESE EDGE HIER AN DER REIHE IST
+										//UNNÖTIG; DA DIE NACHBARN EH WIEDER UEBERSCHRIEBEN WERDEN; SOBALD DIESE EDGE HIER AN DER REIHE IST
 										findEdgeNachbarMatrixIndices(selPtr,lastPtr,seite, richtung);
 										//selPtr->setNachbar(seite, richtung,lastPtr);
 										
@@ -4737,11 +4737,11 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 									}
 									
 									
-									//if(stopSearch)	//eigentlich unnötig 
+									//if(stopSearch)	//eigentlich unnoetig 
 									//	break;
 									
 									//edge ist gültig, also daten sammeln und ptr erstellen
-									//unSelEdges benötigen immer nur ihre Faces und ihre Vtx
+									//unSelEdges benoetigen immer nur ihre Faces und ihre Vtx
 									
 									edgeIter.setIndex(currentEdge,tmp);
 									ceVerts[0] = edgeIter.index(0);
@@ -4754,7 +4754,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 									nSelEdgeTmp->setVtxIDs(ceVerts);
 									nSelEdgeTmp->setFaceIDs(ceFaces);
 
-									//nSelEdges benötigen die isFlipped information nicht
+									//nSelEdges benoetigen die isFlipped information nicht
 									
 									/*	//Dies darf nicht mehr gemacht werden, da bei der Erzeugung der UVs wiklich die nächstgelegene Edge verwendet werden muss
 									//jetzt die EdgeRatio ausrechnen (origEdge zu current unselEdge)
@@ -4781,7 +4781,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 										createNSelGerade(nSelEdgeTmp,ceVerts,vertIter);
 										
 										stopSearch = true;
-										continue;	//hier könnte eigentlich auch break hin
+										continue;	//hier koennte eigentlich auch break hin
 									}
 									
 		
@@ -4793,7 +4793,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 									{
 										//diesen Ptr vormerken, so dass er später mit Ptr versehen werden kann
 										
-										//DEAKTIVIERT - UNSELEDGES SOLLEN KEINE VERBINDUNG ZU SEL EDGES HABEN (AUßER ENDEDGES)
+										//DEAKTIVIERT - UNSELEDGES SOLLEN KEINE VERBINDUNG ZU SEL EDGES HABEN (AUssER ENDEDGES)
 									//	needsPtr = true;
 									//	needsPtrArray[i*2+a] = nSelEdgeTmp;
 
@@ -4878,13 +4878,13 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 							if(count == 1)
 								onlyOneNSelEdge[i*2+a] = true;
 /*
-								//wenn count größer 1, dann ist nSelNachbar ungültig
+								//wenn count groesser 1, dann ist nSelNachbar ungültig
 								if(count > 1)
 									nSelEdgeArray[i*2+a] = 0;
 */
 								/*	//-> würde nicht funzen mit UVs
 								//jetzt durch arcRatios parsen und die nSelEdge mit dem kleinsten Eintrag als nSelEdge eintragen
-								//die Edge soll möglichst orthogonal sein
+								//die Edge soll moeglichst orthogonal sein
 								double smallest = 166666666;
 								UINT smallestID = 0;
 								for(x = 0; x < arcRatios.length(); x++)
@@ -4917,7 +4917,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 						//checken, ob matchEdge bereits ptr hat
 
 						//jetzt bekomme ich zwar doppelt soviele edges am ende, allerdings handelt es sich um nSelEdges
-						//die benötigt werden für den fall das mehrere Edges eines faces angewählt sind
+						//die benoetigt werden für den fall das mehrere Edges eines faces angewählt sind
 						/*
 						l = edgeIDs.length();
 						for(int x = 0; x < l; x++)
@@ -4938,7 +4938,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 							
 							onlyOneNSelEdge[i*2+a] = true;
 
-							//Daten sammeln (nur faces und vtx, normals werden nicht benötigt)
+							//Daten sammeln (nur faces und vtx, normals werden nicht benoetigt)
 							edgeIter.setIndex(matchEdges[0],tmp);
 							
 							MIntArray nSelFaces;
@@ -4952,7 +4952,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 							edge* thisEdge = new nSelEdge(matchEdges[0]);
 
 
-							//auch diese endEdges benötigen isFlippedInfos
+							//auch diese endEdges benoetigen isFlippedInfos
 							MIntArray tmpFaceVtx;
 							bool	flipped[2] = {false,false};
 							//jetzt bei den seFaces checken, ob die direction conform ist oder nicht - diese Werte dann der edge übergeben
@@ -4966,7 +4966,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 							
 							thisEdge->setIsFlipped(flipped);
 						
-							//endEdges werden mit aufgenommen, damit sie später mit gelöscht werden können
+							//endEdges werden mit aufgenommen, damit sie später mit geloescht werden koennen
 							edgePtrs.append(thisEdge);
 							edgeIDs.append(matchEdges[0]);
 							
@@ -5029,7 +5029,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 								findEdgeNachbarMatrixIndices(thisEdge,refEdgePtr,s,r);
 								thisEdge->setNachbar(s,r,refEdgePtr);
 								
-								//diese nSelEdge bekommt keinen ptr zu irgendwem. Dies ist auch nicht nötig, da sie selbst
+								//diese nSelEdge bekommt keinen ptr zu irgendwem. Dies ist auch nicht noetig, da sie selbst
 								//keine aktion ausführen wird
 							}
 					//	}
@@ -5062,7 +5062,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 		{
 			//hier edges bearbeiten, die wingedVtx und Ptr haben
 				//ANSATZ: wenn er hier hinkommt, ist bereits minimalPtr für diese edge erstellt wurden.
-				//außerdem wurde eine edge der wingedVtxedge in alledges belassen, damit der Ptr dank 
+				//ausserdem wurde eine edge der wingedVtxedge in alledges belassen, damit der Ptr dank 
 				//edgeIDs und allEdges gefunden und als "selected" identifiziert werden konnte.
 				//hier ist jetzt nichts weiter zu tun, als die werte zu setzen.
 				//die edgeRemovals wurden bereits von allEdges abgezogen
@@ -5161,7 +5161,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 */
 
 		if((bool)options[8])
-		{//wennnormalen verwendet werden, benötigen die NSelEdges auch noch VtxInfos, damit sie als referenz dienen können
+		{//wennnormalen verwendet werden, benoetigen die NSelEdges auch noch VtxInfos, damit sie als referenz dienen koennen
 			//jetzt noch die VtxIDs setzen
 			int nVtx[2];
 
@@ -5238,7 +5238,7 @@ MDoubleArray	BPTfty::createGerade(int verts[],MItMeshVertex& vertIter)
 	return result;
 }
 
-//wieder löschen wenn fertig
+//wieder loeschen wenn fertig
 
 //-----------------------------------------------------------------------------------------------------------------
 MDoubleArray	BPTfty::createPlane(MDoubleArray& gerade, int face, MFnMesh& fnMesh, MItMeshPolygon& polyIter, MVector& normal)
@@ -5350,7 +5350,7 @@ int			BPTfty::getUID(int face, MIntArray& nFaces,MItMeshPolygon& polyIter,int or
 
 		polyIter.getEdges(nEdges);
 
-		match[i] = helper.matchArray(edges,nEdges);	//wenn match mindestens 2 ist, muss match sicherlich noch geordnet werden von klein nach groß
+		match[i] = helper.matchArray(edges,nEdges);	//wenn match mindestens 2 ist, muss match sicherlich noch geordnet werden von klein nach gross
 		
 
 	}

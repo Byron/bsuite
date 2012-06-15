@@ -22,7 +22,7 @@
 #define BPTStableHeaders__
 
 /**
-	Header, der dafür sorgt, dass die aufgelisteten dateien nicht jedesmal aufs neue kompiliert werden
+	Header, der dafuer sorgt, dass die aufgelisteten dateien nicht jedesmal aufs neue kompiliert werden
 
 */
 

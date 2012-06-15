@@ -297,7 +297,7 @@ MStatus		softTransformationNode::initialize()
 
 
 	//die Attribute : startPoint und inVertices beeinflussen den output nicht, weil sie eigentlich nur einmalig gesetzt werden
-	//bei mode muss ich sehen, ob man das wärend der operation ändern können soll
+	//bei mode muss ich sehen, ob man das wueuerend der operation ueuendern kueuennen soll
 	return MS::kSuccess;
 
 }
@@ -348,17 +348,17 @@ MStatus	softTransformationNode::compute(const MPlug& plug, MDataBlock& data)
 		//inVtx auf keinen Fall editieren, da das von arrayData gegebene OBJ editierbar ist
 		inVtx = arrayData.array();
 		
-		//gleich auf outŽMesh arbeiten
+		//gleich auf outueueMesh arbeiten
 		data.outputValue(outMesh).set(data.inputValue(inMesh).asMesh());
 
-		//weil die inVtx nicht perfekt sein müssen, wenn faces oder edges gewählt waren
+		//weil die inVtx nicht perfekt sein mueuessen, wenn faces oder edges gewueuehlt waren
 		if(inVtx.length() != 0)
 			helper.memoryPrune(inVtx);
 	
 
 		startPos = data.inputValue(startPoint).asVector();
 
-		INVIS(cout<<"inVtx länge = "<<inVtx.length()<<endl;)
+		INVIS(cout<<"inVtx lueuenge = "<<inVtx.length()<<endl;)
 
 
 		//jetzt das AnimFn installieren
@@ -466,7 +466,7 @@ MStatus	softTransformationNode::compute(const MPlug& plug, MDataBlock& data)
 
 
 		/*
-		//jetzt noch die VtxColors zurücksetzen
+		//jetzt noch die VtxColors zurueuecksetzen
 		fnMesh.setObject(data.outputValue(outMesh).asMesh());
 		
 
@@ -482,7 +482,7 @@ MStatus	softTransformationNode::compute(const MPlug& plug, MDataBlock& data)
 		//status.perror("");
 		*/
 
-		MPRINT("HABE FARBEN ZURÜCKGESETZT")
+		MPRINT("HABE FARBEN ZURueueCKGESETZT")
 
 		data.outputValue(outMesh).setClean();
 		outVectors.setClean();
@@ -492,8 +492,8 @@ MStatus	softTransformationNode::compute(const MPlug& plug, MDataBlock& data)
 		MDataHandle outHandle = data.outputValue(outWeights);
 		MFnDoubleArrayData	doubleData;
 
-		//für den Fall dass noch keine werte erzeugt wurden, dieses nachholen
-		//wahrscheinlich nicht nötig, wenn outmesh immer zuerst connected wird
+		//fueuer den Fall dass noch keine werte erzeugt wurden, dieses nachholen
+		//wahrscheinlich nicht nueuetig, wenn outmesh immer zuerst connected wird
 
 		//jetzt noch komplettes array erstellen
 		MFnMesh	meshFn(data.outputValue(outMesh).asMesh());
@@ -542,13 +542,13 @@ bool	softTransformationNode::doTweak()
 
 
 
-	//vtxColors Speichern zwecks späterer wiederherstellung
+	//vtxColors Speichern zwecks spueueterer wiederherstellung
 
 
 
 
 	if(oldFDistance != fDistance || maskSize != oldMaskSize)
-	{//Die TweakArrays müssen neu aufgebaut werden
+	{//Die TweakArrays mueuessen neu aufgebaut werden
 
 		rebuildTweakArrays(polyIter,vertIter );
 		
@@ -572,7 +572,7 @@ bool	softTransformationNode::doTweak()
 	}
 	else
 	{
-		//für den Fall, dass sich falloffTypes geändert haben, neuberechnen
+		//fueuer den Fall, dass sich falloffTypes geueuendert haben, neuberechnen
 		recalculateTweakScaleFactors(fnMesh);
 
 	}
@@ -619,8 +619,8 @@ bool	softTransformationNode::doTweak()
 	if(oldVis != vis)
 	{
 		if(oldVis == true)
-		{//vis war vorher an: jetzt müssen VtxColors wiederhergestellt werden
-			MPRINT("HABE FARBEN ZURÜCKGESETZT")
+		{//vis war vorher an: jetzt mueuessen VtxColors wiederhergestellt werden
+			MPRINT("HABE FARBEN ZURueueCKGESETZT")
 
 				resetToOrigColor(fnMesh);
 
@@ -784,7 +784,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 	int l;
 	int numVerts = vertIter.count();
 	//zuallererst die positionen der vertizen wiederherstell
-	MPRINT("Habe Tweaks zurückgesetzt")
+	MPRINT("Habe Tweaks zurueueckgesetzt")
 
 	l = tweakVtx.length();
 	for(int x = 0; x < l; x++)
@@ -796,7 +796,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 
 	
 	
-	//erstmal alle arrays löschen
+	//erstmal alle arrays lueueschen
 //	tweakParentOrigPos.clear();		//diese Arrays werden einfach in die TweaksArrays integriert, da nun ja keine slideProzedur
 									//mehr vorgeschaltet ist
 //	tweakParentVtx.clear();
@@ -807,7 +807,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 	
 	scaleVectors.clear();
 	tweakVtxScale.clear();			//original TweakScale (linear)
-	recalTweakVtxScale.clear();	//durch Funktion veränderte Version von tweakScale
+	recalTweakVtxScale.clear();	//durch Funktion verueuenderte Version von tweakScale
 	
 	
 	tweakVtx.clear();			//IDs der Vtx, die durch SoftSelection verschoben werden sollen
@@ -819,7 +819,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 	{
 		if(maskSize != 0)
 		{
-			//ptVtx mit growSelection füllen über extraProc
+			//ptVtx mit growSelection fueuellen ueueber extraProc
 
 			generateTweakMask(vertIter,polyIter);
 
@@ -828,7 +828,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 		{
 			ptVtx.setLength(numVerts);	//potentielle TweakVtx
 			
-			//array füllen:
+			//array fueuellen:
 			for(int i = 0; i < numVerts; i++)
 			{
 				ptVtx[i] = i;
@@ -848,13 +848,13 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 				//also wieder alle PTs nehmen
 				ptVtx.setLength(numVerts);	//potentielle TweakVtx
 				
-				//array füllen:
+				//array fueuellen:
 				for(int i = 0; i < numVerts; i++)
 				{
 					ptVtx[i] = i;
 				}
 				
-				//jetzt die parentVtx abwählen
+				//jetzt die parentVtx abwueuehlen
 				//memoryArrayRemove(ptVtx, inVtx);
 			}
 			else if(maskSize != oldMaskSize)
@@ -882,7 +882,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 	l = ptVtx.length();		int l2 = inVtx.length();
 
 	
-	INVIS(cout<<"REBUILT TWEAK ARRAYS: MUSS "<<l * l2<<" RECHNUNGEN AUSFÜHREN"<<endl;)
+	INVIS(cout<<"REBUILT TWEAK ARRAYS: MUSS "<<l * l2<<" RECHNUNGEN AUSFueueHREN"<<endl;)
 	
 
 
@@ -895,7 +895,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 		vertIter.setIndex(ptVtx[i],tmp);
 		startPoint = vertIter.position();
 
-		//distancen ausrechnen: hier eventuell noch ne adaptivität einbauen: z.B nur jeden 2. vtx ind SlideIndices einbeziehen
+		//distancen ausrechnen: hier eventuell noch ne adaptivitueuet einbauen: z.B nur jeden 2. vtx ind SlideIndices einbeziehen
 		int x;
 		for(x = 0; x < l2; x++)
 		{//nun ist die Frage, ob es schneller ist, den vertIter zu strapazieren, oder sich die Position einfach zu berechnen ... 
@@ -911,7 +911,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 		}
 
 
-		//jetzt angaben auswerten und tweakVtx hinzufügen
+		//jetzt angaben auswerten und tweakVtx hinzufueuegen
 		if(minDistance <= fDistance)
 		{
 
@@ -956,7 +956,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 			if(scale > maxScale)
 				maxScale = scale;
 			
-			tweakNormals.append(normal);		//für den Fall speichern, das gepushed wird
+			tweakNormals.append(normal);		//fueuer den Fall speichern, das gepushed wird
 			tweakNormalScale.append(scale);
 		}
 		
@@ -986,7 +986,7 @@ void	softTransformationNode::generateTweakMask(MItMeshVertex& vertIter, MItMeshP
 
 	int tmp = maskSize - oldMaskSize;
 	if(tmp > 0)
-	{//size hat sich vergrößert
+	{//size hat sich vergrueueueueert
 		for(int i = 0; i < tmp; i++)
 		{
 			growVtxSelection(ptVtx,vertIter,polyIter);
@@ -1009,7 +1009,7 @@ void	softTransformationNode::generateTweakMask(MItMeshVertex& vertIter, MItMeshP
 //	MIntArray copy = inVtx; //weil arrayRemove auch rhs beeinflusst
 //	arrayRemove(ptVtx,copy);
 	
-	INVIS(cout<<"PtVtx Länge in GMask: "<<ptVtx.length()<<endl;)
+	INVIS(cout<<"PtVtx Lueuenge in GMask: "<<ptVtx.length()<<endl;)
 
 	oldMaskSize = maskSize;
 

@@ -77,11 +77,11 @@
 namespace BPT
 {
 
-/** Hat die Fähigkeit, einen smartSplit, Chamfer oder solifChamfer auszuführen
+/** Hat die Fhigkeit, einen smartSplit, Chamfer oder solifChamfer auszufuehren
 
   @note
 	Die eigentliche arbeit wird von Factories erledigt. Die Node selbst extrahiert im Grunde
-	nur die nötigen Daten und leitet diese an die Factories weiter
+	nur die ntigen Daten und leitet diese an die Factories weiter
 
 */
 
@@ -114,7 +114,7 @@ private:
 
 
 // ------------------
-// ÖFFENTLICHE ATTRIBUTE
+// OEFFENTLICHE ATTRIBUTE
 public:
 // ------------------
 
@@ -129,7 +129,7 @@ public:
 	//
 	
 	static	MObject		mode;
-	static	MObject		slide;		//!<Wert für slide
+	static	MObject		slide;		//!<Wert fuer slide
 	static	MObject		normal;		//!<wert fÃ¼r bewegung entlang der normale
 	
 	static	MObject		selEdgeIDs;	//!<arrayAttribute
@@ -143,8 +143,8 @@ public:
 	static	MObject		options;	//!<Festes Array
 	static	MObject		slideLimitedObj;//!< True, wenn slide nur zwischen 0 und 1 erlaubt sein soll
 
-	static	MObject		BPTinMesh;	//!<inMeshObj für BPTNode
-	static	MObject		BPToutMesh;	//!<inMeshObj für BPTNode
+	static	MObject		BPTinMesh;	//!<inMeshObj fuer BPTNode
+	static	MObject		BPToutMesh;	//!<inMeshObj fuer BPTNode
 	
 	STE_DEFINE_STATIC_PARAMETERS(BPT);
 
@@ -157,7 +157,7 @@ public:
 		
 
 // ------------------
-// ÖFFENTLICHE VARIABLEN
+// OEFFENTLICHE VARIABLEN
 public:
 // ------------------
 
@@ -232,7 +232,7 @@ private:
 
 	
 	parameters			cp;		//!< currentParameters
-	parameters			op;		//!< oldParameters - um vergleichn zu können, ob sich parameter verändert haben
+	parameters			op;		//!< oldParameters - um vergleichn zu knnen, ob sich parameter verndert haben
 
 	BPT_Helpers			helper; 
 	BPTfty				fBPTfty;
@@ -246,7 +246,7 @@ private:
 	bool				undoItCalled;
 
 
-	uint				initialVtxCount;		//!< Hält den VtxCount bei der ersten echten Berechnung (meshDirty = true)		
+	uint				initialVtxCount;		//!< Hlt den VtxCount bei der ersten echten Berechnung (meshDirty = true)		
 
 	
 

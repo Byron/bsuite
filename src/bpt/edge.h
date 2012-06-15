@@ -133,9 +133,9 @@ protected:
 
 	void					insertNewEdgeVtx(	int newVtx,
 												bool edgeVtxExisted, 
-												edge* insertIntoEdge );	//!< diese prozedur fügt neue edgevertizes in faceDaten ein
+												edge* insertIntoEdge );	//!< diese prozedur fuegt neue edgevertizes in faceDaten ein
 
-	void					addVtxChange( int newVtx, edge* otherSelEdge);	//!< diese methode kümmert sich um alles, was vtxChange betrifft - Vtx, normalIDs, UVs
+	void					addVtxChange( int newVtx, edge* otherSelEdge);	//!< diese methode kuemmert sich um alles, was vtxChange betrifft - Vtx, normalIDs, UVs
 																										
 
 	void					getUVPos(	MPoint newPosition, 
@@ -149,16 +149,16 @@ public:
 //----------------------------------
 ///STATISCHE ELEMENTE
 //----------------------------------
-//werden benötigt, im das Mesh später wieder korrekt aufzubauen, um Dataen zwischen zu speichern,die von jeder Edge aus erreichbar sind
+//werden bentigt, im das Mesh spter wieder korrekt aufzubauen, um Dataen zwischen zu speichern,die von jeder Edge aus erreichbar sind
 
 	static edgeMeshCreator*		creator;
-	static double				maxLength ;	//ist die kleinste unSelEdge und sorgt dafür, dass die Faces nicht übers ziel hinausschießen
+	static double				maxLength ;	//ist die kleinste unSelEdge und sorgt dafuer, dass die Faces nicht uebers ziel hinausschiessen
 	
-	static std::list<edgeFaceData*> MAINFaceDataPtrs;	//!< enthält Ptr zu allen faceDataEinheiten - wird verwendet, um die origFaces anzupassen und um die einheiten zu löschen
-	static std::list<endFaceData*>	endFacePtrs;		//!< hält die Ptr zu den EndFaces, welche ganz zum schluss evaluiert/erstellt werden
-	static std::list<nSelEdgeData*> nSelEdgeDataArray;	//!< hält infos über die zu ändernden Faces, welche an nSelEdges angrenzen. Diese werden später rekonstruiert
+	static std::list<edgeFaceData*> MAINFaceDataPtrs;	//!< enthlt Ptr zu allen faceDataEinheiten - wird verwendet, um die origFaces anzupassen und um die einheiten zu lschen
+	static std::list<endFaceData*>	endFacePtrs;		//!< hlt die Ptr zu den EndFaces, welche ganz zum schluss evaluiert/erstellt werden
+	static std::list<nSelEdgeData*> nSelEdgeDataArray;	//!< hlt infos ueber die zu ndernden Faces, welche an nSelEdges angrenzen. Diese werden spter rekonstruiert
 
-	static BPT_BA					origVtxDoneBA;		//!< ist true, wenn vtx gewählt ist (== selVtx);WIRD VON CHAMFER VERWENDET UND VON SOLIDCHAMFER, allerdings aus erschiedenen Gründen
+	static BPT_BA					origVtxDoneBA;		//!< ist true, wenn vtx gewhlt ist (== selVtx);WIRD VON CHAMFER VERWENDET UND VON SOLIDCHAMFER, allerdings aus erschiedenen Gruenden
 
 
 
@@ -179,15 +179,15 @@ public:
 
 	virtual	const int*		getUIDs() const = 0;			
 
-	virtual	bool			isSelected() = 0; //!< gibt den Typ des faces zurück: false = unSelEdge, true = selEdge
+	virtual	bool			isSelected() = 0; //!< gibt den Typ des faces zurueck: false = unSelEdge, true = selEdge
 
-	virtual MDoubleArray	getGerade(bool displace,const edge* requester,bool useUId = false, int uniqueID = -1) = 0; //!< diese proc ist nur für selEdges definiert
+	virtual MDoubleArray	getGerade(bool displace,const edge* requester,bool useUId = false, int uniqueID = -1) = 0; //!< diese proc ist nur fuer selEdges definiert
 
-	virtual	void			setNewVerts(const edge* requester, MIntArray& newVerts,bool useUID = false, int uniqueID = 0) = 0;	//!< defefniert nur für selEdge
+	virtual	void			setNewVerts(const edge* requester, MIntArray& newVerts,bool useUID = false, int uniqueID = 0) = 0;	//!< defefniert nur fuer selEdge
 
 	virtual void			getValidRichtung(const edge* requester, int& seite, int& richtung, int uniqueID = -1) = 0;
 
-	virtual int				getNewGeradenVtx(const edge* requester) = 0;	//!< definiert nur für selEdge	
+	virtual int				getNewGeradenVtx(const edge* requester) = 0;	//!< definiert nur fuer selEdge	
 
 	virtual MIntArray		getNewVtx() const = 0;
 
@@ -217,35 +217,35 @@ protected:
 	////////////////////////////
 	///PRIVATE DATENELEMENTE////
 	////////////////////////////
-	static			ULONG			side,dir;			/*!< wird für iteration verwendet und verhindert, dass man diese Parameter ständig mitgeben muss
+	static			ULONG			side,dir;			/*!< wird fuer iteration verwendet und verhindert, dass man diese Parameter stndig mitgeben muss
 														//vars sind statisch, da sie immer nur von einer Edge zu einem Zeitpunkt verwendet werden
-														//MERKE: MAN DARF JETZT NICHTS MEHR REKURSIV LÖSEN!!! ->GEHT KLAR ;) */
+														//MERKE: MAN DARF JETZT NICHTS MEHR REKURSIV LOESEN!!! ->GEHT KLAR ;) */
 
-	int				vtxIDs[2];				//!< hält die VtxIDs der beiden enden
+	int				vtxIDs[2];				//!< hlt die VtxIDs der beiden enden
 
 	
-	int				edgeVtx[2];				//!< enthält die neuenVtx auf der origEdge pro seite
+	int				edgeVtx[2];				//!< enthlt die neuenVtx auf der origEdge pro seite
 
 
-	edge*			nachbarn[2][2];			//!< hält ptr zu nachbarEdges pro seite pro richtung, erster index ist für Seite, zweiter index ist für Richtung
+	edge*			nachbarn[2][2];			//!< hlt ptr zu nachbarEdges pro seite pro richtung, erster index ist fuer Seite, zweiter index ist fuer Richtung
 
-	edge*			nSelNachbarn[2][2];		//!< hält Ptr zu nSelEdges zwecks intersection wenn nurEinNachbar
+	edge*			nSelNachbarn[2][2];		//!< hlt Ptr zu nSelEdges zwecks intersection wenn nurEinNachbar
 
 
-	MIntArray		faceIDs;				//!< hält IDs der Faces links und rechts von Edge, sync zu richtung der edgeNachbarn
+	MIntArray		faceIDs;				//!< hlt IDs der Faces links und rechts von Edge, sync zu richtung der edgeNachbarn
 	
 	
 	bool			isFlipped[2];			//!< sync zu Richtung, true, wenn edgeVtx GEGEN den fluss des faces dieser Richtung, false wenn die Vtx in Richtung der FaceVtx
-											//!< wird nicht im konstruktor initialisert - die Werte werden entsprechend gesetzt über zugriffsmethode
+											//!< wird nicht im konstruktor initialisert - die Werte werden entsprechend gesetzt ueber zugriffsmethode
 
-	edgeFaceData*	faceData[2];			//!< hält datenFace pro richtung
+	edgeFaceData*	faceData[2];			//!< hlt datenFace pro richtung
 
 
 
 	MVectorArray	normals;				//!< normalen der facees, sync zu faceIDs
 
 	
-	int				id;						//!< wird im grund nur fürs debuggung gebraucht;
+	int				id;						//!< wird im grund nur fuers debuggung gebraucht;
 
 	//FLAGS
 	bool			clean;					//!< wird am ende der engageMethode auf <true> gesetzt	

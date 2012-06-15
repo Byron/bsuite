@@ -95,7 +95,7 @@ public:
 	static	MObject			vtxColorObj2;
 
 
-//* Im DebugModus soll es auch noch Parameter für polygonoffset geben
+//* Im DebugModus soll es auch noch Parameter fuer polygonoffset geben
 #ifdef DEBUG
 	static	MObject			pOffset1Obj;
 	static	MObject			pOffset2Obj;
@@ -144,7 +144,7 @@ private:
 
 	GLuint	list;
 	bool	listNeedsUpdate;
-	bool	wasInCompute;	//!< wird benötigt, damit man nicht ständig neue displayLists aufbaut, während man etwas verschiebt - man soll dann einfach so zeichnen
+	bool	wasInCompute;	//!< wird bentigt, damit man nicht stndig neue displayLists aufbaut, whrend man etwas verschiebt - man soll dann einfach so zeichnen
 
 	M3dView::DisplayStyle	lastDMode;
 

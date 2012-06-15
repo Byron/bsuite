@@ -38,7 +38,7 @@
 namespace BPT
 {
 
-/** diese Klasse dient als DatenKapsel und stellt ein gewählte edge dar 
+/** diese Klasse dient als DatenKapsel und stellt ein gewhlte edge dar 
 	
 */
 
@@ -76,9 +76,9 @@ public:
 
 
 
-	virtual void	setUIDs(MIntArray& IDs);		//!< setzt einfach die uniqueID auf übergebenen wert, dient der eindeutigen identifikation von nurEinNachbarEdges
+	virtual void	setUIDs(MIntArray& IDs);		//!< setzt einfach die uniqueID auf uebergebenen wert, dient der eindeutigen identifikation von nurEinNachbarEdges
 
-	/** intArray hat zwei einträge: [0] ist schnittVtxID der verschobenen Requesterplane und der versch. nachbarGeraden, [1] ist
+	/** intArray hat zwei eintrge: [0] ist schnittVtxID der verschobenen Requesterplane und der versch. nachbarGeraden, [1] ist
 	schnittpunkt mit nicht verschobener geraden
 	*/
 	virtual	void	setNewVerts(	const edge* requester, 
@@ -89,7 +89,7 @@ public:
 
 	virtual	bool			isSelected(){return true;};
 
-	//* eigentlich könnte man den UseID flag sparen und einfach alles anhand unique id machen (if(uniqueID != -1))
+	//* eigentlich knnte man den UseID flag sparen und einfach alles anhand unique id machen (if(uniqueID != -1))
 	virtual MDoubleArray	getGerade(	bool displace,
 										const edge* requester, 
 										bool useUId = false, 
@@ -101,7 +101,7 @@ public:
 
 	virtual void			getValidRichtung(const edge* requester, int& seite, int& richtung, int uniqueID = -1);
 
-	virtual int				getNewGeradenVtx(const edge* requester);	//!< gibt Vtx zurück, der auf der edge liegt
+	virtual int				getNewGeradenVtx(const edge* requester);	//!< gibt Vtx zurueck, der auf der edge liegt
 
 
 	virtual	const int*		getUIDs() const {return uID;}
@@ -145,7 +145,7 @@ private:
 	
 	int				intersect(bool isEdgeDisplaced,bool displacePlane,edge* nachbar, bool isNurEinNachbar = false);
 
-	//* chamfer ist nur ein dummyParameter, damit ich die gunktion überladen kann
+	//* chamfer ist nur ein dummyParameter, damit ich die gunktion ueberladen kann
 	MPoint			intersect(bool isEdgeDisplaced,bool displacePlane,edge* nachbar, bool isNurEinNachbar, bool chamfer);	
 
 
@@ -169,22 +169,22 @@ private:
 	//GEOMETRIE-DATEN
 	//-----------------
 	//MERKE:	wenn die Edge nonwinged, ist der erste index von plane und gerade immer 0.
-	//			wenn winged Vertex nicht größer 1 ist winged normals leer und die normale des punktes ergibt sich aus
+	//			wenn winged Vertex nicht grsser 1 ist winged normals leer und die normale des punktes ergibt sich aus
 	//			den beiden normalen der planes
 	
 	/**		plane[richtung][koordinaten]
 
-	hält planes der Edge in normalenForm: (x - a) * n = 0 -> {ax,ay,az,nx,ny,nz}
-	eine plane pro richtung, jeweils für jede endEdge falls vorhanden 
+	hlt planes der Edge in normalenForm: (x - a) * n = 0 -> {ax,ay,az,nx,ny,nz}
+	eine plane pro richtung, jeweils fuer jede endEdge falls vorhanden 
 	ansonsten wird nur ein index (plane[0][x][y] genutzt, sync. zu richtung
 
 	*/
 	double	plane[2][6];	
 	
-	//*hält die gerade der Edge, in parameterform {x,y,z,u,v,w}
+	//*hlt die gerade der Edge, in parameterform {x,y,z,u,v,w}
 	double	gerade[6];	
 
-	/**enthält die IDs der neuen Vtx(=schnittpunkte der verschobenen planes/geraden)
+	/**enthlt die IDs der neuen Vtx(=schnittpunkte der verschobenen planes/geraden)
 	
 	  index ergibt sich aus Seite*2+Richtung wenn kein Vtx drin, sind die werte -1
 	*/
@@ -193,7 +193,7 @@ private:
 	bool	smallFaceClean[2]; //!< sync zu vtx, wird von chamfer verwendet
 	
 
-	//*enthält den für jede richtung einzigartigen identifier (die EdgeID, die das face dieser richtung mit	dem face der anderen edge teilt)
+	//*enthlt den fuer jede richtung einzigartigen identifier (die EdgeID, die das face dieser richtung mit	dem face der anderen edge teilt)
 	int		uID[4];	
 
 	

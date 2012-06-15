@@ -90,7 +90,7 @@ public:
 	
 	N = numUVSets, X = vtxChangeIndex / 2; Hält immer origUV gefolgt von newUV -> *2
 	->> X*N*2 + N-N*2		= origUv des X'ten Vtx des N'ten UVSets
-	->> X*N*2 + N-N*2+1	= NewUv des X'ten Vtx des N'ten UVSets, zugehörig zu origUV
+	->> X*N*2 + N-N*2+1	= NewUv des X'ten Vtx des N'ten UVSets, zugehoerig zu origUV
 	
 	 @par
 		wenn eine UV nicht vorhanden ist, dann ist im Array -1 !!!
@@ -101,7 +101,7 @@ public:
 //DATENELEMENTE - Als Zwischenspeicher für optimalen Zugriff auf die Facedaten
 public:
 //----------------------------
-//MERKE : DIESE DATEN HIER MÜSSEN DURCH DIE EDGES AKTUALISIERT WERDEN!
+//MERKE : DIESE DATEN HIER MUESSEN DURCH DIE EDGES AKTUALISIERT WERDEN!
 
 	MIntArray				faceVertices;	//!< hält die Vertizen des Faces
 

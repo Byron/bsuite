@@ -64,14 +64,14 @@ void IVMeshCreator::doInsertVtx( int edgeID,
 	MIntArray connectedFaces;	//hält die Faces, die mit edge verbunden sind
 
 	MVector	slideNormal;		//hält die entgltige Normale, in die die neuen Vertizen sliden
-	double	normalScaleValue = 0;	//skaliert die Normale entsprechend der Größe des dazugehörigen Faces
+	double	normalScaleValue = 0;	//skaliert die Normale entsprechend der Groesse des dazugehoerigen Faces
 	MVector	direction;			//Richtungsvektor von start - endPoint
-	MPoint	startPoint;			//startPoint wird ebenfalls für die Vtxinsertion benötigt
+	MPoint	startPoint;			//startPoint wird ebenfalls für die Vtxinsertion benoetigt
 	int		insertionID;		//die ID des letzten Vtx im Array
 
 	MIntArray vertices[2];		//hält die vertizen der faces, die mit der edge verbunden sind (maximal 2)
 
-	UINT l;						//länge von allen möglicen arrays
+	UINT l;						//länge von allen moeglicen arrays
 
 	//******************
 	//LOS GEHT'S
@@ -106,7 +106,7 @@ void IVMeshCreator::doInsertVtx( int edgeID,
 
 		//hier schon vorsorglich die vertizen holen
 		//man darf hier nur eigene prozeduren verwenden, da zu einem Face auch mehrmals Vertizen hinzu-
-		//gefügt werden können und der PolyIter dann natürlich nicht mehr aktuell ist 
+		//gefügt werden koennen und der PolyIter dann natürlich nicht mehr aktuell ist 
 		getFaceVtxIDs(connectedFaces[i],vertices[i]);
 
 		slideNormal += normal;
@@ -129,12 +129,12 @@ void IVMeshCreator::doInsertVtx( int edgeID,
 
 
 	//slideScale ist immer - 1, da es erst berechnet werden kann, wenn alle Werte eingetragen sind
-	//-1 ist außerdem Flag dafür, dass die Werte noch berechnet werden müssen
+	//-1 ist ausserdem Flag dafür, dass die Werte noch berechnet werden müssen
 	slideScale->append(-1.0);
 
 	//slideIndices[x] ist immer der erste der neuen Vertizen, ich antizipiere das hier: der erste neue Vtx hat
 	//den Index von vtxPoints->length();
-	insertionID = vtxPoints->length() - 1;	//insertionID setzen, später für InsertVtx benötigt
+	insertionID = vtxPoints->length() - 1;	//insertionID setzen, später für InsertVtx benoetigt
 	slideIndices->append( insertionID + 1 );
 
 
@@ -199,7 +199,7 @@ void IVMeshCreator::doInsertVtx( int edgeID,
 		vtxPoints->append(startPoint + (r++ * factor) * mySlide * direction);
 	}
 
-	//DIE NEUEN INDICES IN FACEVERTICES EINFÜGEN UND DIE MESHDATEN DAMIT AKTUALISIEREN
+	//DIE NEUEN INDICES IN FACEVERTICES EINFUEGEN UND DIE MESHDATEN DAMIT AKTUALISIEREN
 	/////////////////////////////////////////////////////////////////////////////////////////
 
 	//jetzt die angrenzenden Faces aktualisieren
@@ -240,7 +240,7 @@ void IVMeshCreator::doInsertVtx( int edgeID,
 
 					for(y = l2 - 1; y > insertionID; y--)
 					{
-						vertices[i].insert(y,x++);	//da die insertposition durch insert um 1 nach oben verschoben wird, muss x ebenfalls um 1 erhöht werden
+						vertices[i].insert(y,x++);	//da die insertposition durch insert um 1 nach oben verschoben wird, muss x ebenfalls um 1 erhoeht werden
 					}
 				
 				}
@@ -283,7 +283,7 @@ void IVMeshCreator::generateUVs(MIntArray& connectedFaces,
 								int		   endVtxID,
 								bool	   useSlide)
 //----------------------------------------------------------------------------------------------------------
-{//erzeugt UVs für die Faces, wenn möglich
+{//erzeugt UVs für die Faces, wenn moeglich
 
 
 	//iteratoren initialisieren
@@ -468,7 +468,7 @@ void IVMeshCreator::generateUVs(MIntArray& connectedFaces,
 							iterCounts,
 							iterUVperVtx );
 
-			//UVs erzeugen (und auch slide, wenn nötig)
+			//UVs erzeugen (und auch slide, wenn noetig)
 			if(useSlide)
 			{			
 				createUVs(	minMaxIDs[1],
@@ -562,7 +562,7 @@ void	IVMeshCreator::createUVs(	int&		 minIndex,
 
 	//jetzt die eigentlichen UVs erstellen
 	double factor = 1.0 / double(splitCount + 1);
-	double	mySlide = (iterSlideStart != 0) ? slide : 1.0;	//klar, man könnte auch darauf verzichten, dass
+	double	mySlide = (iterSlideStart != 0) ? slide : 1.0;	//klar, man koennte auch darauf verzichten, dass
 															//man den selben check weiter unten nochmal macht
 															//allerdings ist es so übersichtlicher
 	double r = 1.0;
@@ -590,7 +590,7 @@ void	IVMeshCreator::createUVs(	int&		 minIndex,
 		//slideIDs sind im Doppelpack codiert:
 		//Xn*2 = StartSlideID, Xn*2 + 1 = endSlideID
 		//dies muss sein, weil nicht davon auszugehen ist, dass das Array lückenlos sein wird
-		//so wie das beim vtxSlideArray (welche ja immer zumindest along normal sliden können)
+		//so wie das beim vtxSlideArray (welche ja immer zumindest along normal sliden koennen)
 		(*(*iterSlideIDs)).append(minIndex);
 		(*(*iterSlideIDs)).append(minIndex + splitCount);
 	}
@@ -624,7 +624,7 @@ void	IVMeshCreator::updateUVArrays(  int faceID,
 											*iterLUT,
 											*iterLUTValues );
 
-	//die neuen UVs werden direkt in das große UVperVtxArray eingefügt
+	//die neuen UVs werden direkt in das grosse UVperVtxArray eingefügt
 
 
 	MIntArray& UVIDs = (*(*iterUVperVtx));
@@ -673,7 +673,7 @@ void IVMeshCreator::generateNormals(	MIntArray&	connectedFaces,
 										int			startVtxID,
 										int			endVtxID		)
 //----------------------------------------------------------------------------------------------------------
-{//aktualisiert die NormalenArrays und fügt hardEdges hinzu, wenn möglich
+{//aktualisiert die NormalenArrays und fügt hardEdges hinzu, wenn moeglich
 
 
 

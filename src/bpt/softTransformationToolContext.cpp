@@ -79,7 +79,7 @@ void	nodeRemovedCB(MObject& node, void* data)
 
 	if(ctxPtr->lastMesh.node() == node)
 	{
-		MPRINT("WARNUNG - MESH gelöscht")
+		MPRINT("WARNUNG - MESH geloescht")
 		ctxPtr->emergency = true;
 		MGlobal::executeCommand("setToolTo selectSuperContext", false, false);
 	}
@@ -173,7 +173,7 @@ bool	softTransformationToolCtx::selectionsDiffer(MSelectionList& inList)
 	if(inList.length() != lastSelection.length() || lastSelection.length() == 0)
 		return true;
 	
-	//also ist es doch nötig, die Componenten zu vergleichen:
+	//also ist es doch noetig, die Componenten zu vergleichen:
 
 	//jeweils nur die erste auswahl testen
 	MDagPath listPath, lastPath;
@@ -287,7 +287,7 @@ void softTransformationToolCtx::toolOffCleanup()
 	MMessage::removeCallback(id3);
 
 	MPRINT("bin in toolOffCleanup")
-	//softTransformNode löschen
+	//softTransformNode loeschen
 
 
 
@@ -325,8 +325,8 @@ void softTransformationToolCtx::toolOffCleanup()
 			generateUndoInfo();
 
 
-	//dupMesh darf erst nach connectSoftNode undo gelöscht werden
-	//maya stürzt ab, wenn diese node gelöscht wird. Dies betrifft wahrscheinlich die in PolyModifier 
+	//dupMesh darf erst nach connectSoftNode undo geloescht werden
+	//maya stürzt ab, wenn diese node geloescht wird. Dies betrifft wahrscheinlich die in PolyModifier 
 	//betreffende limitation  wegen duplicate und fehlendem builtInUndo
 /*	if(dupMeshDagPath.apiType() != MFn::kInvalid)
 	{
@@ -397,7 +397,7 @@ void softTransformationToolCtx::toolOffCleanup()
 	}
 */
 
-	// Jetzt die FastTrgNode wieder löschen
+	// Jetzt die FastTrgNode wieder loeschen
 	//
 	if( fastTrgNodeCreator )
 	{
@@ -496,7 +496,7 @@ void	softTransformationToolCtx::careAboutVNode(bool deleteIt)
 		}
 	}
 	else
-	{//locator wieder löschen wenn nötig
+	{//locator wieder loeschen wenn noetig
 		if(vmCreator != 0)
 		{
 			vmConnector->undoIt();
@@ -517,7 +517,7 @@ MStatus softTransformationToolCtx::doPress(MEvent &event)
 //------------------------------------------------------------
 {
 	MStatus stat;
-//	if(!event.isModifierControl())	//so ist es möglich, noch mit singleClick abzuwählen
+//	if(!event.isModifierControl())	//so ist es moeglich, noch mit singleClick abzuwählen
 		stat = MPxSelectionContext::doPress(event);
    
 	
@@ -544,7 +544,7 @@ MStatus softTransformationToolCtx::doPress(MEvent &event)
 			depNodeFn.findPlug("distance").getValue(initialDist);
 			depNodeFn.findPlug("maskSize").getValue(initialMask);
 
-			// Außerdem noch die worldspace ausmaße des screens finden
+			// Ausserdem noch die worldspace ausmasse des screens finden
 			// TODO - noch richtig machen
 			//
 			MPoint pWorld1, pWorld2;
@@ -679,7 +679,7 @@ MStatus softTransformationToolCtx::doRelease(MEvent &event)
 
 
 		
-		//das löschen des commands übernimmt die undoQueue
+		//das loeschen des commands übernimmt die undoQueue
     }
 /*
 	if(cmd != 0 && !cmdFinalized)
@@ -756,7 +756,7 @@ void	softTransformationToolCtx::calculateScaleFactor()
 MObject	softTransformationToolCtx::findSoftNode()
 //-------------------------------------------------
 {
-	//diese Procedur könnte versagen, wenn mesh keine history hat!
+	//diese Procedur koennte versagen, wenn mesh keine history hat!
 	MFnDependencyNode	depNodeFn(lastMesh.node());
 
 	
@@ -946,7 +946,7 @@ void	softTransformationToolCtx::connectSoftNode(MObject& softNode,MObject& meshN
 			//cout<<"DEPFn Name: "<<depNodeFn.name()<<endl;
 			if(tweaks.numElements() > 0 )
 			{//tweaks sind vorhanden
-				//tweaks löschen
+				//tweaks loeschen
 				//cout<<"CONNECTSOFTNODES: Will Tweaks zurücksetzen"<<endl;
 				
 				MFnNumericData numDataFn;
@@ -1106,7 +1106,7 @@ bool	softTransformationToolCtx::writeBackTweaks()
 	MVectorArray vectors = vectorFn.array();
 	
 	INVIS(cout<<"VectorsLänge = "<<vectors.length()<<endl;)
-	//jetzt sind tweaks in der softNode vorhanden und können ins mesh geschrieben werden
+	//jetzt sind tweaks in der softNode vorhanden und koennen ins mesh geschrieben werden
 	depNodeFn.setObject(lastMesh.node());
 	MPlug	tweaks = depNodeFn.findPlug("pnts");
 	
@@ -1158,7 +1158,7 @@ bool	softTransformationToolCtx::writeBackTweaks()
 	cmd->meshPath = lastMesh;
 
 	
-	if(!cmdFinalized) //dieser check ist eigentlich nicht nötig, aber sicher ist sicher!
+	if(!cmdFinalized) //dieser check ist eigentlich nicht noetig, aber sicher ist sicher!
 	{
 		cmd->finalize();
 		cmdFinalized = true;
@@ -1207,7 +1207,7 @@ bool	softTransformationToolCtx::generateUndoInfo()
 	vPlug.getValue(arrayData);
 
 	
-	//jetzt die geupdateten Corlors durchspülen(nötig bei meshes ohne history
+	//jetzt die geupdateten Corlors durchspülen(noetig bei meshes ohne history
 	double scale;
 	depNodeFn.findPlug("scale").getValue(scale);
 	depNodeFn.findPlug("scale").setValue(scale + 0.000000001);
@@ -1221,7 +1221,7 @@ bool	softTransformationToolCtx::generateUndoInfo()
 	MVectorArray vectors = vectorFn.array();
 	
 	INVIS(cout<<"VectorsLänge = "<<vectors.length()<<endl;)
-	//jetzt sind tweaks in der softNode vorhanden und können ins mesh geschrieben werden
+	//jetzt sind tweaks in der softNode vorhanden und koennen ins mesh geschrieben werden
 
 	
 	
@@ -1245,7 +1245,7 @@ bool	softTransformationToolCtx::generateUndoInfo()
 		
 		cmd->meshPath = lastMesh;
 
-	if(!cmdFinalized) //dieser check ist eigentlich nicht nötig, aber sicher ist sicher!
+	if(!cmdFinalized) //dieser check ist eigentlich nicht noetig, aber sicher ist sicher!
 	{
 		cmd->finalize();
 		cmdFinalized = true;
@@ -1306,7 +1306,7 @@ void update(void * data)
 		
 		if(ctxPtr->hasManip)
 		{
-			MPRINT("Lösche Manipulators!!!")
+			MPRINT("Loesche Manipulators!!!")
 			ctxPtr->deleteManipulators();
 			ctxPtr->hasManip = false;
 		}
@@ -1325,7 +1325,7 @@ void update(void * data)
 		}
 
 
-		//zuerst die VNode löschen wenn möglich
+		//zuerst die VNode loeschen wenn moeglich
 		ctxPtr->careAboutVNode(true);
 
 		//diese proc kümmert sich um undo von softConnector

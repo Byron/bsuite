@@ -201,7 +201,7 @@ MStatus	ByronsPolyToolsNodeManip::connectToDependNode(const	MObject& node)
 	
 	MFnDirectionManip fnDirection(fDirectionManip);
 	
-	//Callbacks hinzufügen:
+	//Callbacks hinzufuegen:
 	unsigned	startIndex = fnDirection.startPointIndex();
 	addPlugToManipConversionCallback(startIndex,(plugToManipConversionCallback) 
 								&ByronsPolyToolsNodeManip::startPointCallback);
@@ -280,7 +280,7 @@ MManipData	ByronsPolyToolsNodeManip::slideOnlyCallbackToPlug(unsigned index)
 MVector ByronsPolyToolsNodeManip::getCamTranslation() const
 //----------------------------------------------------
 {
-	//müsste so eigentlich funzen, wenn nicht, dann halt so wie im Beispiel
+	//muesste so eigentlich funzen, wenn nicht, dann halt so wie im Beispiel
 	MDagPath	path = camPath;
 
 	path.pop();
@@ -315,8 +315,8 @@ MPoint	ByronsPolyToolsNodeManip::getRightScreenPoint()
 {
 
 
-	//diese Funktion sollte sich später noch daten der Node holen. so dass die togglePositions so
-	//gewählt werden, dass sie niemals mit dem DirectionManip interferieren
+	//diese Funktion sollte sich spter noch daten der Node holen. so dass die togglePositions so
+	//gewhlt werden, dass sie niemals mit dem DirectionManip interferieren
 
 
 
@@ -342,8 +342,8 @@ MPoint	ByronsPolyToolsNodeManip::getCenterScreenPoint()
 	int breite = myView.portWidth();
 	int hoch = myView.portHeight();
 
-	//diese Funktion sollte sich später noch daten der Node holen. so dass die togglePositions so
-	//gewählt werden, dass sie niemals mit dem DirectionManip interferieren
+	//diese Funktion sollte sich spter noch daten der Node holen. so dass die togglePositions so
+	//gewhlt werden, dass sie niemals mit dem DirectionManip interferieren
 
 	breite = (breite - (breite % 2))/2;
 	hoch = (hoch - (hoch % 2))  / 2;
@@ -462,7 +462,7 @@ MManipData	ByronsPolyToolsNodeManip::directionCallback(unsigned index)
 	normal.getValue(normalVal);
 
 
-	//hier müssen die Werte eigenticht nur zurückgerechnet werden.
+	//hier muessen die Werte eigenticht nur zurueckgerechnet werden.
 	int newX = slide * breite;
 	int newY = 100 * normalVal + hoch/2;
 
@@ -533,7 +533,7 @@ MManipData	ByronsPolyToolsNodeManip::directionCallbackToPlug(unsigned index)
 		s = 0;
 	 
 	*/
-	//ist eigentlich unnötig, vielleicht kann man auch leeres MManipDataObj  übergeben
+	//ist eigentlich unntig, vielleicht kann man auch leeres MManipDataObj  uebergeben
 	
 	//return	MManipData(s);
 	return	MManipData(newSlide);

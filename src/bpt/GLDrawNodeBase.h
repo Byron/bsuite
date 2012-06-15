@@ -42,7 +42,7 @@
 
 
 
-// Diese Node enthält alles was man braucht, um mit openGl zu zeichnen
+// Diese Node enthlt alles was man braucht, um mit openGl zu zeichnen
 //
 #include <GL/glu.h>
 
@@ -51,7 +51,7 @@ namespace BPT
 {
 
 
-/* *	Ne völlige Unsinnsklasse: Diese Base wird von den Globals included, während sich die GLDRAWNODE die Globals holt
+/* *	Ne vllige Unsinnsklasse: Diese Base wird von den Globals included, whrend sich die GLDRAWNODE die Globals holt
 */
 
 //#################################################
