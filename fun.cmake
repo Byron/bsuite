@@ -360,7 +360,6 @@ function(add_maya_project)
 	################################
 	# Should only run once
 	include_directories(${PROJECT_INCLUDE_DIRS})
-	link_directories(${PROJECT_LIBRARY_DIRS})
 	
 	# assure we have agl
 	if(APPLE)
@@ -413,10 +412,16 @@ function(add_maya_project)
 		
 		# TARGET LEVEL CONFIGURATION
 		#############################
+		# Sometimes ... we use a different library version than one maya provides (on osx, it may be ptx)
+		# Thus we have to put the project library directories on target level, and BEFORE the maya link directory !
+		foreach(PLIB_DIR IN LISTS PROJECT_LIBRARY_DIRS)
+			append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}${PLIB_DIR}" YES)
+		endforeach()
 		append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}${MAYA_LIB_DIR}" YES)
 		if (${CMAKE_BUILD_TYPE} MATCHES Release AND UNIX AND NOT APPLE)
 			append_to_target_property(${PROJECT_ID} LINK_FLAGS "-Wl,--strip-all,-O2" YES)
 		endif()
+		
 		# its ignored by implementation ! Its hard to set per-project includes
 		#pend_to_target_property(${PROJECT_ID} INCLUDE_DIRECTORIES ${MAYA_INCLUDE_DIR})
 		#set_property(TARGET ${PROJECT_ID}
