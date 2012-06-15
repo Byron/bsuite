@@ -1,0 +1,132 @@
+<html>
+<head>
+<title>BPTNode</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="LoopRingMain"></a>&nbsp;The ByronsPolyTools Node</font></td>
+  </tr>
+</table>
+<p><img src="images/BPTNode-Intro.gif" border="0"></p>
+
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#FFF7D9">
+<i>This Chapter introduces you to the ByronsPolyToolsNode (->BPTN). It is the core of ByronsPolyTools, and therefore it is vital to know about its parameters and abilities. <br>
+Every command that creates a BPTN will be able to use all of its parameters in
+the same way. <b>SlideRelative</b>,<b>NormalRelative</b>,<b>Side</b>,<b>AlongNormal</b> and <b>Slide</b> will
+be explained in detail in the following chapters beginning with Smart Split.<br>
+That is why this chapter will concentrate on the parameters that control the built in <b>Soft Selection</b></i>
+</tr>
+</table>
+
+<br>
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="soft"></a>&nbsp;The SoftSelection</font></td>
+  </tr>
+</table>
+<br>
+
+<p><img src="images/softSelectionIntro.jpg" border="0"></p>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>SoftSelections can be controlled very precisely, meaning that you can individually adjust the distances for "alongNormal" and "slide" with the <b>alongNormalTweakDistance</b> and <b>slideTweakDistance</b> parameters, which will determine the size of each influence field.<br>
+The <b>maskSize</b> parameter will grow a mask out of your original selection, restricting the area which will be influenced.<br>
+The <b>Falloff Visualization</b> parameter allows you to control whether you
+want to view the weights (which are shown using Vertex Colors) or not.<br>
+The <b>Mesh Visualization</b> parameter will show the mesh without the deformation imposed by the BPTNode if set to on.<br>
+Additionally you can choose between 4 different <b>falloff type presets</b> and a custom curve to control the way the falloff dimishes.
+</i>
+</tr>
+</table>
+
+<table width="640" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F90"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="fType"></a>&nbsp;Falloff Types ... </font></td>
+  </tr>
+</table>
+<br>
+
+
+<table width="610" border="0">
+
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="soft"></a>&nbsp;Linear</font></td>
+  </tr>
+</table>
+<br>
+
+<p><img src="images/falloffLinear.jpg" border="0"></p>
+
+<table width="610" border="0">
+
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="soft"></a>&nbsp;Smooth</font></td>
+  </tr>
+</table>
+<br>
+
+<p><img src="images/falloffSmooth.jpg" border="0"></p>
+
+<table width="610" border="0">
+
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="soft"></a>&nbsp;Spike</font></td>
+  </tr>
+</table>
+<br>
+
+<p><img src="images/falloffSpike.jpg" border="0"></p>
+
+<table width="610" border="0">
+
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="soft"></a>&nbsp;Dome</font></td>
+  </tr>
+</table>
+<br>
+
+<p><img src="images/falloffDome.jpg" border="0"></p>
+
+<table width="610" border="0">
+
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="soft"></a>&nbsp;Custom (not in STTool)</font></td>
+  </tr>
+</table>
+<br>
+
+<p><img src="images/falloffCustom.jpg" border="0"></p>
+
+<table width="619" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+  <p><i>To use an own custom curve, make sure that a ByronsPolyToolsNode is selected
+  and at least one falloff type is set to custom.
+  </i></p>
+  <p><i>O</i><i>pen the graph Editor. There will be two <b>AnimationCurves</b>, named <b>customANFalloff</b> and <b>customSlFalloff</b> which
+      will change the falloff for the alongNormalFalloffType or the slideFalloffType
+      respectively.<br>
+      Now you can change the curve freely, but it is recommended to keep the keys
+      within their -0.5 <= x <= 0.5 boundary.</i></p>
+  <p><i>It may be necessary to change the the &quot;alongNormal&quot; or &quot;slide&quot; attributes
+      to force an update in the viewports.</i></p>
+  <p><i>
+        <b>Please Note:</b> You should only change the curve when the falloffType
+        is set to custom, because the changes won't have any effect otherwise.</i></p>
+</tr>
+</table>
+
+
+</body>
+</html>

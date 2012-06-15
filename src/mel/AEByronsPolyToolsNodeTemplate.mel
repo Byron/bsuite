@@ -1,0 +1,45 @@
+global proc AEByronsPolyToolsNodeTemplate ( string $nodeName )
+{
+	editorTemplate -beginScrollLayout;
+		
+	///////////////////////
+	// SLIDE ATTRIBUTES //
+	/////////////////////	
+	editorTemplate -beginLayout "Slide Attributes" -collapse 0;
+			
+		editorTemplate -label "Slide Relative" -addControl "slideRelative";
+		editorTemplate -label "Normal Relative" -addControl "normalRelative";
+		editorTemplate -label "Along Normal" -addControl "alongNormal";
+		editorTemplate -label "Slide" -addControl "slide";
+		editorTemplate -label "Side" -addControl "side";
+
+			editorTemplate -addSeparator;
+	
+		editorTemplate -label "Slide Limited" -addControl "slideLimited";
+				
+	editorTemplate -endLayout;
+		
+		
+	/////////////////////////////////
+	// SOFT TRANSFORMATION ENGINE //
+	///////////////////////////////		
+
+	AEsoftTransformationEngineTemplate ( $nodeName );	
+
+		
+		editorTemplate -addSeparator;
+
+	editorTemplate  -addControl "nodeState";
+	
+	
+	//////////////////
+	// SUPPRESIONS //
+	////////////////	
+	editorTemplate -suppress "inMesh";
+	editorTemplate -suppress "customSlFalloff";
+	editorTemplate -suppress "customANFalloff";
+	editorTemplate -suppress "caching";
+	
+	editorTemplate -addExtraControls;
+	editorTemplate -endScrollLayout;
+}

@@ -1,0 +1,317 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="LoopRingMain"></a>&nbsp;The Soft Transformation Tool</font></td>
+  </tr>
+</table>
+<p><img src="images/SST_intro.jpg" border="0"></p>
+
+<br>
+<table width="100%" border="2">
+  <tr> 
+<td bgcolor="#FFF7D9">
+<i>The Soft Transformation Tool (->SST) essentially behaves like the native Maya
+Move Tool, except that you can define an influence radius to affect all the
+components inside it.<br>
+Additionally you can push your selection along the normal, or scale it.<br>
+<b>Please Note:</b> It will only work on polygonal components (vertices, edges, faces). It works on vertices internally, so any other component type will be converted implicitly.<br>
+Additionally you should know about some <u>Undo/Redo</u> Issues that will be the matter later.</i>
+</tr>
+</table>
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Starting the Tool</font></td>
+  </tr>
+</table>
+<br>
+1.<u> Via the BPT Menu</u><br>
+<br>
+-> Click on <i>ByronsPolyTools 1.0 -> Transformation -> Soft Transformation Tool</i><br>
+<br>
+<b>OR</b><br>
+<br>
+2.<u> Manually</u><br>
+<br>
+-> Execute the following command: <i>setSoftTool</i><br>
+<br>
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Tool Options</font></td>
+  </tr>
+</table>
+<br>
+The <i>Use Last Distance</i> parameter allows you to determine whether the tool should save the distance you used with the last selection and reuse it in the next one.<br>
+This allows you "tweak" you mesh more quickly because you don't have to drag
+the distance with every selection change.<br>
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Using the Tool</font></td>
+  </tr>
+</table>
+<ol>
+  <li>Enter the Tool as described above.<br></li>
+  <li>Select at least one polygonal component<br></li>
+  <li>Adjust your soft selection radius by left-clicking directly on one
+      of the components (i.E. the center of faces), and drag the pointer to the
+        right to increase the falloff distance, or drag it to the left to decrease
+        it. Release
+  the mouse button if you are done.<br><br>
+    You can also use the HotKeys: [+] to increase distance and [-] to decrease
+    distance.<br><br>
+    <b>3a.</b>(<i>Optional</i>) Adjust the MaskSize by clicking directly on
+          one of the components with the <b>left and middle</b> mouse button.
+          Drag the pointer to the right to increase the maskSize, or drag it
+          to
+          the left
+          to
+  decrease it.<br><br>
+  You can also use the hotkeys: [Ctrl] + [+] to increase maskSize, and [Ctrl] + [-] to decrese maskSize<br>
+    <br>
+    Now you can do the following:<br>
+    <br>
+    <table width="85%" border="2">
+      <tr>
+        <td bgcolor="#FFF7D9"><i>
+      <b>Please Note:</b> In case your</i> mesh's transform has scaling values
+      higher than 10, the distance and mask change will be more and more unprecise.
+      To prevent this, you should freeze the scaling (<em>Modify-&gt;Freeze Transformation</em>s).
+      </tr>
+    </table>
+  </li>
+</ol>
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Translation</font></td>
+  </tr>
+</table>
+
+<p><img src="images/SST_drag.jpg" border="0"></p>
+
+<br>
+
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Push</font></td>
+  </tr>
+</table>
+
+<p><img src="images/SST_push.jpg" border="0"></p>
+
+<br>
+
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Scale</font></td>
+  </tr>
+</table>
+
+<p><img src="images/SST_scale.jpg" border="0"></p>
+
+<br>
+
+<table width="90%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Changing Falloff Type</font></td>
+  </tr>
+</table>
+
+<table width="90%" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>The STTool offers 4 different falloff types: <b>Linear, Smooth, Spike and Dome </b> (in this order).<br>
+You should use the state manipulator to change the falloff.<br>
+<br>
+<a href="BPT_BPTNode.htm#fType" target="main">Please click here</a> for information on the different falloff types.
+</i>
+</tr>
+
+</table>
+  <table width="90%" border="0">
+  <br>
+    <tr>
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Masking</font></td>
+    </tr>
+  </table>
+
+     <p>As with the ByronsPolyToolsNode, you can use the <strong>maskSize</strong>
+  attribute to limit your influence field with a mask which grows out of your component
+  selection. <br>
+  <br>
+To use the masking, you can do one of the following:</p>
+     <p>- directly click with the <strong>left and middle</strong> mouse button
+       on a selected component and drag it to the right to increase or to the
+     left to decrease the <strong>maskSize</strong>.</p>
+     <p>OR</p>
+     <p>- Open the AttributeEditor ([Ctrl] + [a]), select the softTransformationNode
+       which is directly behind the meshes shapeNode and adjust the <em>Mask
+     Size</em>     parameter.</p>
+     <p>If this parameter is zero (default) the influence field won't be limited.<br>
+     </p>
+     <table width="100%" border="0">
+       <br>
+       <tr>
+         <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Tool
+         Hotkeys</font></td>
+       </tr>
+     </table>
+     <p>In the moment you load the Plugin the first time, some HotKeys will be
+       installed which will make work more convenient.</p>
+     <p>Now you can press ...</p>
+     <p>[+]: To increase the distance.</p>
+     <p>[-]: To decrease the distance.</p>
+     <p>[Ctrl] + [+]: To increase the maskSize.</p>
+     <p>[Ctrl] + [-]: To decrease the maskSize.</p>
+     <p>If you want to create, for what reason ever, these hotkeys manually,
+       please refer to the following section.</p>
+     <table width="100%" border="0">
+       <br>
+       <tr>
+         <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Manually
+             Customizing the Tool</font></td>
+       </tr>
+     </table>
+     <p>The Hotkeys can be made also manually. If you want to do that, you can
+       do the following:</p>
+     <p><em><u>Mapping &quot;IncreseDistance&quot; to the [+] Key:</u></em></p>
+     <ol>
+       <li>Open the <strong>Hotkey Editor</strong> <em>(Windows -&gt; Settings/Preferences-&gt;Hotkeys
+           ... </em>).</li>
+       <li>Choose the &quot;<strong>User</strong>&quot; Tab on the left side.</li>
+       <li>Click on &quot;<strong>New</strong>&quot; and enter a name in the &quot;<strong>Name</strong>&quot; Field.
+         I will use &quot;STTincreaseDistance&quot; in this Example.</li>
+       <li>Click on &quot;<strong>Edit</strong>&quot;</li>
+       <li>In the &quot;<strong>Command</strong>&quot; Field, copy-paste the
+         following lines:<br>
+           <pre>if(`currentCtx` == "softTransformationTool1")
+{
+	eval("softTransformationTool -e -rdc 32 softTransformationTool1");
+}
+else	//use standardBehavior if not inside STTool
+	manipOptions -r -s 2.0</pre>
+    The figure next to the &quot;-rdc&quot; (&quot;relativeDistanceChange&quot;)
+    Flag will be the increment you use to change the distance. The default value
+    will be a trade-off between precision und imprecision, but you can use every
+    figure you like.</li>
+       <li>Click &quot;<strong>Accept</strong>&quot;.</li>
+       <li>In the &quot;<strong>Assign New Hotkey</strong>&quot; Section, enter
+         a &quot;<strong>+</strong>&quot; into the &quot;Key&quot; Field and
+         make sure that the &quot;Modifier&quot; checkboxes are cleared.</li>
+       <li>Hit &quot;Assign&quot; and confirm the following Question.</li>
+     </ol>
+     <p><em><u>Mapping &quot;DecreseDistance&quot; to the [-] Key:</u></em></p>
+     <ul>
+       <li>Repeat steps 3 to 8, but </li>
+       <li>In Step 3, fill &quot;STTdecreaseDistance&quot; in the &quot;Name&quot; field.</li>
+       <li>In Step 5, use the following lines:
+           <pre>if(`currentCtx` == "softTransformationTool1")
+{
+	eval("softTransformationTool -e -rdc -32 softTransformationTool1");
+}
+else	//use standardBehavior if not inside STTool
+	manipOptions -r -s 0.5</pre>
+    If you use a custom figure, simply negate it.<br>
+       </li>
+       <li>In Step 7, enter a &quot;<strong>-</strong>&quot; into the &quot;Key&quot; Field
+         and make sure that the &quot;Modifier&quot; checkboxes are cleared.</li>
+     </ul>
+     <p><em><u>Mapping &quot;IncreseMaskSize&quot; to the [Ctrl] + [+] Key:</u></em></p>
+     <ul>
+       <li>Repeat steps 3 to 8, but </li>
+       <li>In Step 3, fill &quot;STTincreaseMaskSize&quot; in the &quot;Name&quot; field.</li>
+       <li>In Step 5, use the following lines:
+           <pre>if(`currentCtx` == "softTransformationTool1")
+{
+	eval("softTransformationTool -e -rmc 1 softTransformationTool1");
+}
+else	//Insert a command of your choice which will apply 
+	//if STTool is not active
+	/*CommandName*/;
+
+       </pre>
+       </li>
+       <p>You could also enter a custom figure behind the &quot;-rmc&quot; (&quot;relativeMaskChange&quot;)
+         Flag. </p>
+       <p>Behind the else statement you could enter custom comman which will
+         be applied when the STTool is not active. To do that, simply replace &quot;/*commandName*/
+         with your command.</p>
+       <li>In Step 7, enter a &quot;<strong>+</strong>&quot; into the &quot;Key&quot; Field
+         and make sure that the &quot;Modifier&quot; checkbox &quot;Ctrl&quot; is
+         selected.</li>
+     </ul>
+     <p><em><u>Mapping &quot;DecreseMaskSize&quot; to the [Ctrl] + [-] Key:</u></em></p>
+     <ul>
+       <li>Repeat steps 3 to 8, but </li>
+       <li>In Step 3, fill &quot;STTdecreaseMaskSize&quot; in the &quot;Name&quot; field.</li>
+       <li>In Step 5, use the following lines:
+           <pre>if(`currentCtx` == "softTransformationTool1")
+{
+	eval("softTransformationTool -e -rmc -1 softTransformationTool1");
+}
+else	//Insert a command of your choice which will apply 
+	//if STTool is not active
+	/*CommandName*/;
+
+       </pre>
+       </li>
+       <p>You you used a custom figure, it should be negated.</p>
+       <li>In Step 7, enter a &quot;<strong>-</strong>&quot; into the &quot;Key&quot; Field
+         and make sure that the &quot;Modifier&quot; checkbox &quot;Ctrl&quot; is
+         selected.</li>
+     </ul>
+     <p>&nbsp;     </p>
+     <table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="node"></a>&nbsp;The Soft Transformation Node</font></td>
+  </tr>
+</table>
+
+<p><img src="images/SSTNodeAE.gif" border="0"></p>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#FFF7D9">
+<i>The Soft Transformation Node can be considered the engine of the Soft Transformation
+Tool, therefore it will do all the work. It will only be temporarily in your
+node's history.<br>
+The Manipulator actually accesses some of the nodes parameters.
+You can change the parameters directly and enter numerical values if you show
+up the <b>Attribute Editor</b> and choose the <b>softTransformationNode1</b> tab
+while inside of the Soft Transformation Tool (with components selected).<br>
+The only useful parameter that can only be accessed with the AE is the <b>normalRelative</b> parameter. It determines whether the pushing/alongNormal translation will be scaled according to the faces size ("normalRelative == false") or if they should all translate the same way ("normalRelative == true").<br>
+<br>
+<b>Please Note: </b>To prevent you from clicking in the channelBox while the STTool is active (which would cause a Maya Internal Error), it will be deactivated during that time.
+</i>
+</tr>
+</table>
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="node"></a>&nbsp;Undo/ Redo the Tool</font></td>
+  </tr>
+</table>
+<p><br>
+  Because the UR mechanism also registers every parameter change
+on the STNode which doesn't necessarily exist anymore then, there may be several "empty
+undo's" on
+the queue. </p>
+<p><strong>It is not recommended</strong> to hit undo until your selection changes while the STT
+  is acitve. You should favour to leave the tools first and then undo.</p>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<html>
+<head>
+<title>Limitations</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+
+
+<table width="100%" border="0">
+    <tr> 
+      <td bgcolor="#3D3FF0"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">Known Limitations</font></td>
+    </tr>
+</table>
+
+
+<table width="640" border="0">
+<br>
+    <tr> 
+      <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">General</font></td>
+    </tr>
+</table>
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#FF3333"><i>ByronsPolyTools are intended to be a fast and flexible
+	    modeling solution. Therefore, I kept the workload as low as possible.<br>
+Because for every split a new mesh has to be build, I decided to work only on vertices and faces.<br>This is why the <b>normals and the UVs of the mesh will be discarded</b>.</i></b></td>
+  </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>When the mesh input of a BPTNode changes, this change won't be reflected. This is because this may change topology, which could make the result of the node unpredictable.<br>
+<b>Workaround: </b>None
+</i>
+</tr>
+</table>
+
+<table width="640" border="0">
+<br>
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">Smart Split</font></td>
+    </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>If connecting vertices, only two vertices may share a face to be connected. When there are more vertices sharing an edge, only two of them will be connected<br>
+<b>Workaround: </b>None
+</i>
+</tr>
+</table>
+<table width="640" border="2">
+  <tr>
+    <td bgcolor="#99CCFF"> <p><i>If you only select two edges, and these edges belong
+        to the same face, than the SmartSplit </i>will poke faces (instead of
+        connecting these two edges which might have been your intention). This
+        is because the SmartSplit acts on faces, so your two edges will be converted
+        to faces which results in mostly two single faces that are poked.<br>
+        <i><b>Workaround: </b>Use the SplitPolygon Tool instead</i></p>
+  </tr>
+</table>
+<table width="640" border="0">
+<br>
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">Solid Chamfer/Chamfer</font></td>
+    </tr>
+</table>
+
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>In general, the beveling of edges which connect winged vertices (i.e. vertices
+with only two connected edges) may lead to unexpected results and should be avoided.<br>
+<b>Workaround: </b>None
+</i>
+</tr>
+</table>
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>When you try to chamfer boundary edges in combination with with edges that connect winged vertices (i.e. the corners of a plane), this will lead to quite a destroyed mesh.<br>
+<b>Workaround: </b>None
+</i>
+</tr>
+</table>
+
+<table width="640" border="0">
+<br>
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">Boundary</font></td>
+    </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>Boundary cannot select Edges that lie on a boundary.<br>
+<b>Workaround: </b>None</i></tr>
+</table>
+
+<table width="640" border="0">
+<br>
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">Smart Move Component</font></td>
+    </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>You can not move winged vertex or border vertices  or a single edge.<br>
+<b>Workaround: </b>None
+</i>
+</tr>
+</table>
+
+<table width="640" border="0">
+<br>
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">Soft Selections/ Falloff Modification</font></td>
+    </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>Masking: When the mask gets to big, then shrinking the mask may not restore the original selection<br>
+<b>Workaround: </b>Set maskSize to 0 and set then grow it again.
+</i>
+</tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>Masking: Grow and Shrink (on which masking is actually based on) may be slow on large meshes<br>
+<b>Workaround: </b>None
+</tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i><b>Information:</b><br>
+When you use the softselection and change your selection, then the falloff- and meshVisualisation will automatically be turned off. This will happen only once.<br>
+These parameters should always be turned off when you go on modeling. If falloff
+Visualization should stay on and you apply another softselection, then it will
+work on these vertex colors.<br>
+If you had have custom vertex colors, these would be lost then.<br>
+<b>Workaround: </b>Always turn off the Visualization parameters before going
+on with the modeling</i>
+</tr>
+</table>
+
+<table width="640" border="0">
+<br>
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">Soft Transformation Tool</font></td>
+    </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>
+If you are using the tool in the face component mask, then your selection may not correspond to the vertices that are moved then, but only if you use <b>Maya 4.5</b> and whether there is a <b>smooth node</b> on top of the history stack. It seems to be a Maya internal bug, since it is fixed in Maya 5.<br>
+<b>Workaround: </b>Use edges or vertices instead.
+</i>
+</tr>
+</table>
+</body>
+</html>

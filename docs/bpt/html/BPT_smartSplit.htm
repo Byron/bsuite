@@ -1,0 +1,394 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;SmartSplit</font></td>
+  </tr>
+</table>
+
+<p><img src="images/smartSplitIntro.gif" border="0"></p>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#FFF7D9"><i>Split through every Selection, including vertices, edges and faces</i></b></td>
+  </tr>
+</table>
+<br>
+
+<br>
+  <table width="640" border="1" cellspacing="0" cellpadding="0" bordercolor="#666666">
+    <tr valign="top" bgcolor="#99CCFF"> 
+      <td colspan="3"><b>ByronsPolyTools -Flag ...</b><b></b><b></b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="76%" valign="top"><b>Description</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-smartSplit</i></td>
+      <td width="7%"><i>-sp</i></td>
+      <td width="76%" valign="top">- split through your componentSelection</td>
+    </tr>
+
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="72%" valign="top"><b>--Additional Flags--</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><i>-relative</i></td>
+      <td width="7%"><i>-r</i></td>
+      <td width="72%" valign="top">- make the split and its slide in relative mode. This flag is should be turned on to prevent unexpected results<br>
+	<i>Example:</i> ByronsPolyTools -er -r</td>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><i>-slide</i></td>
+      <td width="7%"><i>-sl</i></td>
+      <td width="72%" valign="top">- explicitly set the initial slideValue. If flag not set, it will default to 0.5<br>
+	<i>Example:</i> ByronsPolyTools -er -sl 0.3</td>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="72%" valign="top"><b>--General Flags--</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-slideNotLimited</i></td>
+      <td width="7%"><i>-snl</i></td>
+      <td width="76%" valign="top">- the slide parameter will work without its bounds (0 to 1)</td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-boostPerformance</i></td>
+      <td width="7%"><i>-bp</i></td>
+      <td width="76%" valign="top">- increases the general deformation performance by up to 20%</td>
+    </tr>
+  </table>
+
+<br>
+
+
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="philo"></a>&nbsp;Philosophy</font></td>
+  </tr>
+</table>
+<p><br>
+  With the <em>smartSplit</em> command I intended to create a tool which is able
+  to split trough every
+  selection in an efficient manner. It automatically checks for your selected
+  component(s) and does a split which creates as many quads as possible. It will work with every mesh
+  topology, no matter whether you split through quads, triangles or nGons.</p>
+<p> After the split, you can procedurally change it by just changing values.
+  Slide it, or lift it - to name just two possibilities.<br><br> 
+  The slide will automatically be adjusted to be clearly defined, which means
+  that only those paths
+  will slide, whose slide direction is clear. If paths are blocking each other,
+  slide will be disabled
+  for these sections, while others can still slide when appropriate.
+  <br><br>
+  The slide or slideAlongNormal can be relative or absolute, which can be set
+  independently of
+  each other. If you change slide to absolute mode, it will keep a specific distance
+  to one of its
+  boundary edges, allowing to create an &quot;offset edge&quot; relative to the
+  boundary.
+  When you change the slideAlongNormal into absolute mode, the normal offset
+  of the vertices is
+  dependent to the face(s) they originate from: bigger faces will have a bigger
+  offset then small
+  ones, while in relative mode, every vertex will have the same distance to the
+  surface.<br>
+  <br>
+  To learn more about the built in <b>Soft Selections</b>, please click <a href="BPT_BPTNode.htm#soft" target="main">here</a>. <br>
+  
+
+</p>
+<table width="640" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="abilities"></a>&nbsp;Abilities for ... </font></td>
+  </tr>
+</table>
+<br>
+<table width="90%" border="2">
+  <tr> 
+	<td bgcolor="#FFF7D9"><i>Because of the split's "smart" feature, the command
+	    will adapt to your component selection, doing only appropriate actions.
+	    These are sometimes specific to components and/or the relations between
+	    these components. For that reason, it will be figured out per component.</i></b></td>
+  </tr>
+</table>
+<br>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="vtxSelect"></a>&nbsp;Vertex
+    Selections</font></td>
+  </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>When vertices are selected, it checks whether there is the possibility to make a connection (create a new edge between vertices) between them. This is true when a pair of vertices does not share an edge.<br>
+If they do share an edge, the plug will find the face border of them and invoke
+    the split. </i></b></td>
+  </tr>
+</table>
+<br>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Examples</font></td>
+  </tr>
+</table>
+<p><img src="images/vertexSplit01.gif" border="0"></p>
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>Vertices that don't share an edge with another selected vertex will be connected through an edge.<br>
+<b>Note:</b> There can be only one face per pair of vertices that can be split. This means, that one face may only be shared by to vertices to be split.</i></b></td>
+  </tr>
+</table>
+<br>
+<br>
+<br>
+<p><img src="images/vertexSplit02.gif" border="0"></p>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>When a vertex shares an edge with another selected vertex, there will be a split through the faces around that interconnected cluster of vertices.</i></b></td>
+  </tr>
+</table>
+<br>
+<br>
+<br>
+<p><img src="images/vertexSplit03.gif" border="0"></p>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>The plug will automatically determine which type of split will be appropriate.<br>
+<b>Note:</b>If a vertex could be part of a connection to another selected vertex <b>and</b> is
+part of a cluster, the cluster membership will determine the split.</i></b></td>
+  </tr>
+</table>
+<br>
+<br>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="edgeSelect"></a>&nbsp;Edge
+    Selections</font></td>
+  </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>In general, the edges will be converted to faces. The
+	    plug will check whether there are more contained then connected faces
+	    or vice versa and will use the dominant face Type as base for the split.<br>
+<b>Note:</b> When you select edges that imply both connected faces (due to an
+edge line for example) and contained faces (due to an edge Ring for example)
+it
+will use the dominant type of faces and discard the other one.</i></b></td>
+  </tr>
+</table>
+<br>
+
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Examples</font></td>
+  </tr>
+</table>
+<br>
+<br>
+<p><img src="images/edgeSelect1.gif" border="0"></p>
+<br>
+<p><img src="images/edgeSelect2.gif" border="0"></p>
+<br>
+<p><img src="images/edgeSelect3.gif" border="0"></p>
+<br>
+<br>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="faceSelect"></a>&nbsp;Face
+    Selections</font></td>
+  </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<br>
+In general you can select every combination of faces, may it be triangles, quads or nGons, and the plug will split it in a way that will create quite the most possible count of quads.<br>
+But if you want to learn more about its way to split through meshes, you can of course learn it by doing, or you can read the <b><a href="BPT_technique.htm" target="main">Understanding the split</a></b> chapter.<br>
+For a brief show of how it splits, see the following example pictures.
+
+<table width="640" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Examples</font></td>
+  </tr>
+</table>
+<p><img src="images/faceSelect01.gif" border="0"></p>
+<br>
+<p><img src="images/faceSelect02.gif" border="0"></p>
+<br>
+<p><img src="images/faceSelect03.gif" border="0"></p>
+<br>
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>With single faces selected (faces that do not have
+	    selected neighbors), the split will actually poke the face. For quads
+	    and triangles, this will create a triangulated poke, but applied to nGons
+	    it
+	    will create as many quads as possible according to the face's vertex
+	    count.</i></b></td>
+  </tr>
+</table>
+<br>
+<p><img src="images/poke1.gif" border="0"></p>
+<br>
+<p><img src="images/poke2.gif" border="0"></p>
+<br>
+
+<br>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="slide"></a>&nbsp;<b>The Slide</b></font></td>
+  </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<br>
+When the split is done, there will be a new node in the stack of your mesh called <b>ByronsPolyToolsNode</b>. It holds the following attributes:<br>
+<br>
+
+
+&nbsp;&nbsp;&nbsp;&#149; <i>slideRelative<br></i>
+&nbsp;&nbsp;&nbsp;&#149; <i>normalRelative</i><br>
+&nbsp;&nbsp;&nbsp;&#149; <i>side</i><br>
+&nbsp;&nbsp;&nbsp;&#149; <i>alongNormal</i><br>
+&nbsp;&nbsp;&nbsp;&#149; <i>slide</i><br>
+<br>
+With these attributes you will be able to quickly change the appearance of the split according to your needs.<br>
+There are also some parameters for the built in soft selections. <a href="BPT_BPTNode.htm#soft" target="main">Click here</a> to learn more about it.<br>
+Please see the following for further information.
+<br>
+<br>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Slide and Normal</font></td>
+  </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>The <b>slide</b> parameter will move the split into the direction of its boundary edges, while the <b>alongNormal</b> parameter will move them upwards or downwards.<br>
+<b>Please Note:</b> Whether a face may slide or not depends on how it is situated in the mesh. Sometimes, with a certain constellation of splitted faces, a slide direction may not be conform in comparison to the other faces. In that cases, the slide will be blocked out for the affected faces.
+</i></td>
+  </tr>
+</table>
+<br>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Slide
+    Relative</font></td>
+  </tr>
+</table>
+<br>
+<p><img src="images/slideRelative.gif" border="0"></p>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>If <b>slideRelative</b> is zero, then the split edge will stick to one of their boundary edges. Its distance relative to it will always be the same, and can be tuned with the slide parameter. <br>
+When you set this value to one, then the slide will be relative to the underlying
+    edge, i.e. 0.5 will be the center of this edge, no matter which size it has.</i></td>
+  </tr>
+</table>
+
+
+<br>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Side</font></td>
+  </tr>
+</table>
+<br>
+<p><img src="images/side.gif" border="0"></p>
+<br>
+
+
+</body>
+</html>
+
+
+<br>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;NormalRelative</font></td>
+  </tr>
+</table>
+
+<br>
+<p><img src="images/normalRelative.gif" border="0"></p>
+
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>If <b>normalRelative</b> is zero, then the strength of the displacement along the normal is relative to the size of the underlying face. When turned to one, its displacement will be the same on all the faces, independently of their size.</i></td>
+  </tr>
+</table>
+
+

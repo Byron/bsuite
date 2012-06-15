@@ -1,0 +1,318 @@
+<html>
+<head>
+<title>Bevel</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Bevel</font></td>
+  </tr>
+</table>
+
+<p><img src="images/ChamferSolidChamferIntro.gif" border="0"></p>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#FFF7D9"><i>Bevel the  selected edges either leaving the original
+	    edge (solid Chamfer) or not (chamfer) </i></b></td>
+  </tr>
+</table>
+<br>
+
+<br>
+  <table width="640" border="1" cellspacing="0" cellpadding="0" bordercolor="#666666">
+    <tr valign="top" bgcolor="#99CCFF"> 
+      <td colspan="3"><b>ByronsPolyTools -Flag ...</b><b></b><b></b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="76%" valign="top"><b>Description</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-solidChamfer</i></td>
+      <td width="7%"><i>-sc</i></td>
+      <td width="76%" valign="top">- chamfer edges keeping the original edges</td>
+    </tr>
+
+    <tr valign="top"> 
+      <td width="17%"><i>-chamfer</i></td>
+      <td width="7%"><i>-c</i></td>
+      <td width="76%" valign="top">- chamfer edges deleting the original edges</td>
+    </tr>
+
+
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="72%" valign="top"><b>--Additional Flags--</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><i>-connectEnds</i></td>
+      <td width="7%"><i>-ce</i></td>
+      <td width="72%" valign="top">- Determines whether to connect the endings of the edge selection with the neighbour faces or not<br>
+	<i>Example:</i> ByronsPolyTools -sc -ce</td>
+    </tr>
+
+    <tr valign="top"> 
+      <td width="21%"><i>-triangulateEnds</i></td>
+      <td width="7%"><i>-te</i></td>
+      <td width="72%" valign="top">- Determines whether to triangulate the quad created by the "connectEnds" Flag or not<br>
+	<i>Example:</i> ByronsPolyTools -sc -ce -te</td>
+    </tr>
+
+    <tr valign="top"> 
+      <td width="21%"><i>-slide</i></td>
+      <td width="7%"><i>-sl</i></td>
+      <td width="72%" valign="top">- explicitly set the initial slideValue. If flag not set, it will default to 0.5<br>
+	<i>Example:</i> ByronsPolyTools -c -ce -te -sl 0.3</td>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="72%" valign="top"><b>--General Flags--</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-slideNotLimited</i></td>
+      <td width="7%"><i>-snl</i></td>
+      <td width="76%" valign="top">- the slide parameter will work without its bounds (0 to 1)</td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-boostPerformance</i></td>
+      <td width="7%"><i>-bp</i></td>
+      <td width="76%" valign="top">- increases the general deformation performance by up to 20%</td>
+    </tr>
+  </table>
+
+<br>
+
+
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Philo"></a>&nbsp;Philosophy</font></td>
+  </tr>
+</table>
+<p>The bevel feature consists of two commands: Solid Chamfer and Chamfer. The first
+  one will
+  create a &quot;mirrored&quot; edge along each side of the original edges, and
+  the second one will do nearly
+  the same, except that it deletes the original edge.</p>
+<p>As a general principle, chamfer and solid Chamfer will only change the topology
+  of the selected
+  edges, all the other ones will stay as they are (as opposed to the chamfer
+  behavior of wings3d or
+  the native Maya bevel {which is quite out of competition ;-) }).And it will
+  connect the ends of
+  the chamfer/solid chamfer with the next available vertex (leaving 3 quads by
+  default and if
+  possible), while wings3d or Maya bevel will create a new vertex, leaving a
+  triangle and two
+  nGons normally which would have to be fixed.</p>
+<p>The Slide feature works with them, too, meaning that the slide attribute will
+  change the
+  &quot;
+  softness&quot; of the edge, while alongNormal will move the original edge (in
+  case of solid Chamfer)
+  respective the two new edges (in case of chamfer) outwards or inwards.
+  And of course, again your are free to select edges, faces or vertices and apply
+  the command,
+  because the selection will be implicitly converted to edges.<br>
+  <br>
+To learn more about the built in <b>Soft Selections</b>, please click <a href="BPT_BPTNode.htm#soft" target="main">here</a>.
+<br>
+</p>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="chamfer"></a>&nbsp;Chamfer</font></td>
+  </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>The chamfer command will bevel the selected edges, deleting the original edge. <br>
+The slide parameter will control the offset relative to its original edge, and alongNormal will be mapped to all the new edges.</i></b></td>
+  </tr>
+</table>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#FF9900"><i><b>Important:</b><br>
+Before beveling you should make sure that your object is not non-uniformly scaled.<br>
+Because the chamfer makes it's calculations in objectSpace (the space without any transformation applied), this will lead to nonUniformly distorted bevels.<br>
+If this situation applies, please freeze the scaling and then redo the operation.</i></td>
+  </tr>
+</table>
+<table width="640" border="2">
+  <tr>
+    <td bgcolor="#66FFFF"><i><b>Tip:</b><br>
+      In case the new edges vary in distance you can turn the slideRelative parameter
+          to zero which will make all the vectors the same length and therefore
+          correct this.</i></td>
+  </tr>
+</table>
+<br>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Examples</font></td>
+  </tr>
+</table>
+<p><img src="images/chamfer.gif" border="2"></p>
+
+<br>
+<p><img src="images/chamferPros.gif" border="2"></p>
+
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>As you can see, the ByronsPolyTools Chamfer won't change the topology of the surrounding, but unselected geometry, and it will connect the ends to the next vertex available by default.</i></b></td>
+  </tr>
+</table>
+
+<br>
+
+
+<br>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="solidChamfer"></a>&nbsp;Solid Chamfer</font></td>
+  </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>The solid chamfer command will bevel the selected edges, keeping the original edge. <br>
+The slide parameter will control the offset relative to its original edge, and alongNormal will be mapped to the original edge.</i></b></td>
+  </tr>
+</table>
+<br>
+
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Examples</font></td>
+  </tr>
+</table>
+<br>
+<br>
+<p><img src="images/solidChamfer.gif" border="2"></p>
+<br>
+
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="additionals"></a>&nbsp;Additional Options</font></td>
+  </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<br>
+
+<p><img src="images/connectEnds.gif" border="0"></p>
+<table width="640" border="2">
+  <tr>
+    <td bgcolor="#99CCFF"><p><i>In case that connectEnds is one, but the connection
+          would be indefinite because of the meshes topology, then this flag will
+          be ignored and the ends won't be connected. This should be done by you
+        then.</i></p>
+      Please see the following picture for reference.</td>
+  </tr>
+</table>
+<p><img src="images/BevelException.gif" width="640" height="164" border="2">
+  <br>
+  <br>
+</p>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="sliding"></a>&nbsp;<b>The Slide</b></font></td>
+  </tr>
+</table>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;</font></td>
+  </tr>
+</table>
+<br>
+When the chamfer/solid chamfer is done, the ByronsPolyToolsNode on top of your
+mesh allows you to slide the created edge(s). The following attributes are useful
+for that:<br>
+<br>
+
+&nbsp;&nbsp;&nbsp;&#149; <i>normalRelative</i><br>
+&nbsp;&nbsp;&nbsp;&#149; <i>alongNormal</i><br>
+&nbsp;&nbsp;&nbsp;&#149; <i>slide</i><br>
+<br>
+The <i>slide Parameter</i> will change the offset of the newly created edges,
+creating a softer or harder crease. With the <i>alongNormal</i> attribute you
+will be able to move the edges in- and outward.<br>
+Please see the following for further information.
+<br>
+<br>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F40"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="AttrMain"></a>&nbsp;Examples</font></td>
+  </tr>
+</table>
+
+<p><img src="images/ChamferSlide.gif" border="2"></p>
+
+<p><img src="images/solidChamferSlide.gif" border="2"></p>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF"><i>When the normalRelative parameter is zero, the alongNormalSlide will be scaled according to the size of the underlying face. If it is one, the distance of the new vertices to their respective face will always be the same.</i></b></td>
+  </tr>
+</table>
+<br>
+
+
+</body>
+</html>
