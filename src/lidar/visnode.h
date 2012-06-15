@@ -27,7 +27,7 @@
 #include <maya/MMatrix.h>
 
 #include <fstream>
-#include <auto_ptr.h>
+#include <memory>
 #include <vector>
 
 

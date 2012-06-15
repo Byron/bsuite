@@ -360,11 +360,19 @@ function(add_maya_project)
 	################################
 	# Should only run once
 	include_directories(${PROJECT_INCLUDE_DIRS})
-	link_directories(${PROJECT_LIBRARY_DIRS})
 	
 	# assure we have agl
 	if(APPLE)
-		include_directories(${OSX_AGL_INCLUDE_DIR})
+		foreach(LIB AGL OpenGL IOKit ApplicationServices Cocoa Carbon CoreServices SystemConfiguration System)
+			set(LOCATION_VAR ${LIB}_LOCATION)
+			# This will find the framework in the default system location, couldn't set it to use the 
+			# CMAKE_FRAMEWORK_PATH only.
+			# So we use isysroot as link flag later
+			find_library(${LOCATION_VAR} ${LIB})
+			if(${LOCATION_VAR})
+				list(APPEND OS_SPECIFIC_LIBRARIES ${${LOCATION_VAR}})
+			endif()
+		endforeach()
 	endif()
 	
 	
@@ -404,10 +412,16 @@ function(add_maya_project)
 		
 		# TARGET LEVEL CONFIGURATION
 		#############################
+		# Sometimes ... we use a different library version than one maya provides (on osx, it may be ptx)
+		# Thus we have to put the project library directories on target level, and BEFORE the maya link directory !
+		foreach(PLIB_DIR IN LISTS PROJECT_LIBRARY_DIRS)
+			append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}${PLIB_DIR}" YES)
+		endforeach()
 		append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}${MAYA_LIB_DIR}" YES)
 		if (${CMAKE_BUILD_TYPE} MATCHES Release AND UNIX AND NOT APPLE)
 			append_to_target_property(${PROJECT_ID} LINK_FLAGS "-Wl,--strip-all,-O2" YES)
 		endif()
+		
 		# its ignored by implementation ! Its hard to set per-project includes
 		#pend_to_target_property(${PROJECT_ID} INCLUDE_DIRECTORIES ${MAYA_INCLUDE_DIR})
 		#set_property(TARGET ${PROJECT_ID}
@@ -420,11 +434,22 @@ function(add_maya_project)
 		
 		if (PROJECT_WITH_OPENMP AND OPENMP_FOUND)
 			append_to_target_property(${PROJECT_ID} COMPILE_FLAGS "${OpenMP_CXX_FLAGS}" YES)
+			
+			# for now, on osx, we have to link the omp library with it. Lets try to 
+			if(APPLE)
+				append_to_target_property(${PROJECT_ID} LINK_FLAGS "-lgomp" YES)
+			endif()
+		endif()
+		
+		# Make sure we get the osx 10.6 libs
+		if(APPLE)
+			append_to_target_property(${PROJECT_ID} LINK_FLAGS "-isysroot ${CMAKE_FRAMEWORK_PATH}" YES)
 		endif()
 		
 		target_link_libraries(${PROJECT_ID} 
 										${DEFAULT_MAYA_LIBRARIES} 
-										${PROJECT_LINK_LIBRARIES})
+										${PROJECT_LINK_LIBRARIES}
+										${OS_SPECIFIC_LIBRARIES})
 		
 		# append maya specic libraries
 		foreach(LIBRARY_NAME IN LISTS PROJECT_LINK_MAYA_LIBRARIES)
@@ -477,9 +502,10 @@ function(add_maya_project)
 	# FOR CONVENIENCE, SET THE LATEST MAYA VERSION INCLUDE PATH
 	###########################################################
 	# To help qtcreator, we need to set the maya include on directory level.
-	# Otherwise it will not know the maya headers, which reduces convenience quite a bit
-	# As the include comes last, it will not be effective for the actual compile
-	include_directories(${LATEST_MAYA_INCLUDE_DIR})
-	
+	# ONLY do this if the QTCREATOR is set, otherwise this will be included
+	# always before the actual maya include directories and we get invalid builds !
+	if(QTCREATOR)
+		include_directories(AFTER ${LATEST_MAYA_INCLUDE_DIR})
+	endif()
 endfunction()
 

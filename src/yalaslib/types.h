@@ -184,7 +184,7 @@ struct RGBInfo
 	uint16_t		green;
 	uint16_t		blue;
 	
-	static const size_t record_size = sizeof(red) * 3;
+	static const size_t record_size = sizeof(uint16_t) * 3;
 	
 	inline
 	const void* init_from_raw(const void* data)

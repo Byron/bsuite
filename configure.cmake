@@ -17,6 +17,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LO
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LOWER})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE_LOWER})
 
+message(STATUS "In QtCreator, when running cmake, make sure you specify -DQTCREATOR as additional commandline arguments to have the maya headers parsed.")
+
 # add the profiling configuration. Its essentially the release config, but
 # compiles with profiling instructions, enabling gprof
 if(UNIX)
@@ -48,7 +50,12 @@ if(UNIX)
 		
 	# make sure we see everything! Don't export anything by default
 	# for now, without -pedantic, as it prevents compilation of maya thanks to 'extra ;'  - don't know how to disable this
+	# Also, the architecture is hardcoded, this is a problem for older maya versions which where 32 bit on osx
+	# TODO: put the arch in the config, but make sure its correct on osx for maya plugins automatically
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -fPIC -Wall -Wno-long-long -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-comment -Wcast-qual")
+	if(APPLE)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -fno-gnu-keywords -fpascal-strings")
+	endif()
 endif() #unix
 
 if(${CMAKE_BUILD_TYPE} MATCHES Debug OR ${CMAKE_BUILD_TYPE} MATCHES Profile)
@@ -82,7 +89,7 @@ set(CUSTOM_DEFINITIONS -DREQUIRE_IOSTREAM -D_BOOL)
 if(UNIX)
 	if(APPLE)
 		set (MAYA_INSTALL_BASE_DEFAULT /Applications/Autodesk)
-		list(APPEND CUSTOM_DEFINITIONS -DOSMac_)
+		list(APPEND CUSTOM_DEFINITIONS -DOSMac_ -DOSMacOSX_ -DOSMac_MachO_)
 	else()
 		set (MAYA_INSTALL_BASE_DEFAULT /usr/autodesk)
 		list(APPEND CUSTOM_DEFINITIONS -DLINUX)
@@ -111,11 +118,11 @@ if(NOT EXISTS ${MAYA_INSTALL_BASE_PATH})
 endif()
 
 if(APPLE)
-	set(OSX_AGL_INCLUDE_DIR "/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/AGL.framework/Versions/A/Headers" CACHE STRING
-		"Directory containing the headers of the agl framework of osx")
+	set(CMAKE_FRAMEWORK_PATH "/Developer/SDKs/MacOSX10.6.sdk" CACHE STRING
+		"Directory containing all the osx 10.6 headers")
 	
-	if(NOT EXISTS ${OSX_AGL_INCLUDE_DIR})
-		message(SEND_ERROR "AGL include directory not found at ${OSX_AGL_INCLUDE_DIR} - please configure it in your cmake cache and try again")
+	if(NOT EXISTS ${CMAKE_FRAMEWORK_PATH})
+		message(SEND_ERROR "SYSROOT include directory not found at ${CMAKE_FRAMEWORK_PATH} - please configure it in your cmake cache and try again")
 	endif()
 endif()
 

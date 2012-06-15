@@ -676,8 +676,7 @@ void LidarVisNode::draw(M3dView &view, const MDagPath &path, M3dView::DisplaySty
 					m_error = "display cache not supported";
 					MPlug(thisMObject(), aDisplayCacheMode).setShort(0);
 				}
-			} else {
-				assert(m_las_stream.get());
+			} else if (m_las_stream.get()) {
 				yalas::IStream& las_stream = *m_las_stream.get();
 				if (las_stream.reset_point_iteration() != yalas::IStream::Success) {
 					m_error = "could not initialize LAS stream for iteration";
