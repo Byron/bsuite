@@ -17,6 +17,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LO
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LOWER})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE_LOWER})
 
+message(STATUS "In QtCreator, when running cmake, make sure you specify -DQTCREATOR as additional commandline arguments to have the maya headers parsed.")
+
 # add the profiling configuration. Its essentially the release config, but
 # compiles with profiling instructions, enabling gprof
 if(UNIX)
@@ -50,9 +52,9 @@ if(UNIX)
 	# for now, without -pedantic, as it prevents compilation of maya thanks to 'extra ;'  - don't know how to disable this
 	# Also, the architecture is hardcoded, this is a problem for older maya versions which where 32 bit on osx
 	# TODO: put the arch in the config, but make sure its correct on osx for maya plugins automatically
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -fvisibility=hidden -Wall -Wno-long-long -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-comment -Wcast-qual")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -Wall -Wno-long-long -Wno-unknown-pragmas -Wno-strict-aliasing -Wno-comment -Wcast-qual")
 	if(APPLE)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-gnu-keywords -fpascal-strings")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch x86_64 -fno-gnu-keywords -fpascal-strings")
 	endif()
 endif() #unix
 

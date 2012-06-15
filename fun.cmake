@@ -497,9 +497,10 @@ function(add_maya_project)
 	# FOR CONVENIENCE, SET THE LATEST MAYA VERSION INCLUDE PATH
 	###########################################################
 	# To help qtcreator, we need to set the maya include on directory level.
-	# Otherwise it will not know the maya headers, which reduces convenience quite a bit
-	# As the include comes last, it will not be effective for the actual compile
-	include_directories(${LATEST_MAYA_INCLUDE_DIR})
-	
+	# ONLY do this if the QTCREATOR is set, otherwise this will be included
+	# always before the actual maya include directories and we get invalid builds !
+	if(QTCREATOR)
+		include_directories(AFTER ${LATEST_MAYA_INCLUDE_DIR})
+	endif()
 endfunction()
 
