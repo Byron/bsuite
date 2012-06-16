@@ -19,7 +19,7 @@
 #define YALAS_TYPES_H
 
 #include <cstdlib>
-#include <inttypes.h>
+#include "baselib/inttypes_compat.h"
 
 namespace yalas {
 namespace types {

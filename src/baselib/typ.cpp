@@ -16,7 +16,7 @@
  */
 
 
-#include "typ.h"
+#include "baselib/typ.h"
 
 #ifndef WIN32
 	#include <sys/mman.h>

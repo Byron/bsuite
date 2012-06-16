@@ -15,25 +15,26 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <maya/MFnAttribute.h>
-#include <maya/MFileObject.h>
+#ifndef INTTYPESCOMPAT_H
+#define INTTYPESCOMPAT_H
 
-#include "mayabaselib/base.h"
+#ifdef WIN32
+// On windows, inttypes.h doesn't exist, and I thought it was a c standard library ... 
 
-//********************************************************************
-//**	Utilities
-//********************************************************************
+/* Signed */
+typedef signed char			int8_t;
+typedef short				int16_t;
+typedef int					int32_t;
+typedef long long int		int64_t;
 
-void setup_as_output(MFnAttribute &attr)
-{
-	attr.setStorable(false);
-	attr.setWritable(false);
-}
+/* Unsigned.  */
+typedef unsigned char		uint8_t;
+typedef unsigned short		uint16_t;
+typedef unsigned int		uint32_t;
+typedef unsigned long long int uint64_t;
 
+#else
+#include <inttypes.h>
+#endif
 
-MString resolved_filepath(const MString& filepath)
-{
-	MFileObject fobj;
-	fobj.setRawFullName(filepath);
-	return fobj.resolvedFullName();	
-}
+#endif // INTTYPESCOMPAT_H

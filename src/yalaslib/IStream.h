@@ -21,8 +21,9 @@
 #include "types.h"
 
 #include <iostream>
-#include <inttypes.h>
 #include <cassert>
+
+#include "baselib/inttypes_compat.h"
 
 namespace yalas
 {

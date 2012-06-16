@@ -99,7 +99,7 @@ if(UNIX)
 		list(APPEND CUSTOM_DEFINITIONS -DLINUX)
 	endif()
 else()
-	set(MAYA_INSTALL_BASE_DEFAULT "c:/Program Files")
+	set(MAYA_INSTALL_BASE_DEFAULT "c:/Program Files/Autodesk")
 	list(APPEND CUSTOM_DEFINITIONS -D_AFXDLL -D_MBCS -DNT_PLUGIN)
 	
 	set(LOCAL_WARNING_FLAGS /W3)
@@ -108,7 +108,7 @@ endif()
 
 add_definitions(${CUSTOM_DEFINITIONS})
 
-set(MAYA_INSTALL_BASE_PATH ${MAYA_INSTALL_BASE_DEFAULT} CACHE PATH
+set(MAYA_INSTALL_BASE_PATH "${MAYA_INSTALL_BASE_DEFAULT}" CACHE PATH
     "Path containing all your maya installations, like /usr/autodesk or /Applications/Autodesk/")
 
 set(MAYA_INSTALL_BASE_SUFFIX "${DEFAULT_MAYA_INSTALL_SUFFIX}" CACHE STRING
