@@ -47,8 +47,6 @@
 #include <maya/MPointArray.h>
 #include <maya/MVectorArray.h>
 #include <maya/MDoubleArray.h>
-#include <maya/MColorArray.h>
-#include <maya/MColor.h>
 #include <maya/MGlobal.h>
 #include <maya/MPlugArray.h>
 #include <maya/MFnIntArrayData.h>

@@ -49,6 +49,14 @@ struct Float3
 	    , z(r.z)
 	{}
 	
+	inline bool operator == (const Float3& r) const {
+		return x == r.x && y == r.y && z == r.z;
+	}
+	
+	inline bool operator != (const Float3& r) const {
+		return x != r.x || y != r.y || z != r.z;
+	}
+	
 	inline Float3 operator - (const Float3& r) const {
 		return Float3(x - r.x, y - r.y, z - r.z);
 	}

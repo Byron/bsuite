@@ -76,7 +76,6 @@
 #include <maya/MEventMessage.h>
 #include <maya/MPxNode.h>
 #include <maya/MSelectionList.h>
-#include <maya/MColor.h>
 
 
 
@@ -88,7 +87,7 @@
 #include <math.h>
 #include <componentConverter.h>
 #include <GLDrawNode.h>
-
+#include "baselib/math_util.h"
 
 // STL
 
@@ -217,8 +216,8 @@ namespace BPT
 								float fPointSize);
 
 
-		MColor		getCalColor(const MColor& color1, 
-								const MColor& color2, 
+		Float3		getCalColor(const Float3& color1, 
+								const Float3& color2, 
 								double weight);
 
 
@@ -367,19 +366,14 @@ namespace BPT
 		*/
 		struct	drawData
 		{
-			MColor	vtxColor1;		//!< Erste VtxFarbe
-			MColor	vtxColor2;		//!< Zweite VtxFarbe
+			Float3	vtxColor1;		//!< Erste VtxFarbe
+			Float3	vtxColor2;		//!< Zweite VtxFarbe
 
 			float	pointSize;		//!< Grsse der VertexPoints
 
 			meshStatus	mstat;		//!< Status des Meshes
 
 			GLuint	list;			//!< Speicher fuer die display List
-			
-			drawData()
-				: vtxColor1(MColor::kRGB, 0.0f, 0.0f, 0.0f)
-				, vtxColor2(MColor::kRGB, 0.0f, 0.0f, 0.0f)
-			{}
 
 		} dd;
 

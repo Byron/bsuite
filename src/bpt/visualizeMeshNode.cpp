@@ -57,8 +57,6 @@ visualizeMeshNode::visualizeMeshNode()
 	: list(450000)
 	, listNeedsUpdate(true)
 	, wasInCompute(false)
-	, vtxColor(MColor::kRGB, 0.0f, 0.0f, 0.0f)
-	, vtxColor2(MColor::kRGB, 0.0f, 0.0f, 0.0f)
 	{}
 visualizeMeshNode::~visualizeMeshNode() {}
 
@@ -160,7 +158,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 
 	//Farbe holen	-> Diese Schreibweise hat den (hier unbedeutenden) Vorteil, dass Objekte automatisch zerstrt werden - sie existieren nur innerhalb der Klammern
 	{
-		MColor tmpColor(MColor::kRGB, 0.0f, 0.0f, 0.0f);
+		Float3 tmpColor;
 		
 
 		plug.setAttribute(vtxColorObj);
@@ -169,7 +167,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 		
 		
 		MFnNumericData	numDataFn(colorObj);
-		numDataFn.getData(tmpColor.r, tmpColor.g, tmpColor.b);
+		numDataFn.getData(tmpColor.x, tmpColor.y, tmpColor.z);
 
 		//wenn sich die Farben verndert haben, dann die liste updaten - und alles neuzeichnen
 		if(tmpColor != vtxColor)
@@ -183,7 +181,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 		plug.getValue(colorObj);
 		numDataFn.setObject(colorObj);
 
-		numDataFn.getData(tmpColor.r, tmpColor.g, tmpColor.b);
+		numDataFn.getData(tmpColor.x, tmpColor.y, tmpColor.z);
 
 		if(tmpColor != vtxColor2)
 		{
@@ -342,7 +340,7 @@ void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 				cout<<"StandardRenderMode"<<endl;
 			*/
 
-			MColor tmpColor(MColor::kRGB, 0.0f, 0.0f, 0.0f);
+			Float3 tmpColor;
 			double dTmp;		// hlt das weight, cache
 
 			//weights verwenden um Farbe zu skalieren
@@ -365,7 +363,7 @@ void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 	
 
 				tmpColor = getCalColor(vtxColor, vtxColor2, dTmp );
-				glColor4f(tmpColor.r,tmpColor.g,tmpColor.b, dTmp );
+				glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, dTmp );
 				glVertex3f( (float)point.x, (float)point.y, (float)point.z);
 
 				glEnd();
@@ -447,7 +445,7 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 				uint numPolys = polyIter.count();
 				uint i, x , l;
 				MPoint	point;
-				MColor	tmpCol(MColor::kRGB, 0.0f, 0.0f, 0.0f);
+				Float3 tmpCol;
 				MPointArray triPoints;
 				MIntArray	triVtx;
 				//glColor4f(0.0f, 0.0f, 1.0f, 0.2);
@@ -467,16 +465,16 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 					for(x = 0; x < l ; x+=3)
 					{
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x] ]);
-						glColor4f(tmpCol.r, tmpCol.g,tmpCol.b, vtxWeightArray[ triVtx[x] ]);
+						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x] ]);
 						glVertex3d(triPoints[x].x, triPoints[x].y, triPoints[x].z);
 						
 			
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x+1] ]);
-						glColor4f(tmpCol.r, tmpCol.g,tmpCol.b, vtxWeightArray[ triVtx[x+1] ]);
+						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x+1] ]);
 						glVertex3d(triPoints[x+1].x, triPoints[x+1].y, triPoints[x+1].z);
 
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x+2] ]);
-						glColor4f(tmpCol.r, tmpCol.g,tmpCol.b, vtxWeightArray[ triVtx[x+2] ]);
+						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x+2] ]);
 						glVertex3d(triPoints[x+2].x, triPoints[x+2].y, triPoints[x+2].z);
 
 					}
@@ -534,11 +532,11 @@ visualizeMeshNode::meshStatus	visualizeMeshNode::getMeshStatus()
 
 
 //-----------------------------------------------------------------------------------
-MColor visualizeMeshNode::getCalColor(const MColor& color1, const MColor& color2, double weight)
+Float3 visualizeMeshNode::getCalColor(const Float3& color1, const Float3& color2, double weight)
 //-----------------------------------------------------------------------------------
 {
 
-	return ( color1 * weight + (1.0 -  weight)  * color2 );
+	return color1 * (float)weight + color2 * (float)(1.0 -  weight) ;
 
 }
 

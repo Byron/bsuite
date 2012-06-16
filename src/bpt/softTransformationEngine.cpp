@@ -1745,15 +1745,12 @@ softTransformationEngine::nodeStatusAllowsDrawing()
 
 
 //-----------------------------------------------------------------------------------
-MColor 
-softTransformationEngine::getCalColor(const MColor& color1, 
-									  const MColor& color2, 
+Float3 softTransformationEngine::getCalColor(const Float3 &color1, 
+									  const Float3 &color2, 
 									  double weight)
 //-----------------------------------------------------------------------------------
 {
-
-	return ( color1 * weight + (1.0 -  weight)  * color2 );
-
+	return color1 * (float)weight + color2 *  (float)(1.0 -  weight);
 }
 
 
@@ -1828,7 +1825,8 @@ softTransformationEngine::draw(M3dView& view)
 
 	//Farbe holen	-> Diese Schreibweise hat den (hier unbedeutenden) Vorteil, dass Objekte automatisch zerstuert werden - sie existieren nur innerhalb der Klammern
 	{
-		MColor tmpColor(MColor::kRGB, 0.0f, 0.0f, 0.0f);
+		
+		Float3 tmpColor;
 		
 
 		plug.setAttribute(vtxColorObj);
@@ -1837,7 +1835,7 @@ softTransformationEngine::draw(M3dView& view)
 		
 		
 		MFnNumericData	numDataFn(colorObj);
-		numDataFn.getData(tmpColor.r, tmpColor.g, tmpColor.b);
+		numDataFn.getData(tmpColor.x, tmpColor.y, tmpColor.z);
 
 		//wenn sich die Farben veruendert haben, dann die liste updaten - und alles neuzeichnen
 		if(tmpColor != dd.vtxColor1 )
@@ -1851,7 +1849,7 @@ softTransformationEngine::draw(M3dView& view)
 		plug.getValue(colorObj);
 		numDataFn.setObject(colorObj);
 
-		numDataFn.getData(tmpColor.r, tmpColor.g, tmpColor.b);
+		numDataFn.getData(tmpColor.x, tmpColor.y, tmpColor.z);
 
 		if(tmpColor != dd.vtxColor2)
 		{
@@ -2008,7 +2006,7 @@ softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 			
 
 
-			MColor tmpColor(MColor::kRGB, 0.0f, 0.0f, 0.0f);
+			Float3 tmpColor;
 			double dTmp;		// huelt das weight, cache
 
 			//weights verwenden um Farbe zu skalieren
@@ -2031,7 +2029,7 @@ softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 	
 
 				tmpColor = getCalColor(dd.vtxColor1, dd.vtxColor2, dTmp );
-				glColor4f(tmpColor.r,tmpColor.g,tmpColor.b, dTmp );
+				glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, dTmp );
 				glVertex3f( (float)point.x, (float)point.y, (float)point.z);
 
 				glEnd();
@@ -2110,7 +2108,7 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 				uint numPolys = polyIter.count();
 				uint i, x , l;
 				MPoint	point;
-				MColor	tmpCol(MColor::kRGB, 0.0f, 0.0f, 0.0f);
+				Float3 tmpCol;
 				MPointArray triPoints;
 				MIntArray	triVtx;
 				//glColor4f(0.0f, 0.0f, 1.0f, 0.2);
@@ -2133,16 +2131,16 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 						//glColor4f(0.0f, 0.0f, 1.0f, vtxWeightArray[ polyVtx[x] ]);
 						
 						tmpCol = getCalColor(dd.vtxColor1, dd.vtxColor2 ,  wa[ triVtx[x] ]);
-						glColor4f(tmpCol.r, tmpCol.g,tmpCol.b, wa[ triVtx[x] ]);
+						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x] ]);
 						glVertex3d(triPoints[x].x, triPoints[x].y, triPoints[x].z);
 						
 			
 						tmpCol = getCalColor(dd.vtxColor1, dd.vtxColor2 ,  wa[ triVtx[x+1] ]);
-						glColor4f(tmpCol.r, tmpCol.g,tmpCol.b, wa[ triVtx[x+1] ]);
+						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x+1] ]);
 						glVertex3d(triPoints[x+1].x, triPoints[x+1].y, triPoints[x+1].z);
 
 						tmpCol = getCalColor(dd.vtxColor1, dd.vtxColor2 ,  wa[ triVtx[x+2] ]);
-						glColor4f(tmpCol.r, tmpCol.g,tmpCol.b, wa[ triVtx[x+2] ]);
+						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x+2] ]);
 						glVertex3d(triPoints[x+2].x, triPoints[x+2].y, triPoints[x+2].z);
 
 					}

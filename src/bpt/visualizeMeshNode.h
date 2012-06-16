@@ -30,7 +30,6 @@
 #include <maya/MPointArray.h>
 #include <maya/MDataBlock.h>
 #include <maya/MDataHandle.h>
-#include <maya/MColor.h>
 #include <maya/M3dView.h>
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MFnTypedAttribute.h>
@@ -49,6 +48,7 @@
 #include <maya/MSelectionList.h>
 
 #include <MACROS.h>
+#include "baselib/math_util.h"
 
 
 namespace BPT
@@ -112,7 +112,7 @@ public:
 private:
 //--------------------
 	inline
-	MColor	getCalColor(const MColor& color1, const MColor& color2, double weight); 
+	Float3	getCalColor(const Float3& color1, const Float3& color2, double weight); 
 
 	
 	enum	meshStatus{	kNone, 
@@ -148,8 +148,8 @@ private:
 
 	M3dView::DisplayStyle	lastDMode;
 
-	MColor	vtxColor;
-	MColor	vtxColor2;
+	Float3	vtxColor;
+	Float3	vtxColor2;
 
 	
 

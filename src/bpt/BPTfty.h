@@ -62,8 +62,6 @@
 #include <maya/MSelectionList.h>
 #include <maya/MVectorArray.h>
 #include <maya/MDoubleArray.h>
-#include <maya/MColorArray.h>
-#include <maya/MColor.h>
 #include <maya/MFnSingleIndexedComponent.h>
 #include <maya/MFnAnimCurve.h>
 #include <maya/MAnimUtil.h>
