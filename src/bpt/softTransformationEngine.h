@@ -377,8 +377,8 @@ namespace BPT
 			GLuint	list;			//!< Speicher fuer die display List
 			
 			drawData()
-				: vtxColor1(0.0f, 0.0f)
-				, vtxColor2(0.0f, 0.0f)
+				: vtxColor1(MColor::kRGB, 0.0f, 0.0f, 0.0f)
+				, vtxColor2(MColor::kRGB, 0.0f, 0.0f, 0.0f)
 			{}
 
 		} dd;

@@ -57,8 +57,8 @@ visualizeMeshNode::visualizeMeshNode()
 	: list(450000)
 	, listNeedsUpdate(true)
 	, wasInCompute(false)
-	, vtxColor(0.0f, 0.0f)
-	, vtxColor2(0.0f, 0.0f)
+	, vtxColor(MColor::kRGB, 0.0f, 0.0f, 0.0f)
+	, vtxColor2(MColor::kRGB, 0.0f, 0.0f, 0.0f)
 	{}
 visualizeMeshNode::~visualizeMeshNode() {}
 
@@ -160,7 +160,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 
 	//Farbe holen	-> Diese Schreibweise hat den (hier unbedeutenden) Vorteil, dass Objekte automatisch zerstrt werden - sie existieren nur innerhalb der Klammern
 	{
-		MColor tmpColor(0.0f, 0.0f);
+		MColor tmpColor(MColor::kRGB, 0.0f, 0.0f, 0.0f);
 		
 
 		plug.setAttribute(vtxColorObj);
@@ -342,7 +342,7 @@ void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 				cout<<"StandardRenderMode"<<endl;
 			*/
 
-			MColor tmpColor(0.0f, 0.0f);
+			MColor tmpColor(MColor::kRGB, 0.0f, 0.0f, 0.0f);
 			double dTmp;		// hlt das weight, cache
 
 			//weights verwenden um Farbe zu skalieren
@@ -447,7 +447,7 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 				uint numPolys = polyIter.count();
 				uint i, x , l;
 				MPoint	point;
-				MColor	tmpCol(0.0f, 0.0f);
+				MColor	tmpCol(MColor::kRGB, 0.0f, 0.0f, 0.0f);
 				MPointArray triPoints;
 				MIntArray	triVtx;
 				//glColor4f(0.0f, 0.0f, 1.0f, 0.2);
@@ -466,10 +466,6 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 					
 					for(x = 0; x < l ; x+=3)
 					{
-						//view.setDrawColor( getCalColor(vtxColor, MColor(1.0,0.0,0.0), vtxWeightArray[ polyVtx[x] ] ) );
-						//view.setDrawColor( vtxColor *  vtxWeightArray[ polyVtx[x] ]);
-						//glColor4f(0.0f, 0.0f, 1.0f, vtxWeightArray[ polyVtx[x] ]);
-						
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x] ]);
 						glColor4f(tmpCol.r, tmpCol.g,tmpCol.b, vtxWeightArray[ triVtx[x] ]);
 						glVertex3d(triPoints[x].x, triPoints[x].y, triPoints[x].z);

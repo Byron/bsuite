@@ -744,30 +744,6 @@ void	softTransformationNode::recalculateTweakScaleFactors(MFnMesh& fnMesh,bool f
 		oldFType = fType;
 	}
 
-	
-	
-	/*
-	if(vis && force || oldFType != fType)
-	{//ist schneller, wenna nicht immer aktualisiert
-		resetToOrigColor(fnMesh);	//diese Proc noch anpassen
-		oldFType = fType;
-		
-		
-		int i = 0;
-		
-		
-		
-		for(i = 0; i < l; i++)
-		{	
-			MColor col(origColor.r * (1.0 - recalTweakVtxScale[i]),origColor.g * (1.0 - recalTweakVtxScale[i]),origColor.b * (1.0 - recalTweakVtxScale[i])+ recalTweakVtxScale[i],1.0);
-			fnMesh.setVertexColor(col,tweakVtx[i], NULL);	
-		}
-		
-	}
-	*/
-
-
-
 }
 
 

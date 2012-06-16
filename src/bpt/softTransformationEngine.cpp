@@ -1828,7 +1828,7 @@ softTransformationEngine::draw(M3dView& view)
 
 	//Farbe holen	-> Diese Schreibweise hat den (hier unbedeutenden) Vorteil, dass Objekte automatisch zerstuert werden - sie existieren nur innerhalb der Klammern
 	{
-		MColor tmpColor(0.0f, 0.0f);
+		MColor tmpColor(MColor::kRGB, 0.0f, 0.0f, 0.0f);
 		
 
 		plug.setAttribute(vtxColorObj);
@@ -2008,7 +2008,7 @@ softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 			
 
 
-			MColor tmpColor(0.0f, 0.0f);
+			MColor tmpColor(MColor::kRGB, 0.0f, 0.0f, 0.0f);
 			double dTmp;		// huelt das weight, cache
 
 			//weights verwenden um Farbe zu skalieren
@@ -2110,7 +2110,7 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 				uint numPolys = polyIter.count();
 				uint i, x , l;
 				MPoint	point;
-				MColor	tmpCol(0.0f, 0.0f);
+				MColor	tmpCol(MColor::kRGB, 0.0f, 0.0f, 0.0f);
 				MPointArray triPoints;
 				MIntArray	triVtx;
 				//glColor4f(0.0f, 0.0f, 1.0f, 0.2);
@@ -2129,7 +2129,6 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 					
 					for(x = 0; x < l ; x+=3)
 					{
-						//view.setDrawColor( getCalColor(vtxColor, MColor(1.0,0.0,0.0), vtxWeightArray[ polyVtx[x] ] ) );
 						//view.setDrawColor( vtxColor *  vtxWeightArray[ polyVtx[x] ]);
 						//glColor4f(0.0f, 0.0f, 1.0f, vtxWeightArray[ polyVtx[x] ]);
 						
