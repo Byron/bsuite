@@ -19,6 +19,8 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE_LO
 
 if(NOT QTCREATOR)
 	message(STATUS "In QtCreator, when running cmake, make sure you specify -DQTCREATOR=1 as additional commandline arguments to have the maya headers parsed.")
+else()
+	message(WARNING "The QTCREATOR variable is set - disable it in your builds, otherwise the maya plugins may not work correctly. It needs to be set when updating the creator project only !")
 endif()
 
 # add the profiling configuration. Its essentially the release config, but

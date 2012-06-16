@@ -561,8 +561,12 @@ MStatus softTransformationToolCtx::doPress(MEvent &event)
 
 	
 	careAboutVNode();
-
+	
+#if MAYA_API_VERSION < 201200
 	view.beginOverlayDrawing();
+#else
+	view.beginXorDrawing();
+#endif
     return stat;
 }
 
@@ -693,8 +697,11 @@ MStatus softTransformationToolCtx::doRelease(MEvent &event)
 
 	setHelpString(MString("Select mesh components and use the manipulator to move them. Hit [+]/[-] to change the distance or [Ctrl] + [+]/[-] to change MaskSize."));
 
+#if MAYA_API_VERSION < 201200
 	view.endOverlayDrawing();
-
+#else
+	view.endXorDrawing();
+#endif
 
 	view.refresh(true);
     return stat;
