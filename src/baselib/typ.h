@@ -19,8 +19,8 @@
 #define MISC_TYPES_H
 
 #include <stdlib.h>
-#include <inttypes.h>
 #include <cassert>
+#include "baselib/inttypes_compat.h"
 
 //! Utility which makes derived types non-copyable
 class NonCopyable

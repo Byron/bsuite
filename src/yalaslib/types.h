@@ -19,7 +19,7 @@
 #define YALAS_TYPES_H
 
 #include <cstdlib>
-#include <inttypes.h>
+#include "baselib/inttypes_compat.h"
 
 namespace yalas {
 namespace types {
@@ -146,9 +146,9 @@ struct PointDataRecord0
 	inline
 	void adjust_coordinate(const double* scale, const double* offset)
 	{
-		x = (x * scale[0]) + offset[0];
-		y = (y * scale[1]) + offset[1];
-		z = (z * scale[2]) + offset[2];
+		x = static_cast<uint32_t>((x * scale[0]) + offset[0]);
+		y = static_cast<uint32_t>((y * scale[1]) + offset[1]);
+		z = static_cast<uint32_t>((z * scale[2]) + offset[2]);
 	}
 	
 	//! @} end Interface

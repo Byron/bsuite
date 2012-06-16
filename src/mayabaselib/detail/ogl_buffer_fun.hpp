@@ -128,7 +128,7 @@ bool draw_arrays(MGLFunctionTable* glf, const void* vtx_array, const void* col_a
 			setup_primitive_array<ColorPrimitive>(glf, col_array);
 		}
 		
-		glf->glDrawArrays(MGL_POINTS, 0, len);
+		glf->glDrawArrays(MGL_POINTS, 0, static_cast<MGLsizei>(len));
 	}
 	glf->glPopAttrib();
 	glf->glPopClientAttrib();

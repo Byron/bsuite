@@ -35,6 +35,8 @@
 
 #include "visualizeMeshNode.h"
 
+#include "mayabaselib/ogl_headers.h"
+
 MTypeId visualizeMeshNode::id( 0x00108BC2 );
 MObject visualizeMeshNode::inputMesh;
 MObject visualizeMeshNode::vtxLocations;
@@ -224,7 +226,16 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 	//if( mStat == kNone)	// Nichts zeichnen, wenn nix selected
 	//	return;
 
-
+	MHardwareRenderer* renderer = MHardwareRenderer::theRenderer();
+	if (!renderer) {
+		return;
+	}
+	
+	MGLFunctionTable* glf = renderer->glFunctionTable();
+	if (!glf) {
+		return;
+	}
+	
 
 
 	view.beginGL(); 
@@ -238,7 +249,7 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 		//VertiIter initialisieren
 		MItMeshVertex vertIter(meshData);
 		
-		drawPoints(vertIter, fPointSize);
+		drawPoints(vertIter, fPointSize, glf);
 		
 		// Das updaten der DisplayLists ist zu langsam, weshalb automatisch vtxMode genommen wird
 		wasInCompute = false;
@@ -260,11 +271,11 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 
 			if( list != 450000 ) 
 				//alte liste lschen
-				glDeleteLists(list, 1);
+				glf->glDeleteLists(list, 1);
 			
-			list = glGenLists(1);
+			list = glf->glGenLists(1);
 
-			if(glIsList(list))
+			if(glf->glIsList(list))
 			{
 				listNeedsUpdate = wasInCompute = false;
 
@@ -272,31 +283,31 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 				//#######################
 				//NEUE LISTE AUFZEICHNEN
 				//#######################
-				glNewList(list, GL_COMPILE_AND_EXECUTE);
+				glf->glNewList(list, GL_COMPILE_AND_EXECUTE);
 
 		
 				//drawShaded(polyIter, vertIter, style, mStat);
-				drawShadedTriangles(polyIter, vertIter, style, mStat);
+				drawShadedTriangles(polyIter, vertIter, style, mStat, glf);
 
 
 				//#######################
 				//ENDE LISTE AUFZEICHNEN
 				//#######################
 
-				glEndList();
+				glf->glEndList();
 
 			}
 			else
 			{
 				//fehler, also alles ohne displayList zeichnen
 				//drawShaded(polyIter, vertIter, style, mStat);
-				drawShadedTriangles(polyIter, vertIter, style, mStat);
+				drawShadedTriangles(polyIter, vertIter, style, mStat, glf);
 			}
 
 		}
 		else 
 		{
-			glCallList(list);
+			glf->glCallList(list);
 			wasInCompute = false;
 		}
 
@@ -310,18 +321,18 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 
 
 //-----------------------------------------------------------------------------------
-void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize)
+void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize, MGLFunctionTable* glf)
 //-----------------------------------------------------------------------------------
 {
 
 // Push the color settings
 			// 
-			glPushAttrib( GL_CURRENT_BIT | GL_POINT_BIT );
+			glf->glPushAttrib( GL_CURRENT_BIT | GL_POINT_BIT );
 			
-			glEnable ( GL_POINT_SMOOTH );  // Draw square "points"
-			glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glf->glEnable ( GL_POINT_SMOOTH );  // Draw square "points"
+			glf->glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+			glf->glEnable(GL_BLEND);
+			glf->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
 			/*
@@ -350,9 +361,9 @@ void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 
 				dTmp = vtxWeightArray[i];
 
-				glPointSize( (fPointSize * dTmp) + 3.0 );
+				glf->glPointSize( (fPointSize * dTmp) + 3.0 );
 
-				glBegin( GL_POINTS );	
+				glf->glBegin( GL_POINTS );	
 
 			//	glPointSize( fPointSize );
 				MPoint		point( vertIter.position() );
@@ -363,38 +374,38 @@ void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 	
 
 				tmpColor = getCalColor(vtxColor, vtxColor2, dTmp );
-				glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, dTmp );
-				glVertex3f( (float)point.x, (float)point.y, (float)point.z);
+				glf->glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, dTmp );
+				glf->glVertex3f( (float)point.x, (float)point.y, (float)point.z);
 
-				glEnd();
+				glf->glEnd();
 			} 
 			
 			
 			
-			glPopAttrib();
+			glf->glPopAttrib();
 
 
 }
 
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
-void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVertex& vertIter, M3dView::DisplayStyle style, meshStatus meshStat)
+void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVertex& vertIter, M3dView::DisplayStyle style, meshStatus meshStat, MGLFunctionTable* glf)
 //-------------------------------------------------------------------------------------------------------------------------------------------
 {
 
 				//alles zeichnen
-				glPushAttrib(GL_ALL_ATTRIB_BITS);
+				glf->glPushAttrib(GL_ALL_ATTRIB_BITS);
 				
 				
-				glEnable(GL_POLYGON_OFFSET_FILL);
+				glf->glEnable(GL_POLYGON_OFFSET_FILL);
 				
 				
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glf->glEnable(GL_BLEND);
+				glf->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 				//glDepthMask(GL_FALSE);
 				
-				glPolygonMode(GL_BACK, GL_FILL);
-				glShadeModel(GL_SMOOTH);
+				glf->glPolygonMode(GL_BACK, GL_FILL);
+				glf->glShadeModel(GL_SMOOTH);
 				
 				
 				
@@ -438,7 +449,7 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 				tmpPlug.getValue(param2);
 				#endif
 
-				glPolygonOffset( param1, param2 );
+				glf->glPolygonOffset( param1, param2 );
 				
 				//jedes Poly zeichnen
 				
@@ -460,33 +471,33 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 					l = triVtx.length();
 					
 					
-					glBegin(GL_TRIANGLES);
+					glf->glBegin(GL_TRIANGLES);
 					
 					for(x = 0; x < l ; x+=3)
 					{
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x] ]);
-						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x] ]);
-						glVertex3d(triPoints[x].x, triPoints[x].y, triPoints[x].z);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x] ]);
+						glf->glVertex3d(triPoints[x].x, triPoints[x].y, triPoints[x].z);
 						
 			
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x+1] ]);
-						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x+1] ]);
-						glVertex3d(triPoints[x+1].x, triPoints[x+1].y, triPoints[x+1].z);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x+1] ]);
+						glf->glVertex3d(triPoints[x+1].x, triPoints[x+1].y, triPoints[x+1].z);
 
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x+2] ]);
-						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x+2] ]);
-						glVertex3d(triPoints[x+2].x, triPoints[x+2].y, triPoints[x+2].z);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x+2] ]);
+						glf->glVertex3d(triPoints[x+2].x, triPoints[x+2].y, triPoints[x+2].z);
 
 					}
 					
-					glEnd();
+					glf->glEnd();
 					
 				}
 				
 				
 			//	glDisable(GL_POLYGON_OFFSET_FILL);
 
-				glPopAttrib();
+				glf->glPopAttrib();
 
 
 }

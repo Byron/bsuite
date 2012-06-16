@@ -23,6 +23,8 @@
 #include "softTransformationEngine.h"
 #include <maya/MFnDagNode.h>
 
+#include "mayabaselib/ogl_headers.h"
+
 //////////////////////////////////////////////////////////////////////
 // Statische Objekte
 //////////////////////////////////////////////////////////////////////
@@ -1861,12 +1863,21 @@ softTransformationEngine::draw(M3dView& view)
 
 	}
 
-
+	MHardwareRenderer* renderer = MHardwareRenderer::theRenderer();
+	if (!renderer) {
+		return;
+	}
+	
+	MGLFunctionTable* glf = renderer->glFunctionTable();
+	if (!glf) {
+		return;
+	}
+	
 	
 	// Erstmal die meshMatrix holen, damit die Points auch an der richtigen Stelle erscheinen
 	//
 
-	glMatrixMode( GL_MODELVIEW );
+	glf->glMatrixMode( GL_MODELVIEW );
 
 	// CameraMatrix holen
 	//
@@ -1879,9 +1890,9 @@ softTransformationEngine::draw(M3dView& view)
 	
 	// Neue Matrix holen
 	//
-	glPushMatrix();
+	glf->glPushMatrix();
 
-	glLoadMatrixd( (GLdouble*) meshMatrix);
+	glf->glLoadMatrixd( (GLdouble*) meshMatrix);
 
 
 	// Jetzt die matrix des meshes selbst holen
@@ -1896,7 +1907,7 @@ softTransformationEngine::draw(M3dView& view)
 	
 	matrixFn.matrix().get( meshMatrix );
 
-	glMultMatrixd( (GLdouble* ) meshMatrix );
+	glf->glMultMatrixd( (GLdouble* ) meshMatrix );
 
 
 
@@ -1915,7 +1926,7 @@ softTransformationEngine::draw(M3dView& view)
 		//VertiIter initialisieren
 		MItMeshVertex vertIter(nd.outMesh);
 		
-		drawPoints(vertIter, fPointSize);
+		drawPoints(vertIter, fPointSize, glf);
 		
 
 	}
@@ -1936,9 +1947,9 @@ softTransformationEngine::draw(M3dView& view)
 
 			if( dd.list != 450000 ) 
 				//alte liste lueschen
-				glDeleteLists(dd.list, 1);
+				glf->glDeleteLists(dd.list, 1);
 			
-			dd.list = glGenLists(1);
+			dd.list = glf->glGenLists(1);
 
 			//if(glIsList(dd.list))
 			if( dd.list != 0 )
@@ -1949,37 +1960,37 @@ softTransformationEngine::draw(M3dView& view)
 				//#######################
 				//NEUE LISTE AUFZEICHNEN
 				//#######################
-				glNewList(dd.list, GL_COMPILE_AND_EXECUTE);
+				glf->glNewList(dd.list, GL_COMPILE_AND_EXECUTE);
 
 		
 				//drawShaded(polyIter, vertIter, style, mStat);
-				drawShadedTriangles(polyIter, vertIter, style, mStat);
+				drawShadedTriangles(polyIter, vertIter, style, mStat, glf);
 
 
 				//#######################
 				//ENDE LISTE AUFZEICHNEN
 				//#######################
 
-				glEndList();
+				glf->glEndList();
 
 			}
 			else
 			{
 				//fehler, also alles ohne displayList zeichnen
 				//drawShaded(polyIter, vertIter, style, mStat);
-				drawShadedTriangles(polyIter, vertIter, style, mStat);
+				drawShadedTriangles(polyIter, vertIter, style, mStat, glf);
 			}
 
 		}
 		else 
 		{
-			glCallList(dd.list);
+			glf->glCallList(dd.list);
 
 		}
 
 	}
 
-	glPopMatrix();
+	glf->glPopMatrix();
 
 
 
@@ -1990,19 +2001,19 @@ softTransformationEngine::draw(M3dView& view)
 
 //-----------------------------------------------------------------------------------
 void	
-softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize)
+softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize, MGLFunctionTable* glf)
 //-----------------------------------------------------------------------------------
 {
 
 // Push the color settings
 			// 
-			glPushAttrib( GL_CURRENT_BIT | GL_POINT_BIT );
+			glf->glPushAttrib( GL_CURRENT_BIT | GL_POINT_BIT );
 			
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glf->glEnable(GL_BLEND);
+			glf->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			
-			glEnable ( GL_POINT_SMOOTH );  // Draw square "points"
-			glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+			glf->glEnable ( GL_POINT_SMOOTH );  // Draw square "points"
+			glf->glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
 			
 
 
@@ -2016,9 +2027,9 @@ softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 
 				dTmp = wa[i];
 
-				glPointSize( (fPointSize * dTmp) + 3.0 );
+				glf->glPointSize( (fPointSize * dTmp) + 3.0 );
 
-				glBegin( GL_POINTS );	
+				glf->glBegin( GL_POINTS );	
 
 			//	glPointSize( fPointSize );
 				MPoint		point( vertIter.position() );
@@ -2029,15 +2040,15 @@ softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize)
 	
 
 				tmpColor = getCalColor(dd.vtxColor1, dd.vtxColor2, dTmp );
-				glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, dTmp );
-				glVertex3f( (float)point.x, (float)point.y, (float)point.z);
+				glf->glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, dTmp );
+				glf->glVertex3f( (float)point.x, (float)point.y, (float)point.z);
 
-				glEnd();
+				glf->glEnd();
 			} 
 			
 			
 			
-			glPopAttrib();
+			glf->glPopAttrib();
 
 }
 
@@ -2048,23 +2059,23 @@ void
 softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter, 
 												MItMeshVertex& vertIter, 
 												M3dView::DisplayStyle style, 
-												meshStatus meshStat)
+												meshStatus meshStat,
+												MGLFunctionTable* glf)
 //-------------------------------------------------------------------
 {
-
 				//alles zeichnen
-				glPushAttrib(GL_ALL_ATTRIB_BITS);
+				glf->glPushAttrib(GL_ALL_ATTRIB_BITS);
 				
 				
-				glEnable(GL_POLYGON_OFFSET_FILL);
+				glf->glEnable(GL_POLYGON_OFFSET_FILL);
 				
 				
-				glEnable(GL_BLEND);
-				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				glDepthMask(GL_FALSE);
+				glf->glEnable(GL_BLEND);
+				glf->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glf->glDepthMask(GL_FALSE);
 				
-				glPolygonMode(GL_BACK, GL_FILL);
-				glShadeModel(GL_SMOOTH);
+				glf->glPolygonMode(GL_BACK, GL_FILL);
+				glf->glShadeModel(GL_SMOOTH);
 				
 				
 				
@@ -2101,7 +2112,7 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 
 
 
-				glPolygonOffset( param1, param2 );
+				glf->glPolygonOffset( param1, param2 );
 				
 				//jedes Poly zeichnen
 				
@@ -2123,7 +2134,7 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 					l = triVtx.length();
 					
 					
-					glBegin(GL_TRIANGLES);
+					glf->glBegin(GL_TRIANGLES);
 					
 					for(x = 0; x < l ; x+=3)
 					{
@@ -2131,28 +2142,28 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 						//glColor4f(0.0f, 0.0f, 1.0f, vtxWeightArray[ polyVtx[x] ]);
 						
 						tmpCol = getCalColor(dd.vtxColor1, dd.vtxColor2 ,  wa[ triVtx[x] ]);
-						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x] ]);
-						glVertex3d(triPoints[x].x, triPoints[x].y, triPoints[x].z);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x] ]);
+						glf->glVertex3d(triPoints[x].x, triPoints[x].y, triPoints[x].z);
 						
 			
 						tmpCol = getCalColor(dd.vtxColor1, dd.vtxColor2 ,  wa[ triVtx[x+1] ]);
-						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x+1] ]);
-						glVertex3d(triPoints[x+1].x, triPoints[x+1].y, triPoints[x+1].z);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x+1] ]);
+						glf->glVertex3d(triPoints[x+1].x, triPoints[x+1].y, triPoints[x+1].z);
 
 						tmpCol = getCalColor(dd.vtxColor1, dd.vtxColor2 ,  wa[ triVtx[x+2] ]);
-						glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x+2] ]);
-						glVertex3d(triPoints[x+2].x, triPoints[x+2].y, triPoints[x+2].z);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x+2] ]);
+						glf->glVertex3d(triPoints[x+2].x, triPoints[x+2].y, triPoints[x+2].z);
 
 					}
 					
-					glEnd();
+					glf->glEnd();
 					
 				}
 				
 				
 			//	glDisable(GL_POLYGON_OFFSET_FILL);
 
-				glPopAttrib();
+				glf->glPopAttrib();
 
 
 }

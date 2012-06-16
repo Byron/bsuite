@@ -457,7 +457,7 @@ void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, C
 	case DMNoColor: break;
 	case DMIntensity:
 	{
-		const uint16_t intensity = p.intensity * m_intensity_scale; 
+		const uint16_t intensity = static_cast<uint16_t>(p.intensity * m_intensity_scale); 
 		dc.field[0] = intensity;
 		dc.field[1] = intensity;
 		dc.field[2] = intensity;
@@ -472,7 +472,7 @@ void LidarVisNode::color_point_no_rgb(const yalas::types::PointDataRecord0 &p, C
 	}
 	case DMReturnNumberIntensity:
 	{
-		const uint16_t intensity = p.intensity * m_intensity_scale; 
+		const uint16_t intensity = static_cast<uint16_t>(p.intensity * m_intensity_scale); 
 		dc.field[0] = p.return_number() * scale_3_to_16 + intensity;
 		dc.field[1] = p.num_returns() * scale_3_to_16 + intensity;
 		dc.field[2] = p.return_number() * scale_3_to_16 + intensity;
@@ -518,7 +518,7 @@ bool LidarVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandl
 		}
 	} 
 	else if (plug == aGlPointSize) {
-		m_gl_point_size = dataHandle.asInt();
+		m_gl_point_size = static_cast<MGLfloat>(dataHandle.asInt());
 	} else if (plug == aIntensityScale) {
 		m_intensity_scale = dataHandle.asFloat();
 	} else if (plug == aTranslateToOrigin) {
@@ -599,10 +599,10 @@ MStatus LidarVisNode::compute(const MPlug& plug, MDataBlock& data)
 		data.outputValue(aOutPointDataFormat).setInt(hdr.point_data_format_id);
 		data.outputValue(aOutNumPointRecords).setInt(hdr.num_point_records);
 		
-		data.outputValue(aOutPointScale).set3Float(hdr.x_scale, hdr.y_scale, hdr.z_scale);
-		data.outputValue(aOutPointOffset).set3Float(hdr.x_offset, hdr.y_offset, hdr.z_offset);
-		data.outputValue(aOutPointBBoxMin).set3Float(hdr.min_x, hdr.min_y, hdr.min_z);
-		data.outputValue(aOutPointBBoxMax).set3Float(hdr.max_x, hdr.max_y, hdr.max_z);
+		data.outputValue(aOutPointScale).set3Double(hdr.x_scale, hdr.y_scale, hdr.z_scale);
+		data.outputValue(aOutPointOffset).set3Double(hdr.x_offset, hdr.y_offset, hdr.z_offset);
+		data.outputValue(aOutPointBBoxMin).set3Double(hdr.min_x, hdr.min_y, hdr.min_z);
+		data.outputValue(aOutPointBBoxMax).set3Double(hdr.max_x, hdr.max_y, hdr.max_z);
 		
 		return MS::kSuccess;
 	}

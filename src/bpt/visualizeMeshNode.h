@@ -50,6 +50,7 @@
 #include <MACROS.h>
 #include "baselib/math_util.h"
 
+class MGLFunctionTable;
 
 namespace BPT
 {
@@ -122,12 +123,13 @@ private:
 	meshStatus	getMeshStatus();
 
 
-	void	drawPoints( MItMeshVertex& vertIter, float fPointSize);
+	void	drawPoints( MItMeshVertex& vertIter, float fPointSize, MGLFunctionTable* glf);
 	
 	void	drawShadedTriangles(MItMeshPolygon& polyIter, 
 								MItMeshVertex& vertIter, 
 								M3dView::DisplayStyle style, 
-								meshStatus meshStat);
+								meshStatus meshStat,
+								MGLFunctionTable* glf);
 
 //--------------------
 //CACHE VARIABLEN

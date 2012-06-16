@@ -349,7 +349,7 @@ bool PtexVisNode::setInternalValueInContext(const MPlug &plug, const MDataHandle
 		release_texture_and_filter();
 		release_cache();
 	} else if (plug == aGlPointSize) {
-		m_gl_point_size = dataHandle.asInt();
+		m_gl_point_size = static_cast<float>(dataHandle.asInt());
 	}
 	
 	return false;
@@ -398,6 +398,10 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 	/////////////////
 	// lets just read the samples for now
 	const int numFaces = tex->numFaces();
+	if (numFaces == 0) {
+		m_error = "Ptextured had zero faces - its empty or corrupt";
+		return false;
+	}
 	const int numChannels = tex->numChannels();
 	const DisplayMode displayMode = (DisplayMode)MPlug(thisNode, aDisplayMode).asShort();
 	float mult = MPlug(thisNode, aSampleMultiplier).asFloat();
@@ -412,7 +416,7 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 	typedef std::vector<size_t> SizeVector;
 	SizeVector lut_destruct;
 	lut_destruct.reserve(numFaces);	// prevents a call to the constructor ! We write the data later
-	size_t* flut = static_cast<size_t*>(lut_destruct.data());
+	size_t* flut = &lut_destruct[0];
 	
 	// Ptex crashes if any filter is used - point seems to work well in multi-threaded mode !
 	const int thread_count = to_filter_type(MPlug(thisNode, aPtexFilterType).asShort()) == PtexFilter::f_point 
@@ -464,7 +468,7 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 					
 			for (int u = 0; u < ures; ++u) {
 				for (int v = 0; v < vres; ++v) {
-					tex->getPixel(i, u * inv_mult, v * inv_mult, &pix.x, 0, numChannels);
+					tex->getPixel(i, static_cast<int>(u * inv_mult), static_cast<int>(v * inv_mult), &pix.x, 0, numChannels);
 					*opos++ = pos;
 					*ocol++ = pix;
 					pos.y += step;
@@ -585,7 +589,7 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 				// even samples
 				TFLOAT3 p;
 				for (int v = 0; v < vres; ++v, --ur) {
-					TFLOAT3 ta = a + (svv * v);		// texel vertex a
+					TFLOAT3 ta = a + (svv * static_cast<float>(v));		// texel vertex a
 					for (int u = 0; u < ur; ++u, ta += suv) {
 						const TFLOAT3 tb = ta + suv;
 						const TFLOAT3 tc = ta + svv;
@@ -639,7 +643,7 @@ bool PtexVisNode::update_sample_buffer(Buffer &buf)
 	}
 	
 	// Update sample count, just for user information
-	MPlug(thisNode, aOutNumSamples).setInt(numTexels);
+	MPlug(thisNode, aOutNumSamples).setInt(static_cast<int>(numTexels));
 	
 	return rval;
 }

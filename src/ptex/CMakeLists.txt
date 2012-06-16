@@ -18,12 +18,21 @@ function(init_ptex RESULT)
 		return()
 	endif()
 	
+	# VERIFY ZLIB
+	#############
+	include(FindZLIB)
+	if(NOT ZLIB_FOUND OR NOT ZLIB_LIBRARY)
+		message(WARNING "zlib library was not found, please adjust your cmake cache and try again")
+		if(ZLIB_FOUND)
+			message(SEND_ERROR "Zlib was found, but the ZLIB_LIBRARY variable was not set whatsoever. Please check cmake version")
+		endif()
+		return()
+	endif()
+	
 	set(${RESULT} 1 PARENT_SCOPE)
 endfunction()
 
 init_ptex(WAS_SUCCESSFUL)
-
-
 
 if(WAS_SUCCESSFUL)
 	add_maya_project(NAME
@@ -34,11 +43,14 @@ if(WAS_SUCCESSFUL)
 						${PTEX_INCLUDE_DIR}
 					LINK_LIBRARIES
 						Ptex
-						z
+						"${ZLIB_LIBRARY}"
 					LINK_MAYA_LIBRARIES
 						mayabase
 					LIBRARY_DIRS
 						${PTEX_LIBRARY_DIR}
+					DEFINES
+						THIRD_PARTY_INTTYPES
+						PTEX_STATIC
 					WITH_TEST
 					WITHOUT_EXCEPTIONS
 					WITH_OPENMP
