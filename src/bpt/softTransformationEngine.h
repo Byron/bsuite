@@ -103,6 +103,7 @@ using std::vector;
 // Typedefs
 typedef	std::pair<double, int> wp;		//!< == WeightPair - double als Key, int als dazugehrige localID fuers PositionArray des vtxSets
 
+class MGLFunctionTable;
 
 namespace BPT
 {
@@ -210,10 +211,12 @@ namespace BPT
 		void		drawShadedTriangles(		MItMeshPolygon& polyIter, 
 												MItMeshVertex& vertIter, 
 												M3dView::DisplayStyle style, 
-												meshStatus meshStat);
+												meshStatus meshStat, 
+												MGLFunctionTable* glf);
 
 		void		drawPoints( MItMeshVertex& vertIter, 
-								float fPointSize);
+								float fPointSize,
+								MGLFunctionTable* glf);
 
 
 		Float3		getCalColor(const Float3& color1, 

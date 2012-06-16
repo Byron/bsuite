@@ -75,10 +75,6 @@ const long mayaWndProc = SetWindowLong(mayaWin, GWL_WNDPROC, (long)&myWinProc);
 MStatus		ByronsPolyTools::doIt(const MArgList& args)
 //-----------------------------------------------------------------
 {
-
-	GLuint textureID;
-	glGenTextures( 1, &textureID);
-
 	// Ist die version abgelaufen ?
 	//
 #ifdef EXPIRES
