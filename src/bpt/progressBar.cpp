@@ -33,8 +33,8 @@ currentProgress(0)
 progressBar::progressBar(const MString& text, const int inMaxCount)
 : 
 myText(text), 
-maxCount(inMaxCount),
 startCount(0),
+maxCount(inMaxCount),
 currentProgress(0)
 //----------------------------------------------------------------
 {
@@ -46,8 +46,8 @@ currentProgress(0)
 progressBar::progressBar(const MString& text, int inStartCount, int inMaxCount)
 : 
 myText(text), 
-maxCount(inMaxCount),
 startCount(inStartCount),
+maxCount(inMaxCount),
 currentProgress(0)
 //----------------------------------------------------------------
 {

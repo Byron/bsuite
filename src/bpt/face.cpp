@@ -41,7 +41,12 @@ face::face(MIntArray inVtx,int inID):vtx(inVtx),clean(false),id(inID)
 	}
 }
 //--------------------------------------------------------------------------------------------------------------------
-face::face(MIntArray inVtx,MIntArray inCorners,MIntArray inNachbarIDs, int inID):vtx(inVtx),corners(inCorners),id(inID),nachbarIDs(inNachbarIDs),clean(false)
+face::face(MIntArray inVtx,MIntArray inCorners,MIntArray inNachbarIDs, int inID)
+: vtx(inVtx)
+, corners(inCorners)
+, nachbarIDs(inNachbarIDs)
+, clean(false)
+, id(inID)
 //--------------------------------------------------------------------------------------------------------------------
 {
 	for(int i = 0; i < 20;i++)
@@ -291,7 +296,6 @@ void	face::refillNachbarArray(int start,int end)
 bool	face::modifyType3EdgeCheck(dData& data)
 //------------------------------------------------
 {
-	bool returnValue = false;
 	int tmp = 0;
 	dData locData = convertData(data,tmp);
 
@@ -410,10 +414,10 @@ void	face::splitTypeMinusOne()
 	//jetzt werden 2 CornerEdges erstellt aus vorhandenen Vtx
 
 	corners.append(vtx[0]);
-	int ID = (vtx.length() - (vtx.length() % 2)) / 2;
+	unsigned ID = (vtx.length() - (vtx.length() % 2)) / 2;
 
 	//zwischenräume erstellen
-	int i;
+	unsigned i;
 	for(i = 1; i < ID;i++)
 		corners.append(-(ID - i));
 
@@ -440,9 +444,6 @@ void	face::splitTypeMinusOne()
 	
 
 	//nun VtxArray erstellen
-	int vtxL = vtx.length();
-	int lastID = 0;
-	int localCount = 0;
 	MIntArray	newVtxOrder;
 	MIntArray	begleiter;		//synchron zu vtxPerCorner[n],speichert info, ob vtx neu oder nicht
 	MIntArray	vtxPerCorner[4];	//enthält alle 
@@ -460,7 +461,7 @@ void	face::splitTypeMinusOne()
 
 
 
-	int first,second,third,last;
+	unsigned first,second,third,last;
 	first = 0;second = 1;third = 1;last = 1;
 
 	int centerVtx;
@@ -595,18 +596,13 @@ void	face::splitNormalTwo()
 	
 
 	//nun VtxArray erstellen
-	int vtxL = vtx.length();
-	int lastID = 0;
-	int localCount = 0;
-	MIntArray	newVtxOrder;
-	MIntArray	begleiter;		//synchron zu vtxPerCorner[n],speichert info, ob vtx neu oder nicht
 	MIntArray	vtxPerCorner[4];	//enthält alle 
 	
 	//Ziel: Alle Vtx samt NewVtx pro corner in ein Array packen in richtiger Reihenfolge 
 	//cout<<"Bin vor CreateCompleteCornerEdgeArray"<<endl;
 	
 	
-	int i;
+	unsigned i;
 	for(i = 0; i < numCorners;i++)
 	{
 		int l = cornerData[i*2] + cornerData[2*i+1];
@@ -676,7 +672,7 @@ void	face::splitNormalTwo()
 
 			int lastID;
 
-			if( (endCornerEdgeID + 1)%numCorners != startCornerEdgeID )
+			if( (endCornerEdgeID + 1)%numCorners != (unsigned)startCornerEdgeID )
 			{
 				lastID = (endCornerEdgeID + 1)%numCorners;
 				
@@ -822,7 +818,6 @@ void		face::SplitTypeOne()
 	
 	
 	//nun VtxArray erstellen
-	int vtxL = vtx.length();
 	MIntArray	newVtxOrder;
 	MIntArray	begleiter;		//synchron zu vtxPerCorner[n],speichert info, ob vtx neu oder nicht
 	MIntArray	vtxPerCorner[4];	//enthält alle 
@@ -831,7 +826,7 @@ void		face::SplitTypeOne()
 	//cout<<"Bin vor CreateCompleteCornerEdgeArray"<<endl;
 
 	//erstmal Array erstllen für allre CEdges
-	int i;
+	unsigned i;
 	for(i = 0; i < numCorners;i++)
 	{
 		int l = cornerData[i*2] + cornerData[2*i+1];
@@ -860,7 +855,6 @@ void		face::SplitTypeOne()
 	}
 
 
-	bool	special = false;	//special ist switch für Corner2 Vtx4 typ, der umgeformt wird in standard typeTwo Face
 	//Nun anhand des CornerCounts entsprechende lastEdge finden
 	switch(numCorners)
 	{
@@ -872,8 +866,8 @@ void		face::SplitTypeOne()
 				tmp[0] = vtxPerCorner[startCornerEdgeID];
 				
 				
-				int ID = (startCornerEdgeID + 1)%3;
-				int l = vtxPerCorner[ID].length()-1;
+				unsigned  ID = (startCornerEdgeID + 1)%3;
+				unsigned l = vtxPerCorner[ID].length()-1;
 				
 				for(i = 0; i < l; i++)
 					tmp[1].append(vtxPerCorner[ID][i]);
@@ -1009,7 +1003,7 @@ void		face::SplitTypeOne()
 	int fakeNachbarID;
 	//locID von erstem nachbarn finden
 
-	int	l = nachbarIDs.length();
+	unsigned l = nachbarIDs.length();
 	for(i = 0; i < l;i++)
 	{
 		if(!(nachbarIDs[i] < 0))
@@ -1136,7 +1130,7 @@ void		face::SplitTypeOne()
 		//wenn es dreieck ist, dann wird kein centerVtx erstellt, weil das dann bullshit ist :).
 		if(vtx.length() > 3 || numNachbarn > 1)
 		{
-			int first = 0, last = 1,second = 1,third = 1;
+			int first = 0, last = 1,second = 1;
 			int centerVtx = creator->createCenterVtx(id);
 
 
@@ -1198,7 +1192,7 @@ void		face::SplitTypeOne()
 		}
 		else
 		{
-			int first = 0, last = 1,second = 1,third = 1;
+			int first = 0, last = 1,second = 1;
 
 			
 			//out<<"Erstelle Faces"<<endl;
@@ -1206,8 +1200,6 @@ void		face::SplitTypeOne()
 			newVtxOrder.append(vtxPerCorner[first][0]);
 			newVtxOrder.append(vtxPerCorner[first][1]);
 			newVtxOrder.append(vtxPerCorner[last][vtxPerCorner[last].length()-2]);
-
-			int lBound = 1;
 
 			creator->changePolyVtxIDs(id,newVtxOrder);
 
@@ -1226,8 +1218,6 @@ void		face::SplitTypeOne()
 			newVtxOrder.append(vtxPerCorner[first][vtxPerCorner[first].length()-2]);
 			newVtxOrder.append(vtxPerCorner[first][vtxPerCorner[first].length()-1]);
 			newVtxOrder.append(vtxPerCorner[second][1]);
-
-			int rBound = vtxPerCorner[first].length()-2;
 
 			creator->createPoly(newVtxOrder);
 
@@ -1266,9 +1256,6 @@ void	face::splitType3()
 	
 	
 	//nun VtxArray erstellen
-	int vtxL = vtx.length();
-	MIntArray	newVtxOrder;
-	MIntArray	begleiter;		//synchron zu vtxPerCorner[n],speichert info, ob vtx neu oder nicht
 	MIntArray	vtxPerCorner[4];	//enthält alle 
 	
 	//Ziel: Alle Vtx samt NewVtx pro corner in ein Array packen in richtiger Reihenfolge 
@@ -1276,7 +1263,7 @@ void	face::splitType3()
 
 	//erstmal Array erstllen für allre CEdges
 	int i;
-	for(i = 0; i < numCorners;i++)
+	for(i = 0; (uint)i < numCorners;i++)
 	{
 		int l = cornerData[i*2] + cornerData[2*i+1];
 		
@@ -1363,7 +1350,7 @@ void	face::splitType3()
 		
 		neu.append(centerVtx);
 
-		for(i = rAlone; i < vtxPerCorner[aloneEdge].length();i++)
+		for(i = rAlone; i < (int)vtxPerCorner[aloneEdge].length();i++)
 			neu.append(vtxPerCorner[aloneEdge][i]);
 	}
 	else
@@ -1498,11 +1485,10 @@ void	face::splitType3()
 	//Ansatz: ist die aloneEdge mit typ 3 oder 4 verbunden, dann all ihre Vtx auf normalSlide packen
 
 	MIntArray locIDs;
-	int l2 = vtx.length();
 
 	locIDs = getCornerEdgeNachbarIDs(nachbarSave,vtxPerCorner[aloneEdge][0],vtxPerCorner[aloneEdge].length());
 
-	for(i = 0; i < locIDs.length();i++)
+	for(i = 0; i < (int)locIDs.length();i++)
 	{	
 		if(nachbarn[locIDs[i]]->whichType() >= 3 && !nachbarn[locIDs[i]]->isClean())
 		{
@@ -1723,7 +1709,7 @@ void	face::createFacesBetweenBounds(int origLBound,int origRBound,int lBound, in
 }
 
 //------------------------------------------------------------------------
-void	face::setBounds(MIntArray& vtxPerCorner,int newVtxCount,int& lBound,int& rBound)
+void	face::setBounds(MIntArray& vtxPerCorner, int newVtxCount, int &lBound, int &rBound)
 //------------------------------------------------------------------------
 {
 
@@ -1748,7 +1734,6 @@ void	face::setBounds(MIntArray& vtxPerCorner,int newVtxCount,int& lBound,int& rB
 	
 	int nl = nachbarIDs.length();
 
-	int l = startLocID + vtxPerCorner.length() - newVtxCount;//cornerData[startCornerEdgeID*2+1];
 	////cout<<"SET_BOUNDS: "<<l<<" = maxLength"<<endl;
 	//i = 0;
 	while(newVtxCount != 0)
@@ -1762,7 +1747,6 @@ void	face::setBounds(MIntArray& vtxPerCorner,int newVtxCount,int& lBound,int& rB
 	}
 
 	////printArray(locIDs," = locIDs");
-	int biggest = -1, smallest = 1666666;
 	
 	l2 = locIDs.length();
 	if( l2 == 1)
@@ -1820,9 +1804,6 @@ void	face::splitControlTwo()
 	
 	
 	//nun VtxArray erstellen
-	int vtxL = vtx.length();
-	MIntArray	newVtxOrder;
-	MIntArray	begleiter;		//synchron zu vtxPerCorner[n],speichert info, ob vtx neu oder nicht
 	MIntArray	vtxPerCorner[4];	//enthält alle 
 	
 	//Ziel: Alle Vtx samt NewVtx pro corner in ein Array packen in richtiger Reihenfolge 
@@ -1830,7 +1811,7 @@ void	face::splitControlTwo()
 
 	//erstmal Array erstllen für allre CEdges
 	int i;
-	for(i = 0; i < numCorners;i++)
+	for(i = 0; i < (int)numCorners;i++)
 	{
 		int l = cornerData[i*2] + cornerData[2*i+1];
 		
@@ -2000,12 +1981,10 @@ int		face::getType()
 //----------------------------------------------------------
 {
 	//zuerst die Nachbarn pro Corner finden
-	int nl = nachbarIDs.length();
 	int l = corners.length();
-	int lVtx = vtx.length();
 	int cornerCount=0,nachbarCount = 0;
 	int lastID = 0;
-	MIntArray tempNCount(l,0);int typeTwoCount = 0;
+	MIntArray tempNCount(l,0);
 	isControlTwo = false;
 	int index;
 
@@ -2178,7 +2157,6 @@ int		face::findLastNachbarVtx(int firstVtxLocID)
 //----------------------------------------------------------
 {
 	int lVtx = vtx.length();	//damit auch 0 gegeben werden kann
-	int l = nachbarIDs.length();
 	int iPlusOne = nachbarIDs[(firstVtxLocID + 1)];
 
 	if(iPlusOne < 0)
@@ -2710,10 +2688,12 @@ void	face::processCornerEdges(MIntArray& processedVtx,MIntArray& newVtxCount,MIn
 			else if(type == 1)
 				myType = 1;
 			else if(type == 2)
+			{
 				if(isControlTwo)
 					myType = 2;
 				else
 					myType = 0;
+			}
 			//jetzt DataObj erstellen für SlideProcs
 			dData data(i,lastVtxLocID,a,nextCorner,vtx[i],vtx[lastVtxLocID],corners[a],corners[nextCorner],myType,id,i);
 			//PS: isFlipped ist automatisch false
@@ -2806,7 +2786,6 @@ MIntArray	face::createCompleteCornerEdgeArray(int cornerStartID,int l,int i,MInt
 	//<l> ist die länge der CornerEdge, <i> ist der Index des vtxPerFace[4] Arrays der Hauptprocedur
 	MIntArray	vtxPerCorner;
 	MIntArray	begleiter;
-	int localCount = 0;
 	int vtxL = vtx.length();
 
 	////cout<<"CREATE_COMPLETE_CORNEREDGE_ARRAY: "<<"START"<<endl;
@@ -2823,7 +2802,7 @@ MIntArray	face::createCompleteCornerEdgeArray(int cornerStartID,int l,int i,MInt
 	
 	int rBound,lBound;
 	//Nun ProcessedVtx hinzufügen
-	if(i != numCorners-1)
+	if(i != (int)numCorners-1)
 		rBound = processedVtx[processedVtx.length() - 1 - (i+1)];
 	else
 		rBound = processedVtx.length() - 1 - (i+1);
@@ -2907,11 +2886,7 @@ void	face::splitType4()
 
 	
 	//l = processedVtx.length();
-	int vtxL = vtx.length();
-	int lastID = 0;
-	int localCount = 0;
 	MIntArray	newVtxOrder;
-	MIntArray	begleiter;		//synchron zu vtxPerCorner[n],speichert info, ob vtx neu oder nicht
 	MIntArray	vtxPerCorner[4];	//enthält alle 
 
 	//Ziel: Alle Vtx samt NewVtx pro corner in ein Array packen in richtiger Reihenfolge 
@@ -2919,7 +2894,7 @@ void	face::splitType4()
 
 
 	int i;
-	for(i = 0; i < numCorners;i++)
+	for(i = 0; i < (int)numCorners;i++)
 	{
 		int l = cornerData[i*2] + cornerData[2*i+1];
 		
@@ -3047,10 +3022,8 @@ void	face::splitType4()
 	//testweise alle Vtx von Face mit NormalSlide versehen
 	MIntArray	nachbarSave,locIDs;
 	int startLocVtx,endLocVtx,l2 = vtx.length(),type4Count = 0;
-	for(i = 0; i < numCorners; i++)
+	for(i = 0; i < (int)numCorners; i++)
 	{
-		int l = vtxPerCorner[i].length();
-		
 		//if(i != numCorners - 1)
 		//	l--;
 		//nachbarIDs finden
@@ -3070,7 +3043,7 @@ void	face::splitType4()
 	//wenn mindestens 2 type 4 dran sind, werden alle Punkte mit along normal geschleppt
 	if(type4Count >= 2)
 	{
-		for(i = 0; i < numCorners; i++)
+		for(i = 0; i < (int)numCorners; i++)
 		{
 			int l = vtxPerCorner[i].length();
 			
@@ -3083,7 +3056,7 @@ void	face::splitType4()
 	//wenn nur ein t4 face, dann nur die geteilten Vtx hinzufügen
 	else if(type4Count == 1)
 	{
-		for(i = 0; i < locIDs.length();i++)
+		for(i = 0; i < (int)locIDs.length();i++)
 		{
 			if(nachbarn[locIDs[i]]->whichType() == 4)
 			{
@@ -3242,7 +3215,6 @@ int		face::processMultiVtxNachbar(MIntArray& tmpFaceVtx,int vertsZwischenIDs,int
 	int		nIDLength = vtx.length() ;//- 1;	//hier gleich letzten Flag abziehen
 	int		madeNewVtx = 0;
 
-	bool	tmpSlide = false;	//nur für testzwecke: später muss <<useSlide>>verwendet werden
 	bool	useSlide = false; //wird von gatherSlideData gesetzt
 	//mindestens 1 Vtx liegt zwischen ihnen
 	//!!!!!!!!Eventuell vorher noch die Wahre Zahl an Vtx zwischen den IDs erreichen ...!!!!!!!
@@ -3879,7 +3851,6 @@ dData	face::convertData(dData& data, int& errCode)
 	//errCode: -1 = fehler und InputData zurückgeben, ansonsten 0
 	//nimmt die Absoluten IDs der inputData und findet die entsprechenden LocIDs dieses Faces
 	//wandelt nachbarID nicht um: dies wird nur von Convert to opposite gemacht
-	const int vtxL = vtx.length();
 	int tmp;
 	dData myData = data;
 

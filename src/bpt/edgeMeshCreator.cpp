@@ -629,11 +629,11 @@ void	edgeMeshCreator::insertVtx(const edgeFaceData* faceData, int origID, int ne
 void	edgeMeshCreator::removeVtx(int vtxID, int faceID)
 //-----------------------------------------------------------------
 {
-	int offset = getValidAbsoluteOffset(faceID);
+	unsigned offset = getValidAbsoluteOffset(faceID);
 
-	int aOffset = offset + (*offsets)[faceID];
+	unsigned aOffset = offset + (*offsets)[faceID];
 
-	int vtxLocID;	// == der faceRelative index des Vtx
+	unsigned vtxLocID;	// == der faceRelative index des Vtx
 
 	bool found = false;
 
@@ -1138,7 +1138,6 @@ void	edgeMeshCreator::recreateOriginalFace(edgeFaceData* origFace)
 
 	MIntArray UVTmp;		//speichert die UVÄnderungen eines newVtx
 	
-	int k = origFace->vtxChange.length();
 	UINT l = origFace->vtxChange.length();
 
 	UINT vOffset = getValidAbsoluteOffset(origFace->id);	//gültiges offset in faceVtxArray
@@ -1171,7 +1170,7 @@ void	edgeMeshCreator::recreateOriginalFace(edgeFaceData* origFace)
 		bool notFound = true;
 
 
-		int i;
+		unsigned i;
 		for(i = vOffset; i < vCount; i++)	
 		{
 			if(	(*faceVtxIDs)[i] == origVtx)

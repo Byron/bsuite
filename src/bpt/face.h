@@ -177,10 +177,10 @@ private:
 										MIntArray& vtxPerCornerEnd
 																	);
 
-	void		setBounds(	MIntArray& vtxPerCorner,
+	void		setBounds(MIntArray& vtxPerCorner,
 							int newVtxCount,
-							int& lBound,
-							int& rBound
+							int &lBound,
+							int &rBound
 														);	//!< findet die Bounds eines VtxPerCornerArrays in Reihenfolge
 	
 
@@ -292,7 +292,7 @@ private:
 	bool		isFlippedArray[20];		//!< hier wird gespeichert, ob die Daten relativ zur richtung des faces vertauscht sind
 
 	int			numNachbarn;	//!< speichert die maximale zahl der nachbarn pro corner(ev. unntig, aber vielleicht relevant fuer Type -1)
-	int			numCorners;		//!< wird fuer PokeSingleFace benutzt
+	unsigned	numCorners;		//!< wird fuer PokeSingleFace benutzt
 	int			type;
 	int			id;				//!< die eigene FaceID
 

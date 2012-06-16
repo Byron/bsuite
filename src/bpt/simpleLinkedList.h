@@ -34,21 +34,27 @@ template <class T>
 class simpleLinkedList  
 {
 public:
-	simpleLinkedList<T>():size(0),currentPosition(0),currentPositionPtr(0),startPosition(0){tail = new linkedNode<T>;};
-	simpleLinkedList<T>(const simpleLinkedList<T>& other){ };
-	~simpleLinkedList<T>(){/*cout<<"RUFE SIMPLELINKEDLIST DESTRUKTOR"<<endl;*/ tail->next = 0; delete tail; if(size != 0){ delete startPosition;}  };
-	//~simpleLinkedList<T>(){cout<<"RUFE SIMPLELINKEDLIST DESTRUKTOR"<<endl;/*delete startPosition;*/};
+	simpleLinkedList<T>()
+		: currentPositionPtr(0)
+		, startPosition(0) 
+		, tail(new linkedNode<T>)
+		, currentPosition(0)
+		, size(0)
+		
+	{ }
+	simpleLinkedList<T>(const simpleLinkedList<T>& other){ }
+	~simpleLinkedList<T>(){/*cout<<"RUFE SIMPLELINKEDLIST DESTRUKTOR"<<endl;*/ tail->next = 0; delete tail; if(size != 0){ delete startPosition;}  }
 
-	int length(){return size;};
+	unsigned length() { return size; }
 
 	void append(T* object);
 
-	void	clear(){ tail->next = 0;delete tail; if(size != 0){ delete startPosition;} };
+	void	clear(){ tail->next = 0;delete tail; if(size != 0){ delete startPosition;} }
 
 
-	T*& operator[]( int index ); //Dieser operator erlaubt auch zuweisung, der untere nicht
+	T*& operator[]( unsigned index ); //Dieser operator erlaubt auch zuweisung, der untere nicht
 	
-	T* operator[]( int index ) const;
+	T* operator[]( unsigned index ) const;
 
 
 private:
@@ -60,11 +66,8 @@ private:
 	linkedNode<T>* tail;
 
 	
-	
-	int size ;
-
-	int currentPosition;
-
+	unsigned currentPosition;
+	unsigned size ;
 };
 
 
@@ -90,7 +93,7 @@ void simpleLinkedList<T>::append(T* object)
 
 
 template <class T>
-T*& simpleLinkedList<T>::operator[]( int index )
+T*& simpleLinkedList<T>::operator[]( unsigned index )
 {
 	linkedNode<T>* tmpNode = 0;
 
@@ -119,7 +122,7 @@ T*& simpleLinkedList<T>::operator[]( int index )
 }
 
 template <class T>
-T* simpleLinkedList<T>::operator[]( int index ) const
+T* simpleLinkedList<T>::operator[]( unsigned index ) const
 {
 //	if(index >= size)
 //{

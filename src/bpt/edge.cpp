@@ -27,7 +27,9 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-edge::edge(int inID):clean(false),id(inID)
+edge::edge(int inID)
+	: id(inID)
+	, clean(false)
 {
 	//sicherheitshalber alle nachbarn mit 0 initialisieren
 	nachbarn[0][0] = 0;
@@ -41,7 +43,10 @@ edge::edge(int inID):clean(false),id(inID)
 }
 
 
-edge::edge(MIntArray inFaceIDs,int inID):clean(false),faceIDs(inFaceIDs),id(inID)
+edge::edge(MIntArray inFaceIDs,int inID)
+	: faceIDs(inFaceIDs)
+	, id(inID)
+	, clean(false)
 {
 	nachbarn[0][0] = 0;
 	nachbarn[0][1] = 0;
@@ -1017,8 +1022,6 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 
 		vectors[2] = positions[i] - positions[(i-1+l)%l];	// == die vorhergehende edge, in faceRichtung
 
-		INVIS(double test9 = vectors[1].length());
-
 		length = vectors[0].length();	//zwischenspichern der lueuenge, weil die noch oft gebraucht wird
 		
 		rl	= (cos(vectors[0].angle(vectors[1])) * vectors[1].length()) / length;
@@ -1036,8 +1039,6 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 
 		//wenn der Winkel (cosGAMMA) zwischen dem newVektor und der normale, die nach aussen zeigt, negativ ist, dann ist neuer Vtx innen (relativ
 		//zu dieser edge)
-		INVIS(double test5 = (normal * vectors[1]) / ( normal.length() * vectors[1].length() + DELTA));	//+DELTA, um 0 zu vermeiden
-		
 		if((normal * vectors[1]) / (normal.length() * vectors[1].length() +  DELTA) <= 0.0 )	//== 0 bedeutet auf der kante - eventuell dieses = rausnehmen, da es eh keine rolle spielt eigentlich
 			inside = true;
 		else
@@ -1135,12 +1136,8 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 		{	
 			//ich will das inverse dieser weights - je nueueher das weight bei 0, desto estueuerker ist es. 
 			//Diese klasulierung da untern sorgt dafueuer, dass alle invertierten weights nach der normalisierung ach wieder 1 ergeben
-			INVIS(double preweight = weights[r+x];)
 
 			weights[r+x] /= maxWeight[i];	//normalisieren auf 1
-
-			INVIS(double test = weights[r+x];)
-			INVIS(double test2 = maxWeight[i];)
 
 			inverse = (1 - weights[r+x]);
 			fWeight = 1 / (weights[r+x] / inverse) * inverse ;	
@@ -1311,7 +1308,7 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 	bool		isNGVtx = false;		//flag: isNachbargeradenVtx - wird ein NG Vtx auf der nachbargeraden erstellt?	
 	
 
-	int			selSharedFaceLocID = 0;
+	unsigned int	selSharedFaceLocID = 0;
 	
 	//jetzt die locID herausfinden, die das face anzeigt, welches mit der selEdge geteilt wird (und zwar relativ zum array der unSelEdge)
 	if(!orslSelected)
@@ -1344,7 +1341,7 @@ void		edge::insertNewEdgeVtx( int newVtx, bool edgeVtxExisted, edge* orsl)
 	//VERTIZEN BEARBETIEN
 	int validStart;					//validStart enthueuelt die ID des ORIGVtx , welcher am nueuechsten an dem edgeVtx dran ist (laut MeshTopologie)
 	int validEnd;
-	int realValidEnd;				// ==  ValidEnd - Speicher fueuer den Originalwert - er wird fueuer UVs benueuetigt, da diese immer die eigentliche Edg als referenz nehmen mueuessen
+	int realValidEnd(0);				// ==  ValidEnd - Speicher fueuer den Originalwert - er wird fueuer UVs benueuetigt, da diese immer die eigentliche Edg als referenz nehmen mueuessen
 	
 	//jetzt mueuessen die Vertizen gefunden werden, die die edge bilden fueuer den neuen EdgeVtx, genannt frameVtx
 	if(this == orsl)	//hier muss nicht auf nen bereits existenten Vtx gecheckt werden,da dieser Zweig NIE von Chamfer durchlaufen wird

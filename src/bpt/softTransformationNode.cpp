@@ -35,13 +35,14 @@
 //////////////////////////////////////////////////////////////////////
 
 //--------------------------------------------------------------------------------------------------------------------------
-softTransformationNode::softTransformationNode():	oldMaskSize(0),
-													oldFType(-1),
-													oldFDistance(-1.0),
-													vtxColorsStored(false),
-													onStartup(true),
-													maxScale(1.0),
-													oldVis(false)
+softTransformationNode::softTransformationNode()
+	: maxScale(1.0)
+	, oldMaskSize(0)
+	, oldFType(-1)
+	, oldVis(false)
+	, oldFDistance(-1.0)
+	, vtxColorsStored(false)
+	, onStartup(true)
 //--------------------------------------------------------------------------------------------------------------------------
 {
 
@@ -780,16 +781,16 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 								INVIS(cout<<"------------------------------------------------"<<endl;)
 								INVIS(cout<<"BAUE TWEAKARRAYS AUF"<<endl;)
 								INVIS(cout<<"------------------------------------------------"<<endl;)
-	int  tmp;
-	int l;
-	int numVerts = vertIter.count();
+	int tmp;
+	unsigned l;
+	unsigned numVerts = vertIter.count();
 	//zuallererst die positionen der vertizen wiederherstell
 	MPRINT("Habe Tweaks zurueueckgesetzt")
 
 	l = tweakVtx.length();
-	for(int x = 0; x < l; x++)
+	for(unsigned x = 0; x < l; x++)
 	{
-		vertIter.setIndex(tweakVtx[x],tmp);
+		vertIter.setIndex(tweakVtx[x], tmp);
 		vertIter.setPosition(tweakOrigPos[x]);
 	}
 
@@ -829,7 +830,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 			ptVtx.setLength(numVerts);	//potentielle TweakVtx
 			
 			//array fueuellen:
-			for(int i = 0; i < numVerts; i++)
+			for(unsigned i = 0; i < numVerts; i++)
 			{
 				ptVtx[i] = i;
 			}
@@ -849,7 +850,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 				ptVtx.setLength(numVerts);	//potentielle TweakVtx
 				
 				//array fueuellen:
-				for(int i = 0; i < numVerts; i++)
+				for(unsigned i = 0; i < numVerts; i++)
 				{
 					ptVtx[i] = i;
 				}
@@ -879,14 +880,14 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 	
 	maxScale = 0.0;
 
-	l = ptVtx.length();		int l2 = inVtx.length();
+	l = ptVtx.length();		unsigned l2 = inVtx.length();
 
 	
 	INVIS(cout<<"REBUILT TWEAK ARRAYS: MUSS "<<l * l2<<" RECHNUNGEN AUSFueueHREN"<<endl;)
 	
 
 
-	for(int i = 0; i < l; i++)
+	for(unsigned i = 0; i < l; i++)
 	{
 		minIndex = -1;
 		minDistance = 16666666666;
@@ -896,8 +897,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 		startPoint = vertIter.position();
 
 		//distancen ausrechnen: hier eventuell noch ne adaptivitueuet einbauen: z.B nur jeden 2. vtx ind SlideIndices einbeziehen
-		int x;
-		for(x = 0; x < l2; x++)
+		for(unsigned x = 0; x < l2; x++)
 		{//nun ist die Frage, ob es schneller ist, den vertIter zu strapazieren, oder sich die Position einfach zu berechnen ... 
 			vertIter.setIndex(inVtx[x],tmp);
 			
@@ -938,7 +938,7 @@ void	softTransformationNode::rebuildTweakArrays(MItMeshPolygon& polyIter, MItMes
 			double scale = 0.0;
 			
 			
-			for( x = 0; x < faces.length(); x++)
+			for(unsigned x = 0; x < faces.length(); x++)
 			{
 				polyIter.setIndex(faces[x],tmp);
 				polyIter.getNormal(tmpNormal);

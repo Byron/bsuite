@@ -34,9 +34,15 @@ class linkedNode
 {
 public:
 
-	linkedNode():object(0),next(0){};
-	linkedNode(T* inObject):object(inObject),next(0){}; //mit dem unteren destruktor wird ein objekt uebrigbleiben, mindestens
-	~linkedNode(){ /*if(object != 0)delete object;*/ if(next != 0)delete next; };
+	linkedNode()
+		: next(0)
+		, object(0) 
+	{}
+	linkedNode(T* inObject)
+		: next(0)
+		, object(inObject)
+	{} //mit dem unteren destruktor wird ein objekt uebrigbleiben, mindestens
+	~linkedNode(){ /*if(object != 0)delete object;*/ if(next != 0) delete next; }
 	//~linkedNode(){cout<<"RUFE LINKED NODE DESTRUKTOR"<<endl;};
 	
 
@@ -44,8 +50,8 @@ public:
 
 	
 
-	T*&				getValue(){return object;};
-	T*				getValue() const {return object;};
+	T*&				getValue(){return object;}
+	T*				getValue() const {return object;}
 
 	linkedNode<T>* next;
 

@@ -171,8 +171,6 @@ bool		BPT_Helpers::getLocIndexMod2(int value,const MIntArray& array, UINT& local
 bool		BPT_Helpers::isOnArray(int value,const MIntArray& array, int lBound, int hBound) const
 //---------------------------------------------------------------------------------------
 {//extra für meshCreator
-	int l = array.length();
-
 	for(int i = lBound; i < hBound; i++)
 		if(array[i] == value)
 			return true;
@@ -452,7 +450,6 @@ void		BPT_Helpers::invertArray(MIntArray& array, int lBound, int rBound)
 {
 	//dasselbe wie oben, nur mit variablen zur arbeit au groesseren arrays - bzw. der Umkehr von array teilen
 	int l2 = ((rBound - lBound) / 2 ) + lBound + ((rBound - lBound) % 2);
-	int lminus = array.length() - 1;
 	int tmp;
 	UINT r = 0;
 
@@ -671,7 +668,7 @@ bool		BPT_Helpers::UVSetDiffers(const MIntArray& UVs1, const MIntArray& UVs2) co
 void		BPT_Helpers::printArray(const MIntArray& array, MString message)
 //-----------------------------------------------------------------
 {
-	for(int i = 0; i < array.length(); i++)
+	for(unsigned i = 0; i < array.length(); i++)
 		cout <<array[i]<<message.asChar()<<endl;
 
 	cout <<"//printArray Ende"<<endl;

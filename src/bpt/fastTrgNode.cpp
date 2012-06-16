@@ -60,7 +60,8 @@ fastTrgNode::~fastTrgNode()
 //
 
 	// Unregister the triangulation function.
-    MStatus stat = unregisterTrgFunction( "fastTrg" );
+	char name[] = "fastTrg";
+    MStatus stat = unregisterTrgFunction( name );
 }
 
 //----------------------------------------------------------------------------------------------
@@ -84,7 +85,8 @@ void fastTrgNode::postConstructor()
 	// the same as the name given when setting the usrTrg
 	// attribute on the mesh. See example above.
 	// 
-    MStatus stat = registerTrgFunction( "fastTrg", fastTrgNode::triangulateFace );
+	char name[] = "fastTrg";
+    MStatus stat = registerTrgFunction( name, fastTrgNode::triangulateFace );
 }
 
 //----------------------------------------------------------------------------------------------

@@ -54,31 +54,26 @@
 
 
 //-----------------------------------------------------------------
-BPTfty::BPTfty():	slide(0.5),
-					ftyCreator(0),
+BPTfty::BPTfty()
+: slide(0.5)
 
-					UVSlideStart(0),
-					UVSlideEnd(0),
-					UVSlideIndices(0),
-					UVSlideDirections(0),	
-					UVSlideScale(0),
-/*
-					Us(0),
-					Vs(0),
-					UVCounts(0),
-					UVperVtx(0),
-*/	
+, normalScale(0)
+, slideScale(0)
+, slideDirections(0)
+, slideNormals(0)
+, slideStartPoints(0)
+, slideEndPoints(0)
+, slideIndices(0)
+, maySlide(0)
 
-					maxStandardScale(1.0),
+, UVSlideStart(0)
+, UVSlideEnd(0)
+, UVSlideIndices(0)
+, UVSlideDirections(0)
+, UVSlideScale(0)
 
-					normalScale(0),		
-					slideScale(0),		
-					slideDirections(0),	
-					slideNormals(0),		
-					slideStartPoints(0),
-					slideEndPoints(0),
-					slideIndices(0),
-					maySlide(0)
+, maxStandardScale(1.0)
+, ftyCreator(0)
 //-----------------------------------------------------------------
 {
 
@@ -1511,8 +1506,8 @@ void		BPTfty::SMC_createUVSlide(int commonVtx, int startVtx, int endVtx, MItMesh
 			if(polyIter.hasUVs(UVSetNames[u]))
 			{
 				//commonUV holen
-				int x;
-				for(x = 0; x < faceVtx.length(); x++)
+				
+				for(unsigned x = 0; x < faceVtx.length(); x++)
 				{
 					if(faceVtx[x] == commonVtx)
 					{
@@ -1523,7 +1518,7 @@ void		BPTfty::SMC_createUVSlide(int commonVtx, int startVtx, int endVtx, MItMesh
 				}
 
 				//startUV holen
-				for(x = 0; x < faceVtx.length(); x++)
+				for(unsigned x = 0; x < faceVtx.length(); x++)
 				{
 					if(faceVtx[x] == startVtx)
 					{
@@ -1545,8 +1540,7 @@ void		BPTfty::SMC_createUVSlide(int commonVtx, int startVtx, int endVtx, MItMesh
 			if(polyIter.hasUVs(UVSetNames[u]))
 			{
 				//commonUV holen
-				int x;
-				for(x = 0; x < faceVtx.length(); x++)
+				for(unsigned x = 0; x < faceVtx.length(); x++)
 				{
 					if(faceVtx[x] == commonVtx)
 					{
@@ -1557,7 +1551,7 @@ void		BPTfty::SMC_createUVSlide(int commonVtx, int startVtx, int endVtx, MItMesh
 				}
 
 				//startUV holen
-				for(x = 0; x < faceVtx.length(); x++)
+				for(unsigned x = 0; x < faceVtx.length(); x++)
 				{
 					if(faceVtx[x] == endVtx)
 					{
@@ -4225,6 +4219,7 @@ bool	BPTfty::isDirConform(	const int index0,
 	for(UINT i = 0; i < l; i++)
 	{
 		if(faceVerts[i] == index0)
+		{
 			if(faceVerts[(i+1) % l] == index1)
 			{
 				INVIS(cout<<"Vertizen "<<index0<<" und "<<index1<<" sind faceConform."<<endl;);
@@ -4235,6 +4230,7 @@ bool	BPTfty::isDirConform(	const int index0,
 				INVIS(cout<<"Vertizen "<<index0<<" und "<<index1<<" sind NICHT faceConform."<<endl;);
 				return false;
 			}
+		}
 	}
 
 	MPRINT("IS DIR CONFORM: FORBIDDEN PATH");
@@ -4407,7 +4403,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 			l = edgeIDs.length();
 			for(i = 0; i < l;i++)
 			{
-				if(edgeIDs[i] == allEdgesZero)
+				if(edgeIDs[i] == (int)allEdgesZero)
 				{
 					hasPtr = true;
 					existingPtr = edgePtrs[i];
@@ -4451,7 +4447,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 				l = connectedEdges[i].length();
 				for(a = 0; a < l; a++)
 				{
-					if(connectedEdges[i][a] == allEdgesZero)
+					if(connectedEdges[i][a] == (int)allEdgesZero)
 					{
 						connectedEdges[i].remove(a);
 						break;
@@ -4639,7 +4635,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 										edge* selPtr = 0;
 										
 										//hat edge ptr?
-										int miles2 = edgeIDs.length();
+										unsigned miles2 = edgeIDs.length();
 										for(x = 0; x < miles2;x++)
 										{
 											if(currentEdge == edgeIDs[x])

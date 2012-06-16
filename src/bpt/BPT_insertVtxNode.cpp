@@ -68,10 +68,11 @@ MTypeId     BPT_InsertVtx::IVid( 0x00108BC5 );
 
 //Constructor/Destructor
 //------------------------------------------------------------------
-BPT_InsertVtx::BPT_InsertVtx():	meshDirty(true),
-								scriptJobInitated(false),
-								lastCount(-1),
-								lastSpin(-1)
+BPT_InsertVtx::BPT_InsertVtx()
+: scriptJobInitated(false)
+, meshDirty(true)
+, lastCount(-1)
+, lastSpin(-1)
 //------------------------------------------------------------------
 {
 }

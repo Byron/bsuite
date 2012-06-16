@@ -207,7 +207,6 @@ MStatus	ByronsPolyToolsNodeManip::connectToDependNode(const	MObject& node)
 								&ByronsPolyToolsNodeManip::startPointCallback);
 	
 	//cout<<"StartIndex2 = "<<startIndex<<endl; 
-	unsigned directionIndex = fnDirection.directionIndex();
 
 //	addPlugToManipConversionCallback(directionIndex,(plugToManipConversionCallback) 
 //									&ByronsPolyToolsNodeManip::directionCallback);

@@ -116,7 +116,7 @@ public:
 							ULONG operandMinSize = 0     );			//!< -->wenn man diesen Wert setzt, muss er den index nicht selbst suchen
 																	//!< fügt das übergebene intarray zum BitArray hinzu und erweitert es, wenn noetig
 	
-	bool			isFlagSet (long index) const;					//!< BitFlag abrufen als Bool ->SICHER
+	bool			isFlagSet (unsigned index) const;					//!< BitFlag abrufen als Bool ->SICHER
 
 
 	//UNSICHERE METHODEN:	ALLE OHNE RANGECHECK, sind folglich aber schneller
@@ -250,7 +250,7 @@ ULONG*		 array;		//!< zeigt auf den Begin des zugrundeliegenden LongArrays - es 
 
 //Konstanten (damit diese nich immer als literale konstanten erzeugt werden, um dann wieder verworfen zu werden
 //------------------
-static const int   nBitsInUlong;	//!< number of bits per chunk
+static const unsigned nBitsInUlong;	//!< number of bits per chunk
 static const ULONG null;
 static const ULONG one;
 static const ULONG fulllong;

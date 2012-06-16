@@ -67,7 +67,7 @@ void IVMeshCreator::doInsertVtx( int edgeID,
 	double	normalScaleValue = 0;	//skaliert die Normale entsprechend der Groesse des dazugehoerigen Faces
 	MVector	direction;			//Richtungsvektor von start - endPoint
 	MPoint	startPoint;			//startPoint wird ebenfalls für die Vtxinsertion benoetigt
-	int		insertionID;		//die ID des letzten Vtx im Array
+	unsigned insertionID;		//die ID des letzten Vtx im Array
 
 	MIntArray vertices[2];		//hält die vertizen der faces, die mit der edge verbunden sind (maximal 2)
 

@@ -262,7 +262,7 @@ public:
 //
 
 
-	unsigned short	numUVSets;
+	unsigned short		numUVSets;
 
 	BPT_Helpers			helper;
 
@@ -340,9 +340,7 @@ protected:
 	MPointArray*		vtxPoints;		//!< VTXIds und deren Position							
 	MIntArray*			faceVtxIDs;		//!< Die VtxIDs, so wie sie die Faces definieren		
 	MIntArray*			offsets;		//!< relativer offset(zahl der vtx/face) pro faceID	
-	MIntArray*			offsetsAbsolute;//!< absoluter offset zum finden des richtigen \
-										   	 insertpoints fuer neue vtx/zum ndern der \
-											 vtxNumerierung
+	MIntArray*			offsetsAbsolute;//!< absoluter offset zum finden des richtigen insertpoints fuer neue vtx/zum ndern der vtxNumerierung
 
 	MPlugArray			compPlugs;		//!< speichert die Plugs, welche selectionLists enthalten
 	MObjectArray		compLists;		//!< speichert ComponentListen, sync zu CompPlugs
@@ -449,8 +447,7 @@ protected:
 
 	//BPT_Helpers			helper;	//hat hilfsprozeduren, und ist ffentlich (dies ist ein reminder )
 
-	bool				deallocUVs;		//!< sollen die UVDaten mit der zerstrung des creators ebenfalls gelscht werden oder soll das jemand anders machen? \
-										default = false;
+	bool				deallocUVs;		//!< sollen die UVDaten mit der zerstrung des creators ebenfalls gelscht werden oder soll das jemand anders machen? default = false;
 };
 
 }

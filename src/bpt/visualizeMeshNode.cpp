@@ -54,9 +54,9 @@ MObject	visualizeMeshNode::vtxWeights;
 
 
 visualizeMeshNode::visualizeMeshNode()
-	: listNeedsUpdate(true)
+	: list(450000)
+	, listNeedsUpdate(true)
 	, wasInCompute(false)
-	, list(450000)
 	, vtxColor(0.0f, 0.0f)
 	, vtxColor2(0.0f, 0.0f)
 	{}
@@ -221,8 +221,6 @@ void visualizeMeshNode::draw( M3dView & view, const MDagPath & path,
 	if(mStat != lastStat)
 	{
 		lastStat = mStat;
-
-		listNeedsUpdate;
 	}
 
 	//if( mStat == kNone)	// Nichts zeichnen, wenn nix selected
@@ -429,6 +427,7 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 							
 							break;
 						}
+					default: break;
 					}
 				}
 

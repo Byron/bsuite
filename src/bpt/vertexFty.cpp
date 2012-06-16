@@ -42,9 +42,9 @@
 vertexFty::vertexFty(MIntArray* inSelVtxIDs,
 					 meshCreator* inCreator,
 					 int inSpin)
-									:				selVtxIDs(inSelVtxIDs),
-													ftyCreator(inCreator),
-													spin(inSpin)
+: ftyCreator(inCreator)
+, selVtxIDs(inSelVtxIDs)
+, spin(inSpin)
 //-------------------------------------------------------------------------------------------
 {
 	
@@ -247,7 +247,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 	//erstmal runup machen zum spinWert
 	i = null;
 	UINT l3 = null;	//couter für schleifendurchlauf
-	for(UINT u = null; u < spin; u++)
+	for(UINT u = null; u < (uint)spin; u++)
 	{
 		for(i = (i+1) % l; i < l; i = (i+1)%l)
 		{
@@ -265,7 +265,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 		for(; l3++ != l; i = (i+1)%l)	//damit spin mit einbezogen wird
 		{//jeden Vtx im Array bearbeiten, der selected ist
 
-			if( f[i]&is^is || f[i]&iv^iv)	//ohne klammerung, da operatorvorrang eindeutig
+			if( (f[i]&is)^is || (f[i]&iv)^iv)	//ohne klammerung, da operatorvorrang eindeutig
 				continue;	//wenn er nich gewählt ist oder nicht gültig, dann mit nächstem Vtx fortfahren
 
 			//jetzt checken ob in ArrayRichtung mindestens 1 ungewählter Vtx vorhanden ist
@@ -337,7 +337,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 						flagValue = f[(t+x+l)%l];
 
 						//hier wird die Condition nicht benutzt
-						if( flagValue & is || flagValue & iv^iv )
+						if( flagValue & is || (flagValue & iv)^iv )
 						//wenn vtx selected oder nicht gültig ist, abbruch
 							break;
 
@@ -347,7 +347,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 							
 							//in dem moment, wo der vtx ungültig ist, 
 							//muss die Suche eh gestoppt werden
-							if(f[z] & iv ^ iv)
+							if((f[z] & iv) ^ iv)
 								goto machWeiter;
 							
 							if(f[z] & is )
@@ -391,7 +391,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 						//jetzt von tsb ausgehen und nächstbesten selVtx finden (--> op beachten, +l zur sicherheit, da op auch negativ sein kann)
 						for(z = (tsb+l-x)%l; ; z = (z+l-x)%l)
 						{
-							if( f[z] & iv ^ iv )
+							if( (f[z] & iv) ^ iv )
 								//wenn ungültiger Vtx gefunden wurde, muss abgebrochen werden
 								goto machWeiter;
 
@@ -407,7 +407,7 @@ inline void vertexFty::splitFace( MIntArray& faceVtx, MIntArray& matchVtx, int f
 						for(z = (teb+l+x)%l; ; z = (z+l+x)%l)
 						{
 							
-							if( f[z] & iv ^ iv )
+							if( (f[z] & iv) ^ iv )
 								//wenn ungültiger Vtx gefunden wurde, muss abgebrochen werden
 								goto machWeiter;
 

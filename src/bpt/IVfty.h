@@ -39,6 +39,7 @@
 #include <maya/MItMeshEdge.h>
 #include <maya/MItMeshVertex.h>
 #include <maya/MIntArray.h>
+
 #include <maya/MPointArray.h>
 #include <maya/MSelectionList.h>
 #include <maya/MVectorArray.h>
@@ -69,8 +70,8 @@ class IVfty :	public polyModifierFty
 	//FUNKTIONEN
 public:
 	
-	IVfty(void);
-	virtual ~IVfty(void);
+	IVfty();
+	virtual ~IVfty();
 
 //-------------------------------------
 //HAUPT METHODEN

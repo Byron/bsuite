@@ -50,13 +50,14 @@ MObject softTransformationEngine::customSl;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-softTransformationEngine::softTransformationEngine():	lastDistance(-1.0), 
-														lastFType( (unsigned short)50000), 
-														animFnInitialized(false), 
-														mayCreateIdleEvent(true),
-														lastMaxWeights(-1), 
-														lastSmoothen(-1), 
-														lastEdgeDistance(0)
+softTransformationEngine::softTransformationEngine()
+: mayCreateIdleEvent(true)
+, animFnInitialized(false)
+, lastDistance(-1.0)
+, lastFType(50000U)
+, lastMaxWeights(-1)
+, lastSmoothen(-1)
+, lastEdgeDistance(0)
 {
 
 }
@@ -365,7 +366,7 @@ bool	softTransformationEngine::rebuildTweakArrays()
 		// ( wie beim SMC )
 		// Merke: vtxSet hat mindestens einen Eintrag, wenn er hier ist
 		
-		if( vd.vtxSet[0] < l )
+		if( (uint)vd.vtxSet[0] < l )
 		{
 			helper.memoryArrayRemove(vd.potVtx, vd.vtxSet);
 		}
@@ -679,7 +680,7 @@ void	softTransformationEngine::generateEdgeWeights(	const MIntArray& vtxSet,
 		
 		
 		// Nun die Weigths entsprechend des maxWeigthsParams
-		maxWeights = (weights.size() < nd.maxWeights) ? weights.size() : nd.maxWeights ; 
+		maxWeights = (weights.size() < (uint)nd.maxWeights) ? weights.size() : (uint)nd.maxWeights ; 
 		
 		
 		
@@ -965,7 +966,7 @@ void	softTransformationEngine::createWeightsBasedOnDistance()
 	
 	MItMeshVertex inVertIter(nd.inMesh);
 	
-	int		maxWeights;		// Speichert die tatsuechlich zahl an maxWeights zwischen . mindestens td.maxWeights, oder weniger
+	unsigned maxWeights;		// Speichert die tatsuechlich zahl an maxWeights zwischen . mindestens td.maxWeights, oder weniger
 	double	sumWeights;		// Tmpvar fuer Summe der Weights;
 	double	newSum;
 	MDoubleArray distScales;		// DistanceScale - je weiter weg, desto schwuecher ist das weight - pro weight
@@ -1019,7 +1020,7 @@ void	softTransformationEngine::createWeightsBasedOnDistance()
 		
 		
 		// Es soll die grueuetMuegliche zahl an weights genommen werden
-		maxWeights = (nd.maxWeights < weights.size() ) ? nd.maxWeights : weights.size();
+		maxWeights = ((uint)nd.maxWeights < weights.size() ) ? (uint)nd.maxWeights : weights.size();
 		
 		
 		if(maxWeights > 0 )
@@ -2096,6 +2097,7 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 							
 							break;
 						}
+					default: break;
 					}
 				}
 

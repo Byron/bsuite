@@ -69,13 +69,14 @@ MTypeId     ByronsPolyToolsNode::id( 0x00108BC0 );
 
 //Constructor/Destructor
 //----------------------------------------------------------------------------------------------------------
-ByronsPolyToolsNode::ByronsPolyToolsNode():	meshDirty(true),
-											oldShowMesh(false), 
-											undoItCalled(false),
-											isAutoSelect(false),
-											check(false),
-											isSCMode(false),
-											dgMod(0)
+ByronsPolyToolsNode::ByronsPolyToolsNode()
+: check(false)
+, isAutoSelect(false)
+, isSCMode(false)
+, dgMod(0)
+, meshDirty(true)
+, oldShowMesh(false)
+, undoItCalled(false)
 //----------------------------------------------------------------------------------------------------------
 {
 }
@@ -638,7 +639,6 @@ MStatus ByronsPolyToolsNode::doCompleteCompute(MDataBlock& data)
 				isSCMode = (mode == 4 || mode == 5)?true:false;
 
 				//MDagPath vom Mesh holen
-				bool selectEdges = true;
 				//MFnDependencyNode depNodeFn(thisMObject());
 				
 				

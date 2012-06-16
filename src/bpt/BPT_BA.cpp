@@ -20,11 +20,11 @@
 
 
 
-INVIS(ULONG		BPT_BA::counter = 0;);
+INVIS(ULONG		BPT_BA::counter = 0;)
 
 
 //KONSTANTEN DEFINITIONEN
-const int 	BPT_BA::nBitsInUlong		= sizeof( ULONG ) * 8;
+const unsigned 	BPT_BA::nBitsInUlong		= sizeof( ULONG ) * 8;
 const ULONG BPT_BA::null		= (ULONG)0;
 const ULONG BPT_BA::one			= (ULONG)1;
 const ULONG BPT_BA::fulllong	= ~(ULONG)0;
@@ -32,7 +32,13 @@ const ULONG BPT_BA::fulllong	= ~(ULONG)0;
 
 
 //--------------------------------------------------------------------
-BPT_BA::BPT_BA(): array(NULL),numChunks(null),highBound(null),lowBound(null),offset(null),numTrue(null)
+BPT_BA::BPT_BA()
+: lowBound(null)
+, highBound(null)
+, offset(null)
+, numChunks(null)
+, numTrue(null)
+, array(NULL)
 //--------------------------------------------------------------------
 {
 	INVIS(number = counter++;)
@@ -42,7 +48,11 @@ BPT_BA::BPT_BA(): array(NULL),numChunks(null),highBound(null),lowBound(null),off
 
 
 //--------------------------------------------------------------------
-BPT_BA::BPT_BA( ULONG initialSize, bool initialValue ):array(NULL), lowBound(null), offset(null),highBound(initialSize)
+BPT_BA::BPT_BA( ULONG initialSize, bool initialValue )
+: lowBound(null)
+, highBound(initialSize)
+, offset(null)
+, array(NULL)
 //--------------------------------------------------------------------
 {
 
@@ -210,7 +220,7 @@ BPT_BA::BPT_BA(const MIntArray& initialArray, bool beginIsIndex0, bool initialVa
 			aIndex = (ULONG) (index / nBitsInUlong);
 			shift = index - aIndex*nBitsInUlong;
 			wert = one << shift;
-			operand = array[aIndex]&wert^wert ;
+			operand = (array[aIndex]&wert)^wert ;
 			
 
 			//unbedingt vorher checken, ob bit schon gesetzt, damit mehrfach vorhandene nicht das gesamt bitArray versauen
@@ -240,7 +250,7 @@ BPT_BA::BPT_BA(const MIntArray& initialArray, bool beginIsIndex0, bool initialVa
 			aIndex = (ULONG) (index / nBitsInUlong);
 			shift = index - aIndex*nBitsInUlong;
 			wert = one << shift;
-			operand = array[aIndex]^wert&wert;
+			operand = array[aIndex]^(wert&wert);
 
 
 		//	array[aIndex] -= ( (array[aIndex] & wert) == null ) 
@@ -405,7 +415,7 @@ void		BPT_BA::getIntArray(MIntArray& inResult) const
 }
 
 //--------------------------------------------------------------------
-bool		BPT_BA::isFlagSet ( long index) const
+bool		BPT_BA::isFlagSet ( unsigned index) const
 //--------------------------------------------------------------------
 {
 		
@@ -453,7 +463,7 @@ void		BPT_BA::setBitTrue (ULONG index)
 	//ULONG wert = one << index % nBitsInUlong;
 	ULONG wert = one << shift;
 
-	ULONG operand = ( array[chunk] & wert ^ wert);
+	ULONG operand = ( array[chunk] & wert ) ^ wert;
 
 
 	//kein check mehr, um geschwindigkeit zu gewinnen
@@ -534,7 +544,7 @@ void	BPT_BA::setBits (const MIntArray& indices, bool value)
 
 			//wert = one << index % nBitsInUlong;
 			wert = one << shift;
-			operand = array[aIndex]&wert^wert;
+			operand = (array[aIndex]&wert)^wert;
 
 			//kein check mehr, um geschwindigkeit zu gewinnen
 			//wenn man diese Procedur aufruft, muss man sicher sein, dass der Flag auch wirklich false is
@@ -680,7 +690,7 @@ bool	BPT_BA::expand	(ULONG  expandBy, bool valueOfNewBits )
 				aIndex = (ULONG)(i / nBitsInUlong);
 				shift = i - aIndex * nBitsInUlong;
 				wert = one << shift;
-				operand = array[aIndex] & wert ^ wert;
+				operand = (array[aIndex] & wert) ^ wert;
 				
 
 				array[aIndex] += operand;
@@ -738,7 +748,7 @@ bool	BPT_BA::expand	(ULONG  expandBy, bool valueOfNewBits )
 		{
 			shift = i - aIndex * nBitsInUlong;
 			wert = one << shift;
-			operand = newArray[aIndex] & wert ^ wert;
+			operand = (newArray[aIndex] & wert) ^ wert;
 
 			newArray[aIndex] += operand;
 			numTrue += operand >> shift;
@@ -800,7 +810,7 @@ bool	BPT_BA::contract (ULONG  contractBy)
 	//hier lohnt sich die arbeit mit operand usw. nicht unbedingt.
 	ULONG wert;
 	//wenn alte groesse für die kontraktion ausreicht, dann ...
-	if( newSize > (numChunks - 1) * nBitsInUlong )
+	if( (unsigned)newSize > (numChunks - 1) * nBitsInUlong )
 	{//... einfach highBound umsetzen und fertig
 
 		//aber vorher noch die numTrue aktualisieren
@@ -1018,7 +1028,7 @@ bool	BPT_BA::add (  MIntArray& operand, ULONG max, ULONG minSize )
 
 		for(i = null;i < l; i++)
 		{	
-			if(operand[i] > max)
+			if(operand[i] > (int)max)
 				max = operand[i];
 		}
 	}
@@ -1099,7 +1109,7 @@ outOfIf:
 
 	//wenn er hier ist, hat das array auf jeden Fall die passende groesse, so dass die operation ausgeführt werden kann
 	return performLogicalOperation(operand,2,operand);
-
+	
 }
 
 

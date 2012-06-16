@@ -30,7 +30,10 @@ unsigned short	edgeFaceData::numUVSets;
 BPT_Helpers		edgeFaceData::helper;
 
 //---------------------------------------------
-edgeFaceData::edgeFaceData(UINT inFaceID):id(inFaceID), UVAbsOffsets(0),UVRelOffsets(0)
+edgeFaceData::edgeFaceData(UINT inFaceID)
+: UVAbsOffsets(0)
+, UVRelOffsets(0)
+, id(inFaceID)
 //---------------------------------------------
 {	
 }
@@ -70,12 +73,12 @@ MIntArray		edgeFaceData::getNewVtxUVs(int newVtx) const
 	UINT l = vtxChange.length();
 	UINT r = 0;
 
-	for(int i = 1; i < l; i+=2)
+	for(unsigned i = 1; i < l; i+=2)
 	{
 		if(vtxChange[i] == newVtx)
 		{			
 
-			int l2 = --i*numUVSets + numUVSets*2;
+			unsigned l2 = --i*numUVSets + numUVSets*2;
 			for(i = i*numUVSets+1; i < l2; i+=2)
 			{
 				UVs[r++] = UVChange[i];

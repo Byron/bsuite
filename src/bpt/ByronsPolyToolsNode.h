@@ -146,7 +146,7 @@ public:
 	static	MObject		BPTinMesh;	//!<inMeshObj fuer BPTNode
 	static	MObject		BPToutMesh;	//!<inMeshObj fuer BPTNode
 	
-	STE_DEFINE_STATIC_PARAMETERS(BPT);
+	STE_DEFINE_STATIC_PARAMETERS(BPT)
 
 	//options[0] == 0: nix				//options[1] == 0: nix				
 	//options[0] == 1: help				//options[1] == 1: connectEnd			//dies eventuell rausnehmen		

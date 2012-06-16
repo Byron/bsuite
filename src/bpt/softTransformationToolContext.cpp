@@ -33,22 +33,24 @@
 //******************************************************************************************************************
 
 //------------------------------------------------------------
-softTransformationToolCtx::softTransformationToolCtx():	dgModFn(0),
-														cmd(0),
-														softConnector(0),
-														animCreator(0),
-														copyDagMod(0),
-														hasManip(false),
-														useLastDistance(false),
-														fType(0),
-														lastDistance(0.0),
-														bbScaleFactor(0.0),
-					/*zur sicherheit*/					fVis(true),
-														nirFlag(false),
-														emergency(false),
-														vmCreator(0),
-														vmConnector(0),
-														fastTrgNodeCreator(0)
+softTransformationToolCtx::softTransformationToolCtx()
+: cmd(0)
+, copyDagMod(0)
+, dgModFn(0)
+, animCreator(0)
+, softConnector(0)
+, fastTrgNodeCreator(0)
+, fType(0)
+, fVis(true)
+, lastDistance(0.0)
+, useLastDistance(false)
+, nirFlag(false)
+, hasManip(false)
+, emergency(false)
+, vmCreator(0)
+, vmConnector(0)
+, bbScaleFactor(0.0)
+
 //------------------------------------------------------------
 {
 	lastSelection.clear();

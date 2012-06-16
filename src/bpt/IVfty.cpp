@@ -21,31 +21,29 @@
 
 
 //--------------------------------------------------------------
-IVfty::IVfty(void):	maxStandardScale(1.0),
-
-					UVSlideStart(0),	
-					UVSlideEnd(0),
-					UVSlideIndices(0),
-					UVSlideDirections(0),	
-					UVSlideScale(0),
-
-					normalScale(0),
-					slideScale(0),		
-					slideDirections(0),
-					slideNormals(0)	,
-					slideStartPoints(0),
-					slideEndPoints(0),
-					slideIndices(0),
-					maySlide(0),
-
-					spin(0)	//nur zur Sicherheit, is aber eigentlich unnoetig
+IVfty::IVfty()
+: spin(0)//nur zur Sicherheit, is aber eigentlich unnoetig
+, UVSlideStart(0)
+, UVSlideEnd(0)
+, UVSlideIndices(0)
+, UVSlideDirections(0)
+, UVSlideScale(0)
+, normalScale(0)
+, slideScale(0)
+, slideDirections(0)
+, slideNormals(0)
+, slideStartPoints(0)
+, slideEndPoints(0)
+, slideIndices(0)
+, maySlide(0)
+, maxStandardScale(1.0)
 //---------------------------------------------------------------
 {
 }
 
 
 //-------------------
-IVfty::~IVfty(void)
+IVfty::~IVfty()
 //-------------------
 {
 
@@ -575,6 +573,7 @@ bool	IVfty::isDirConform(const int index0,
 	for(UINT i = 0; i < l; i++)
 	{
 		if(faceVerts[i] == index0)
+		{
 			if(faceVerts[(i+1) % l] == index1)
 			{
 				INVIS(cout<<"Vertizen "<<index0<<" und "<<index1<<" sind faceConform."<<endl;);
@@ -585,6 +584,7 @@ bool	IVfty::isDirConform(const int index0,
 				INVIS(cout<<"Vertizen "<<index0<<" und "<<index1<<" sind NICHT faceConform."<<endl;);
 				return false;
 			}
+		}
 	}
 
 	MPRINT("IS DIR CONFORM: FORBIDDEN PATH");
@@ -599,24 +599,24 @@ void		IVfty::doSlide(MObject& slideMesh)
 
 MStatus	stat;
 
-	int minIndex, maxIndex;		//wird später verwendet für schleife (for)
-	UINT x;						//für die iteration
+	unsigned minIndex, maxIndex;//wird später verwendet für schleife (for)
+	unsigned x;					//für die iteration
 	double r = 1.0;				//für iteration
 	double	factor = 1.0 / (count + 1);	//factor für positionsberechnung
 
 	MFnMesh	FnMesh(slideMesh,&stat);
 
 	
-	int l = slideIndices->length() - 1;	//MINUS 1, da der letzt eintrag von slideIndices ein dummy ist, welcher
-										//die info über den letzten erzeugten vertex erhält, ohne dass dazu noch
-										//noch irgendwelche vektoren gespeichert wären
+	unsigned l = slideIndices->length() - 1;	//MINUS 1, da der letzt eintrag von slideIndices ein dummy ist, welcher
+												//die info über den letzten erzeugten vertex erhält, ohne dass dazu noch
+												//noch irgendwelche vektoren gespeichert wären
 	
 	//dafür sorgen, dass scaling immer den korrekten wert hat
 	if(maxStandardScale == 1.0)
 	{//findet den groessten normalscalewert und setzt damit maxStandardScale	
 		maxStandardScale = 0.0;
 
-		for(int i = 0; i < l; i++)
+		for(unsigned i = 0; i < l; i++)
 		{
 			if((*normalScale)[i] > maxStandardScale)
 				maxStandardScale = (*normalScale)[i];
@@ -631,7 +631,7 @@ MStatus	stat;
 	}
 
 	//checken, welche seite gewünscht ist
-	for(int i = 0; i < l; i++)
+	for(unsigned i = 0; i < l; i++)
 	{
 		r = 1.0;
 

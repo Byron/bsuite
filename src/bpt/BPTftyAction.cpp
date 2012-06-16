@@ -259,7 +259,6 @@ MStatus BPTfty::doIt()//int slideInt)
 				
 
 				MIntArray		neighbors;
-				int				realFaceCount = 0;					
 				bool			faceMatchWasZero = false;
 				
 				MItMeshPolygon	polyIter(fMesh);
@@ -267,8 +266,6 @@ MStatus BPTfty::doIt()//int slideInt)
 				int				tmp,l,ID,lastID;
 
 				BPT_BA			tmpFaceIDs(polyIter.count());
-
-				int				faceCount = polyIDs.length();
 
 
 				
@@ -383,7 +380,7 @@ MStatus BPTfty::doIt()//int slideInt)
 							ID = findID(vtxMatch,faceVerts);
 		
 							//INVIS(cout<<"GEFUNDENE ID = "<<ID<<endl;)
-							if(nachbarFaces.length() < ID + 1)
+							if((int)nachbarFaces.length() < ID + 1)
 							{	
 								tmp = nachbarFaces.length();
 								nachbarFaces.setLength(ID + 1);
@@ -514,16 +511,12 @@ MStatus BPTfty::doIt()//int slideInt)
 					
 					
 
-					INVIS(unsigned int p = tmpFaceIDs.getTrueCount(););
-					INVIS(unsigned int h = polyIDBA.getTrueCount(););
 
 					polyIDBA = polyIDBA - tmpFaceIDs;
 					//nach dieser BA operations muss die synchronizität für trueCount wiederhergestellt werden
 					polyIDBA.syncNumTrue();
 
 					tmpFaceIDs.setAllFalse();
-
-					INVIS(p = polyIDBA.getTrueCount();)
 
 					
 				//	INVIS(cout<<"CREATE_NETWORK: "<<"Neue polyIDs:"<<endl;)

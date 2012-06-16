@@ -762,8 +762,8 @@ void	selEdge::engageBevel(int connectEnds, int triangulateEnds, bool isSC)
 		nurEinNachbar[side] =		(faceIDs.length() == 1 && nachbarn[side][0]->isSelected())
 							||	nachbarn[side][0] == nachbarn[side][1];
 							
-		hitsBorder =	nachbarn[side][0]->isSelected() && nachbarn[side][0]->borderThere(id, this)
-					||	nachbarn[side][1] != 0 && nachbarn[side][1]->isSelected() && nachbarn[side][1]->borderThere(id, this) ;
+		hitsBorder = (nachbarn[side][0]->isSelected() && nachbarn[side][0]->borderThere(id, this))
+					||	(nachbarn[side][1] != 0 && nachbarn[side][1]->isSelected() && nachbarn[side][1]->borderThere(id, this));
 
 
 		if(	nurEinNachbar[side] | hitsBorder)//wenn eine Edge in einer der beiden richtungen on border, dann das nur ein nachbar schema verwenden
@@ -1882,8 +1882,6 @@ endIt:;
 							//	Am einfachsten wre es, wenn man einfach spter jedes Vorkommen des origVtx mit dem edgeVtx vertauschen wrde und umgekehrt
 							//	->Liste erstellen, die mitgefhrt wird
 							
-							MIntArray faceVtxIDs[2];	//zwischenspeicher fr faceVtxIDs
-
 							for(UINT a = 0; a < max; a++)
 							{
 								
@@ -2574,7 +2572,7 @@ void		selEdge::C_dataAddVtx(edgeFaceData* fData,const edgeFaceData* nRefFace, in
 
 	//und nun die restlichen UVs einfgen. Dies muss so gemacht werden, weil man .insert nur innerhalb des Arrays nehmen kann, ansonsten muss append verwendet werden
 	UINT indexChange = 0;	//als offsetMarker
-	for(UINT i = 0; i < creator->numUVSets - 1;i++)
+	for(UINT i = 0; i < creator->numUVSets - 1U;i++)
 	{
 		if(fData->UVRelOffsets[i])
 		{

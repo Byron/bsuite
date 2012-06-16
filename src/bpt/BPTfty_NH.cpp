@@ -473,13 +473,11 @@ void	BPTfty_NH::findEdgeLoops(MIntArray& allEdges, MIntArray& edgeLoops)
 	MItMeshVertex	vertIter(fMesh);			//PS: alle hilfsprocs erhalten referenzen des iterators
 	MItMeshPolygon	polyIter(fMesh);
 
-	int				maxEdgeCount = options[2];	//wenn dieser Wert 0, dann unendlich edges findbar
 	int				edgeCount	;				//counter für jeden edgeLoop, wird inkrementiert
 
 	MIntArray		removed;					//enthält entfernte Kanten, wird später wieder auf die Selection getan (doppelte Kanten, kanten mit connection zu nEck)
 	MIntArray		triEdges;					//hält gewählte Edges, die auf triangles liegen
 
-	int				LOffset = 0;
 	unsigned int	l = allEdges.length(); 
 	int				tmp;
 
@@ -558,7 +556,6 @@ void	BPTfty_NH::findEdgeLoops(MIntArray& allEdges, MIntArray& edgeLoops)
 	}
 
 
-	bool			go = true;
 	
 	//nun zuerst triangleArray bearbeiten
 	
@@ -776,7 +773,7 @@ void	BPTfty_NH::findBorderEdges(int startEdge,
 	{
 		helper.addIntArrayToLHS(edgeLoops, result[1]);
 		
-		for(int i = 0; i < l; i++)
+		for(unsigned i = 0; i < l; i++)
 		{
 			if(removals[i] > -1)
 			{

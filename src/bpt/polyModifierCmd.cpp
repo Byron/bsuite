@@ -254,7 +254,7 @@ void		polyModifierCmd::deleteTweaks()
 		nullVector = numDataFn.object();
 		unsigned numTweaks = meshTweakPlug.numElements();
 		MPlug tweak;
-		for(int  i = 0; i < numTweaks; i++ )
+		for(unsigned  i = 0; i < numTweaks; i++ )
 		{
 			// Access using logical indices since they are the only plugs guaranteed
 			// to hold tweak data.

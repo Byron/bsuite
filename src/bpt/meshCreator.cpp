@@ -34,19 +34,21 @@ meshCreator::meshCreator(	MObject&		fMesh,
 							MDagPath&		meshPath
 															)
 						
-						 :
+: numUVSets(0)
 
-																	edgeIter(fMesh),
-																	polyIter(fMesh),
-																	meshFn(fMesh),
-																	vertIter(fMesh),
-																	slide(inSlide),
-																	minID(999999999),
-																	maxID(0),
-																	nMinID(999999999),
-																	nMaxID(0),
-																	deallocUVs(true),
-																	numUVSets(0)
+, vertIter(fMesh)
+, edgeIter(fMesh)
+, polyIter(fMesh)
+, meshFn(fMesh)
+
+, minID(999999999)
+, maxID(0)
+, nMinID(999999999)
+, nMaxID(0)
+
+, slide(inSlide)
+
+, deallocUVs(true)
 
 																	
 {
@@ -335,7 +337,6 @@ meshCreator::meshCreator(	MObject&		fMesh,
 		polyIter.getEdges(containedEdges);
 		l = containedEdges.length();
 		
-		INVIS(UINT test = polyIter.index(););
 		
 		faceVerts.clear();
 		
@@ -519,11 +520,11 @@ MStatus 	meshCreator::createMesh(MObject& newMeshData)
 	
 	MIntArray	mFaceList;	//man muss bedenken, dass der MeshCreator wirklich nur passende face - vertex Kombinationen erzeugt !!!
 	
-	int count ;
-	UINT x,y;
-	int offset = 0; 
-	int l2 ;
-	int l3 ;
+	unsigned count ;
+	unsigned x,y;
+	unsigned offset = 0; 
+	unsigned l2 ;
+	unsigned l3 ;
 	int indexOne, indexTwo;		//hält den ersten index einer Edge
 	MIntArray vertices;
 	MIntArray edges;
@@ -536,7 +537,7 @@ MStatus 	meshCreator::createMesh(MObject& newMeshData)
 	
 	INVIS(status.perror("PROB1 = ");)
 		
-		UINT l = normalCount.length();
+	unsigned l = normalCount.length();
 	
 	
 	
@@ -966,7 +967,7 @@ int 	meshCreator::doFaceOneSplit(int faceID,
 	
 	if(connectedFaces.length() == 1)
 	{
-		int l = connectedFaces.length();
+		unsigned l = connectedFaces.length();
 		for(i = 0; i < l;i++)
 		{
 			if(!isBoundary)
@@ -1107,12 +1108,12 @@ int 	meshCreator::doFaceOneSplit(int faceID,
 	//zum schluss alle newIDs aus dump holen, sie im bearbeiteten vertsArray finden und die indices speichern
 		
 		l = dump.length();
-		int l2 = verts.length();
+		unsigned l2 = verts.length();
 		for(i = 0; i < l; i++)
 		{
 			tmp = dump[i];
 			
-			for(int a = 0; a < l2; a++)
+			for(unsigned a = 0; a < l2; a++)
 			{
 				if(tmp == verts[a])
 				{
@@ -1442,7 +1443,6 @@ void	meshCreator::changeNormals(	int faceID,
 	MIntArray	 normalIndicesChange;	//array mit geänderten normalIndices
 	normalIndicesChange.setSizeIncrement(localVtxChange.length());
 
-	int offset = getValidAbsoluteOffset(faceID);
 	//erstmal normalen holen, um den alten Vtx ihre normale zuordnen zu koennen
 	
 
@@ -1610,7 +1610,7 @@ void	meshCreator::updateNormalArraysWith(const MIntArray& normalIndicesChange, i
 
 		int change = l - normalCount[faceID];
 		
-		int aOffset = getValidAbsNormalOffset(faceID) ;
+		unsigned aOffset = getValidAbsNormalOffset(faceID) ;
 		int i = 0;	//i muss signed sein, damit es negativ werden kann!
 
 		if(change < 0)
@@ -1631,9 +1631,9 @@ void	meshCreator::updateNormalArraysWith(const MIntArray& normalIndicesChange, i
 		//jetzt sind arrays garantiert angepasst, also noch die neuen Datn übertragen
 		UINT l2 = aOffset + l;
 		UINT r = 0;
-		for(i = aOffset; i < l2; i++)
+		for(uint x = aOffset; x < l2; x++)
 		{
-			normalVertexIndices[i] = normalIndicesChange[r++];
+			normalVertexIndices[x] = normalIndicesChange[r++];
 		}
 
 		//restliche Arrays anpassen oder aktualisieren
@@ -2492,14 +2492,20 @@ void	meshCreator::addVtx(int vtxID,
 
 	
 	//korrekte insertPosition finden
-	for(int i = aOffset; i < l; i++)
+	for(int i = aOffset; i < l; i++) 
+	{
 		if((*faceVtxIDs)[i] == startID)
+		{
 			if((*faceVtxIDs)[i+1] == endID)
 			{
 				(*faceVtxIDs).insert(vtxID,i+1);
 			}
 			else
+			{
 				(*faceVtxIDs).insert(vtxID,i-1);
+			}
+		}
+	}
 
 
 //	faceVtxCount(relativ) inkrementieren
@@ -2713,7 +2719,6 @@ alternativeSearch:	//wird von newVtx search angesprungen
 					{
 						if(faceVtx[k] == vtx)
 						{
-							INVIS(int tmp = faceUVs[k];);
 							UVChange.append(faceUVs[k]);
 							break;
 						}
@@ -2948,7 +2953,7 @@ int		meshCreator::getValidAbsoluteUVOffset(int faceID,
 			
 			MIntArray& LUTValues = *iterLUTValues;
 
-			for(int i = 0;i < l ;i++)
+			for(unsigned i = 0;i < l ;i++)
 			{
 				if(LUT[i] < faceID)
 					offset += LUTValues[i];
@@ -3078,7 +3083,7 @@ void	meshCreator::getConnectedFaces(UINT vtxID, MIntArray& connectedFaces) const
 
 		for(x = absOffset; x < maxLength;x++)
 		{
-			if((*faceVtxIDs)[x] == vtxID)
+			if((*faceVtxIDs)[x] == (int)vtxID)
 			{//face i beinhaltet vtx, also auf liste setzen und mit nächster iteration in huptschleife weitermachen
 				connectedFaces.append(i);
 				break;

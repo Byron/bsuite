@@ -183,7 +183,7 @@ namespace BPT
 		//	ZUGRIFFS METHODEN
 	public:
 		//---------------------------
-		void	getMeshPath(MDagPath& inPath){ if(! meshPath.isValid() ) saveMeshPathes(); inPath = meshPath; };
+		void	getMeshPath(MDagPath& inPath){ if(! meshPath.isValid() ) saveMeshPathes(); inPath = meshPath; }
 
 
 
@@ -257,17 +257,17 @@ namespace BPT
 
 
 		// TWEAK VTX PUSH FUNKTIONEN
-		void	doNoPush(MVector& direction, uint index){};			//!< Macht nix
+		void	doNoPush(MVector& direction, uint index){}			//!< Macht nix
 
-		void	doSizeRelativePush(MVector& direction, uint index ){ direction += td.normals[index] * nd.push * wa[td.vtx[index]] ; };
+		void	doSizeRelativePush(MVector& direction, uint index ){ direction += td.normals[index] * nd.push * wa[td.vtx[index]] ; }
 
-		void	doStandardPush(MVector& direction, uint index ){ direction += td.normals[index].normal() * nd.push * wa[td.vtx[index]] * maxScale ; };
+		void	doStandardPush(MVector& direction, uint index ){ direction += td.normals[index].normal() * nd.push * wa[td.vtx[index]] * maxScale ; }
 
 
 		// PARENT VTX PUSH FUNKTIONEN
-		void	pDoSizeRelativePush(MVector& direction, uint index ) {direction += td.pNormals[index] * nd.push ;};
+		void	pDoSizeRelativePush(MVector& direction, uint index ) {direction += td.pNormals[index] * nd.push ;}
 
-		void	pDoStandardPush(MVector& direction, uint index ) {direction += td.pNormals[index].normal() * nd.push * maxScale;};
+		void	pDoStandardPush(MVector& direction, uint index ) {direction += td.pNormals[index].normal() * nd.push * maxScale;}
 
 
 		//---------------------------
