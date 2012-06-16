@@ -1,0 +1,200 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="intro"></a>&nbsp;Transformation</font></td>
+  </tr>
+</table>
+<br>
+<img src="images/transformationIntro.jpg" border="0">
+<br>
+The Transformation Tools will help you to quickly rearrange your meshes.<br>
+<br>
+The <b>Smart Move Component</b> command allows you to move components directly
+on the mesh, it feels a bit like the movement of isoParms on a NURBS surface.
+You can also make special selections that will move as if they were a Chamfer
+or a solid chamfer.<br>
+As opposed to Maya's native move component tool the edges polarity does not play a role, so the components will move as expected.<br>
+<br>
+The <b>Soft Transformation Tool</b> allows you to move components, but as opposed to the native Move Tool, you can adjust a soft selection and influence the surrounding geometry.<br>
+<br>
+Both tools work on vertices, so any other selection type will be implicitly converted to this component type.<br>
+To learn more about these tools, please go on reading.
+<br>
+
+<br>
+<br>
+
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="smc"></a>&nbsp;Smart Move Component</font></td>
+  </tr>
+</table>
+
+</table>
+<br>
+  <table width="100%" border="1" cellspacing="0" cellpadding="0" bordercolor="#666666">
+    <tr valign="top" bgcolor="#99CCFF"> 
+      <td colspan="3"><b>ByronsPolyTools -Flag ...</b><b></b><b></b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="76%" valign="top"><b>Description</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-smartMoveComponent</i></td>
+      <td width="7%"><i>-smc</i></td>
+      <td width="76%" valign="top">- allows you to move your selection with the parameters of the BPTNode</td>
+    </tr>
+<tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="72%" valign="top"><b>--Additional Flags--</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-slideNotLimited</i></td>
+      <td width="7%"><i>-snl</i></td>
+      <td width="76%" valign="top">- the slide parameter will work without its bounds (0 to 1)</td>
+    </tr>
+  </table>
+
+<br>
+
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="intro"></a>&nbsp;Philosophy</font></td>
+  </tr>
+</table>
+<br>
+The Smart Move Component Command, which actually creates a ByronsPolyToolsNode, was created to help you rearranging your components quickly and efficiently.<br>
+In general, once the BPT Node is created, you can use all its parameters nearly
+exactly the same way as you are used to it by the other commands.<br>
+And you will be able to move your selection as if it was created by Smart Split, Solid Chamfer or Chamfer.<br>
+While sliding, the edges will move on the underlying faces which will keep the original shape of your mesh as good as possible.<br>
+
+<br>
+To learn more about the built in <b>Soft Selections</b>, please click <a href="BPT_BPTNode.htm#soft" target="main">here</a>.
+<br>
+<br>
+For a more descriptive explanation, please refer to the following pictures.
+<br>
+<table width="640" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="intro"></a>&nbsp;Smart
+    Split - like Behavior</font></td>
+  </tr>
+</table>
+<br>
+<p><img src="images/SMC_edgeLine.jpg" border="0"></p>
+<br>
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>When you select a single line of edges, the command will make it behave as if it was created by a Smart Split. As mentioned above, you can use every parameter on the BPT Node the move the selection. 
+</i>
+</tr>
+
+
+<br>
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>In this example, the slideRelative parameter is 1. In this case, the side parameter will flip the vectors along which the selected edges slide. This additionally helps to change the shape of the object.<br>
+<b>Please Note:</b> The logical behavior when flipping the sides would be, that
+the slide parameter flips its behavior( i.e. 0 will have the same position as
+formerly 1 and vice versa), which would be quite useless, so I decided to make
+it behave like that, at least when slideRelative is 1.
+</i>
+</tr>
+<br><br>
+<img src="images/SMC_edgeLine02.jpg" border="2">
+<table width="640" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="intro"></a>&nbsp;Chamfer
+    - like Behavior</font></td>
+  </tr>
+</table>
+<br>
+<img src="images/SMC_edgeLine03.jpg" border="0">
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>When you select two stacked lines of edges, or a single line of faces, these components will behave as if they were created with the chamfer command.
+</i>
+</tr>
+</table>
+<br>
+
+<table width="640" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="intro"></a>&nbsp;Solid
+    Chamfer - like Behavior</font></td>
+  </tr>
+</table>
+<br>
+<img src="images/SMC_edgeLine04.jpg" border="0">
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>When you select three stacked lines of edges, or a two stacked lines of faces, these components will behave as if they were created with the solid chamfer command.
+</i>
+</tr>
+
+
+<table width="640" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="intro"></a>&nbsp;Complex
+    Paths</font></td>
+  </tr>
+</table>
+<br>
+<img src="images/SMC_edgeLine05.jpg" border="0">
+<table width="90%" border="2">
+  <tr> 
+<td bgcolor="#99CCFF">
+<i>With every one of the abilities mentioned above, you can also create complex
+paths, which may change directions.
+</i>
+</tr>
+<br>
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="intro"></a>&nbsp;Soft Transformation Tool</font></td>
+  </tr>
+</table>
+<br>
+
+<a href="BPT_STT.htm" target="main">Continue with the Soft Transformation Tool</a>
+
+</body>
+</html>

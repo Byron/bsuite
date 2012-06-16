@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>Merge Components Script</title>
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<pre>
+string $selected[];
+clear $selected;
+float $buffer4[];
+clear $buffer4;
+float $finalResult[];
+clear $finalResult;
+$selected = `ls -sl -fl`;
+
+
+if(size($selected) > 0)
+{
+
+	int $convertSelection = false;
+
+	//check if components other than vertices are selected
+
+	if(size(`filterExpand -sm 32`) > 0)
+		$convertSelection = true;
+	else if(size(`filterExpand -sm 34`) > 0)
+		$convertSelection = true;
+	else if(size(`filterExpand -sm 35`) > 0)
+		$convertSelection = true;
+
+	if($convertSelection)
+	{//get the converted selection
+
+		PolySelectConvert 3;
+		$selected = `ls -sl -fl`;
+	}
+
+	if(size($selected) > 1)
+	{
+
+		for ($vertex in $selected)
+		{//average the positions
+
+			$buffer4 = `xform -q -os -t $vertex`;
+			$finalResult[0] += $buffer4[0];
+			$finalResult[1] += $buffer4[1];
+			$finalResult[2] += $buffer4[2];
+
+		}
+
+
+		$finalResult[0] /= size($selected);
+		$finalResult[1] /= size($selected);
+		$finalResult[2] /= size($selected);
+
+
+
+		for ($vertex in $selected)
+		{//move vertices to averaged position
+
+			xform -a -t $finalResult[0] $finalResult[1] $finalResult[2] $vertex;
+
+		}
+
+	
+		//finally, apply polyMerge
+		polyMergeVertex  -d 0.015 -ch 1 $selected;
+
+	}
+	else
+		warning("Your selection should contain more than 1 vertex");
+
+}
+else
+	warning("Please select some polygonal components");
+</pre>
+</body>
+</html>

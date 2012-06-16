@@ -1,0 +1,142 @@
+<html>
+<head>
+<title>BPT Docs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+
+
+<table width="96%" border="0">
+    <tr> 
+      <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">Understanding the Split</font></td>
+    </tr>
+  </table>
+<br>
+
+In general, splitting through faces is quite a complex problem, because the plug has to deal with any type of geometry, including triangles, quads, nGons and any combination of them.<br>
+This is why I had to break it down, so every face is seen by the plug in terms
+of <b>Corner Vertices</b>, <b>Corner Edges</b> and selected <b>neighbors per
+corner</b>.
+<br>
+<br>
+<br>
+<table width="96%" border="0">
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">Face Classification</font></td>
+    </tr>
+  </table>
+<br>
+In general, every Vertex sharing at least 4 edges is a corner vertex. Two corner
+vertices in a sequence create a corner edge. A CornerEdge may contain several
+selected neighbors and therefore several nonCornerEdge vertices.<br>
+As a special case, faces with exactly 4 vertices will always have 4 corner vertices, no matter whether this was true by definition.<br>
+<br>
+Every Corner Edge ( there have to be at least two to be included in the split
+) may have several selected neighbors. But what counts is whether a corner edge
+has at least one selected neighbor or not. These Corner Edges can be seen as "marked".
+This circumstance makes it possible to allow a classification of the faces. Additionally,
+there is made a distinction between control faces and normal ones. ControlFaces
+have the ability to decide, which direction for the slide should be used, and
+they are able to propagate this information to the other, therefore passive,
+faces.<br>
+<br>
+Faces with only one marked cornerEdge are classified as <b>Type One</b> Faces.
+Type One Faces will always be slideControlFaces, but with a lower priority than
+Type Two Control Faces (i.e. a type two control face will override the direction
+created by a type one face)<br>
+<br>
+Faces with two marked cornerEdges are classified as <b>Type Two</b> Faces. In this case, there are two possibilities: if the marked edges  are connected with each other, then Type Two Face will be a "SlideControler", being able to choose a direction for the slide.<br>
+If these marked edges are not connected with each other, the face will be a "normal" Type Two.<br>
+<br>
+Faces with three marked cornerEdges and exactly one unmarked cornerEdge will be a <b>type three</b> faces.<br>
+<br>
+Faces with all of their cornerEdges being marked are classified as <b>type four</b> faces.<br>
+<br>
+And last but not least, there are <b>Type Zero</b> faces which don't have one marked corner Edge, or only have one corner Vertex.<br>
+<br>
+The following pictures will explain that visually.<br>
+<br>
+<img src="images/uts01.gif" border="0">
+<br>
+<br>
+<img src="images/uts02.gif" border="0">
+<br>
+<br>
+As you see in the second picture, every faceType has a special way to be split,
+there is always a particular scheme which will always apply, no matter how many
+selected neighbor Faces there are.<br>
+<br>
+
+<table width="96%" border="0">
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">The Split-Scheme</font></td>
+    </tr>
+  </table>
+<br>
+To explain how the scheme will be applied, the following pictures will show a split through every Face Type, once in a quad, and once in a nGonVersion. The faces relevant for the specific scheme will be marked.<br>
+
+<br>
+<img src="images/uts03.gif" border="0">
+<br>
+<br>
+As you can see, in case of multiple selected neighbors per cornerEdge, he will connect to each of them inside the specific cornerEdge, keeping his specific scheme.<br>
+When the cornerEdge has multiple unselected neighbors, there won't be a visible
+effect - he just includes their vertices in the new faces, creating an nGon. <br>
+<br>
+<table width="96%" border="0">
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">The Slide</font></td>
+    </tr>
+  </table>
+<br>
+As already mentioned, the slide and esspecially its direction is dependent on
+the control Faces (Type 2 & 1 Control). With these, it is possible for the computer
+to determine whether he can activate the slide for parts of the selection because
+it is clearly defined or not.<br>
+In case of a loop Split, where there are no control faces but just type two ones,
+they will decide for one direction when the loop is detected.<br>
+The basic idea behind is the following:<br>
+A control Face gets the order to create a direction, which is then transmitted
+to its neighbor. If the neighbor is a normal Type Two, he will simply pass
+the direction to its opposing neighbor, and again, and again, until there comes
+another controlFace. If this controlFace has got a higher priority (i.e. type2control
+rules over type1), it will overwrite the input direction if it has a higher priority,
+or it will validate it, and send back the new direction whole the way. The faces
+passing through the new direction will save it for later use.<br>
+In case the passed direction hits a type 4 face, it will be blocked, sending back the information that it is forbidden to slide on this path.<br>
+<br>
+This allows the user to split through complex paths, while maintaining the ability
+to use the slide safely, at least on the paths that are "safe" - which have
+clearly defined direction.<br>
+The following pictures will demonstrate that, marked paths are blocked.
+<br>
+<br>
+<img src="images/utsSlide01.gif" border="0">
+<br>
+<br>
+<img src="images/utsSlide02.gif" border="0">
+<br>
+<br>
+<table width="96%" border="0">
+    <tr> 
+      <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="Limitations"></a>&nbsp;</font><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF">The Technique behind</font></td>
+    </tr>
+  </table>
+<br>
+To be able to solve that problem I decided to convert the selected faces into
+a more "mesh like" data structure. This "structure" is made of "Faces". Each
+face knows about is neighbors, vertices and cornervertices. You could say that
+they are interconnected, forming a "real" mesh, as opposed to the array data
+which represents a mesh in Maya.<br>
+Once created, the data structure allows fast transmission of messages (i.e. to
+get the right direction, create vertices ... ), and sharing of data.<br>
+<br>
+Chamfer and Solid Chamfer works in the same way, except the data structure consists
+of "Edges". And additionally, I had to do more math to calculate the new points
+(i.e. he has to do some intersections).<br>
+Hmmm ... .<br>
+<br>
+"That's all I 've to say about thaaat" -Forest Gump ;-)
+</body>
+</html>

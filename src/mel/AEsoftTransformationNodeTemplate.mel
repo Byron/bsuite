@@ -1,0 +1,48 @@
+global proc AEsoftTransformationNodeTemplate ( string $nodeName )
+{
+	editorTemplate -beginScrollLayout;
+		editorTemplate -beginLayout "Translation" -collapse 1;
+			editorTemplate -label "Start Point" -addControl "startPoint";
+			editorTemplate -label "End Point" -addControl "endPoint";
+
+		editorTemplate -endLayout;
+		
+		editorTemplate -beginLayout "Numerical Values" -collapse 0;
+			
+			editorTemplate -label "Visualize Falloff" -addControl "falloffVisualization";
+			
+			editorTemplate -addSeparator;
+			
+			editorTemplate -label "Mask Size" -addControl "maskSize";
+			editorTemplate -label "Distance" -addControl "distance";
+			
+			editorTemplate -addSeparator;
+				
+			editorTemplate -label "Falloff Type" -addControl "falloffType";
+				
+			editorTemplate -addSeparator;
+			
+			editorTemplate -label "Normal is Relative" -addControl "normalRelative";
+			editorTemplate -label "Uniform Scale" -addControl "scale";
+			editorTemplate -label "Along Normal" -addControl "alongNormal";
+				
+		editorTemplate -endLayout;	
+	
+			
+
+	//Label "ExtraAttributes ausschalten
+		editorTemplate  -extraControlsLabel "";		
+	
+		editorTemplate -suppress "nodeState";
+		editorTemplate -suppress "inMesh";
+		editorTemplate -suppress "caching";
+		editorTemplate -suppress "finalize";
+		editorTemplate -suppress "inVertices";
+		editorTemplate -suppress "inverseMatrix";
+		editorTemplate -suppress "outVectors";
+		editorTemplate -suppress "customFalloff";
+		editorTemplate -suppress "outWeights";
+	
+	//editorTemplate -addExtraControls;
+	editorTemplate -endScrollLayout;
+}

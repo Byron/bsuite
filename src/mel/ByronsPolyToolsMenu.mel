@@ -1,0 +1,1699 @@
+//***** BYRONS POLY TOOLS MENU SETUP *****
+
+// SEBASTIAN THIEL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+// INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+// EVENT SHALL ALIAS|WAVEFRONT BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+// CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+// DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+// TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+// PERFORMANCE OF THIS SOFTWARE.
+
+
+
+//***********************************************
+//------------UI - BEGINNING---------------------
+//***********************************************
+
+//-----------------------------------------------------------------------------
+global proc ByronsPolyToolsMenu()
+//-----------------------------------------------------------------------------
+{
+//	DESCRIPTION:
+// 	-sets up the BPT menu in the Maya menu bar
+
+
+//get rid of the bothering cycleCheckWarnings
+cycleCheck -e 0;
+
+//	global string 		$BPT_MainWindow;
+	global float		$BPTSlide = 0.5;		//global storage for the slide valuie used in the command
+	global int		$BPTedgeCount[2] = {0,0};	//first entry is MaxEdgeCount, second one is flag. If true, the fisrst entry will be ignored
+
+	global int		$BPT_EBlastCount = 1;		//holds the split count for the edge based smartSplit
+
+    if ( `menu -exists mainBPTMenu` )
+        deleteUI mainBPTMenu;
+	
+	//install the STTHotkeys if not already done
+	//STT_installHotkeys();
+
+	//optionsVars setzen
+	//----------------------------------------------------
+	if(!`optionVar -ex BPT_snl`)
+		optionVar -iv BPT_snl 0;
+	
+	if(!`optionVar -ex BPT_ascm`)
+		optionVar -iv BPT_ascm 1;
+		
+	if(!`optionVar -ex BPT_ce`)
+		optionVar -iv BPT_ce 1;
+		
+	if(!`optionVar -ex BPT_te`)
+		optionVar -iv BPT_te 0;
+		
+	if(!`optionVar -ex BPT_ucs`)
+		optionVar -iv BPT_ucs 0;
+		
+	if(!`optionVar -ex BPT_ir`)
+		optionVar -iv BPT_ir 1;
+		
+	if(!`optionVar -ex BPT_nir`)
+		optionVar -iv BPT_nir 0;
+		
+	if(!`optionVar -ex BPT_avt`)
+		optionVar -iv BPT_avt 1;
+		
+	if(!`optionVar -ex BPT_avm`)
+		optionVar -iv BPT_avm 0;
+
+	if(!`optionVar -ex BPT_slfi`)	//== SlideFalloffInterpolation
+		optionVar -iv slfi 1;
+
+	if(!`optionVar -ex BPT_anfi`)	//AlongNormalFalloffInterpolation
+		optionVar -iv BPT_anfi 1;
+		
+	if(!`optionVar -ex BPT_stfi`)	//STTFalloffInterpolation
+		optionVar -iv BPT_stfi 1;
+	
+		
+	if(!`optionVar -ex BPT_uld`)
+		optionVar -iv BPT_uld 1;
+		
+	if(!`optionVar -ex BPT_STvf`)
+		optionVar -iv BPT_STvf 1;
+		
+	if(!`optionVar -ex BPT_STnir`)
+		optionVar -iv BPT_STnir 0;
+	
+	if(!`optionVar -ex BPT_spsl`)
+		optionVar -iv BPT_spsl 2;
+	
+	if(!`optionVar -ex BPT_csl`)
+		optionVar -iv BPT_csl 2;
+	
+	if(!`optionVar -ex BPT_scsl`)
+		optionVar -iv BPT_scsl 3;
+	
+	if(!`optionVar -ex BPT_spast`)
+		optionVar -iv BPT_spast 0;
+	
+	if(!`optionVar -ex BPT_cast`)
+		optionVar -iv BPT_cast 1;
+	
+	if(!`optionVar -ex BPT_scast`)
+		optionVar -iv BPT_scast 1;
+	
+	if(!`optionVar -ex BPT_EBWE`)
+		optionVar -iv BPT_EBWE 0;
+
+	if(!`optionVar -ex BPT_EBCE`)
+		optionVar -iv BPT_CE 1;
+	//----------------------------------------------------
+	
+//	setParent $BPT_MainWindow;
+
+	menu -l "BPT 1.0"
+		-p MayaWindow
+		-to 1
+		-aob true
+		mainBPTMenu;
+
+	menuItem -l "Split: "
+ 	-sm true
+ 	-to true
+ 	-aob true
+ 	smartSplitMenuItem;
+
+	
+
+	menuItem -l "Smart Split"
+	-ann "Split through any selection"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-sp \",0))"
+	smartSplitItem;
+	
+	 	  menuItem -optionBox 1 
+		// need to add -i option
+ 		-annotation "Smart Split Options" 
+ 		-l "Smart Split Option Box" -ecr false 
+ 		-c "showSmartSplitOptionWindow(\"-sp \")"
+ 		smartSplitOptionBox; 
+
+menuItem -divider true;
+
+	menuItem -l "Smart Connect: "
+ 	-sm true
+ 	-to true
+ 	-aob true
+ 	smartSplitEBMenuItem;
+
+		menuItem -l "Connect 1 Time"
+		-ann "Split through any selection, 1 time"
+		-echoCommand false
+		-c "$BPT_EBlastCount = 1;eval(generateCmdString(\"-iv -civ \",0));"
+		smartSplitEB1Item;
+
+
+		menuItem -l "Connect 2 Times"
+		-ann "Split through any selection, 2 times"
+		-echoCommand false
+		-c "$BPT_EBlastCount = 2;eval(generateCmdString(\"-iv -civ \",0));"
+		smartSplitEB2Item;
+
+
+		menuItem -l "Connect 3 Times"
+		-ann "Split through any selection, 3 times"
+		-echoCommand false
+		-c "$BPT_EBlastCount = 3;eval(generateCmdString(\"-iv -civ \",0));"
+		smartSplitEB3Item;
+
+
+	setParent -m ..;
+
+		menuItem -l "Repeat Connect"
+		-ann "Split through any selection, using the last count"
+		-echoCommand false
+		-c "eval( generateCmdString( ( \"-iv -civ -ic \" + $BPT_EBlastCount ),0 ) );"
+		smartSplitEBItem;
+
+	 	  menuItem -optionBox 1 
+		// need to add -i option
+ 		-annotation "Smart Split Options" 
+ 		-l "Smart Split Option Box" -ecr false 
+ 		-c "showSmartSplitOptionWindow(\"-iv -civ \")"
+ 		smartSplitEBOptionBox; 
+
+menuItem -divider true;
+
+	menuItem -l "Insert Vertices"
+	-ann "Insert vertices into the edges according to your selection"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-iv \",0))"
+	smartSplitIVItem;
+	
+	 	  menuItem -optionBox 1 
+		// need to add -i option
+ 		-annotation "Insert Vertices Options" 
+ 		-l "Smart Split Option Box" -ecr false 
+ 		-c "showSmartSplitOptionWindow(\"-iv \")"
+ 		smartSplitIVOptionBox; 
+	
+
+//weitere Flags als CheckBoxItem
+	
+	menuItem -divider true;
+
+	
+	
+	//SHARED OPTIONS	
+	menuItem -l "Shared Options"
+	-en 0 
+	sharedOptionsItem;
+	
+	menuItem -divider true;
+
+
+	menuItem -l ("Slide = " + $BPTSlide)
+	-ann "The initial SlideValue"
+	-echoCommand false
+	-c "$BPTSlide =($BPTSlide + 0.1)%1.0; menuItem -e -l (\"Slide = \" + $BPTSlide) slideItem"
+	slideItem;
+	
+	
+	menuItem -l "Slide Is Relative"
+	-ann "Detemines whether slideIsRelative parameter will be true or false initially"
+	-echoCommand false
+	-c "optionVar -iv BPT_ir `menuItem -q -cb isRelativeItem`"
+	-cb `optionVar -q BPT_ir`
+	isRelativeItem;
+	
+	menuItem -l "Normal Is Relative"
+	-ann "Detemines whether normalIsRelative parameter will be true or false initially"
+	-echoCommand false
+	-c "optionVar -iv BPT_nir `menuItem -q -cb normalIsRelativeItem`"
+	-cb `optionVar -q BPT_nir`
+	normalIsRelativeItem;
+
+	setParent -m ..;
+
+
+
+
+
+	
+	menuItem -divider true;
+	
+	menuItem -l "Bevel: "
+ 	-sm true
+ 	-to true
+ 	-aob true
+ 	bevelSplitMenuItem;
+	
+		menuItem -l "Chamfer"
+	-ann "Chamfers the selection"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-c \",1))"
+	chamferItem;
+	
+		menuItem -l "Solid Chamfer"
+	-ann "Chamfers the selection, but keeps the original edges"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-sc \",1))"
+	solidChamferItem;
+	
+	menuItem -divider true;
+	
+	menuItem -l "Connect Ends"
+	-ann "Detemines whether to connect the ends of the chamferoperation or leave them open creating nGons"
+	-echoCommand false
+	-cb `optionVar -q BPT_ce`
+	-c "optionVar -iv BPT_ce `menuItem -q -cb connectEndsItem` ;if(`menuItem -q -cb triangulateEndsItem`){menuItem -e -cb 0 triangulateEndsItem; optionVar -iv BPT_te 0;}"	
+	connectEndsItem;
+	
+	
+		menuItem -l "Triangulate Ends"
+	-ann "Detemines whether to triangulate the connected ends or not"
+	-echoCommand false
+	-cb `optionVar -q BPT_te`
+	-c "optionVar -iv BPT_te `menuItem -q -cb triangulateEndsItem`; if(!(`menuItem -q -cb connectEndsItem`) ){menuItem -e -cb 1 connectEndsItem; optionVar -iv BPT_ce 1;}"
+	triangulateEndsItem;
+	
+			menuItem -l "Use Slide Of 0.2"
+	-ann "If active, the slide will be set to 0.2 initially"
+	-echoCommand false
+	-c "optionVar -iv BPT_ucs `menuItem -q -cb smallSlideEndsItem`"
+	-cb `optionVar -q BPT_ucs`
+	smallSlideEndsItem;
+	
+	menuItem -l "Normal Is Relative"
+	-ann "Detemines whether normalIsRelative parameter will be true or false initially"
+	-echoCommand false
+	-c "optionVar -iv BPT_nir `menuItem -q -cb normalIsRelativeItem`"
+	-cb `optionVar -q BPT_nir`
+	bNormalIsRelativeItem;
+	
+	setParent -m ..;
+
+
+menuItem -divider true;
+
+	menuItem -l "Selection: "
+ 	-sm true
+ 	-to true
+ 	-aob true
+ 	selectionSplitMenuItem;
+
+
+
+	menuItem -l "Smart Edge Ring"
+	-ann "Select the EdgeRings of your selection"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-er \",2))"
+	smartEdgeRingItem;
+
+
+	menuItem -l "Smart Edge Loop"
+	-ann "Select the EdgeLoops of your selection"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-el \",2))"
+	smartEdgeLoopItem;
+
+	menuItem -l "Boundary"
+	-ann "Convert your selection to the according outline"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-bnd \",2))"
+	outlineItem;
+	
+	menuItem -l "Grow"
+	-ann "Grows your selection"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-gro \",2))"
+	growItem;
+
+	menuItem -l "Shrink"
+	-ann "Shrinks your selection"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-shr \",2))"
+	shrinkItem;
+	
+
+	menuItem -divider true;
+	
+	menuItem -l "Auto Switch Component Mask"
+	-ann "Automatically switches the component mask to edges in case of edgeLoop/Ring or boundary"
+	-echoCommand false
+	-c "optionVar -iv BPT_ascm `menuItem -q -cb astItem`"
+	-cb `optionVar -q BPT_ascm`
+	astItem;
+
+	menuItem -l "Enable Count"
+	-ann "Stops loop/ringSelect after a certain edge count"
+	-echoCommand false
+	-c "if($BPTedgeCount[1] == 0){menuItem -e -l \"Disable Count\" enableMecItem; menuItem -e -l (\"MaxEdgeCount == \" + $BPTedgeCount[0]) -en 1 mecItem;$BPTedgeCount[1] = 1;}else{$BPTedgeCount[1] = 0;$BPTedgeCount[0] = 1; menuItem -e -en 0 -l \"MaxEdgeCount Disabled\" mecItem;menuItem -e -l \"Enable Count\" enableMecItem;}"
+	enableMecItem;
+	
+	menuItem -l "MaxEdgeCount Disabled"
+	-ann "Stops loop/ringSelect after a certain edge count"
+	-echoCommand false
+	-en 0
+	-c "$BPTedgeCount[0] += 1; menuItem -e -l (\"MaxEdgeCount == \" + $BPTedgeCount[0]) mecItem;"
+	mecItem;
+	
+	setParent -m ..;
+	
+	menuItem -divider true;
+	
+	
+		menuItem -l "Transformation: "
+ 	-sm true
+ 	-to true
+ 	-aob true
+ 	TransformationMenuItem;
+
+	menuItem -l "Smart Move Component"
+	-ann "Move Components along their normal or along a clear direction"
+	-echoCommand false
+	-c "eval(generateCmdString(\"-smc \",3) )"
+	SMCItem;
+
+	menuItem -divider true;
+	menuItem -divider true;
+
+	menuItem -l "Slide Without Bounds"
+	-ann "If set, the slide value can have arbitary values"
+	-echoCommand false
+	-c "optionVar -iv BPT_snl `menuItem -q -cb dontLimitSlideItem`"
+	-cb `optionVar -q BPT_snl`
+	dontLimitSlideItem;
+	
+	menuItem -divider true;
+	
+	menuItem -l "Soft Transformation Tool"
+	-ann "Move and twist your selection with soft bounds"
+	-echoCommand true
+	-c "setSoftTool()"
+	STTItem;
+
+	menuItem -divider true;
+	menuItem -divider true;	
+
+	menuItem -l "Use Last Distance"
+	-ann "If enabled, the softTransformationTool will remember the last distance when the selection changes"
+	-echoCommand false
+	-cb `optionVar -q BPT_uld`
+	-c "softTransformationTool -e -uld `menuItem -q -cb STuldItem` `currentCtx`;"
+	STuldItem;
+
+	menuItem -l "Push FaceSizeRelative"
+	-ann "If enabled, pushing will be altered by the underlying faces size"
+	-echoCommand false
+	-cb `optionVar -q BPT_STnir`
+	-c "softTransformationTool -e -uld `menuItem -q -cb STnirItem` `currentCtx`;"
+	STnirItem;
+	
+	menuItem -l "Visualize Falloff"
+	-ann "If enabled, the tool's falloff will be visualized"
+	-echoCommand false
+	-cb `optionVar -q BPT_STvf`
+	-c "softTransformationTool -e -uld `menuItem -q -cb STvfItem` `currentCtx`;"
+	STvfItem;
+
+
+	setParent -m ..;
+	menuItem -divider true;
+
+
+	menuItem -divider true;
+  menuItem -divider true;
+
+	menuItem -l "Preferences ... "
+ 	-c "showBPTPreferences"
+ 	BPT_preferencesMenuItem;	
+
+
+menuItem -divider true;
+menuItem -divider true;
+	//HelpSystem
+	
+	menuItem -l "QuickHelp"
+	-ann "Get QuickHelp on BPT"
+	-echoCommand false
+	-c "ByronsPolyTools -h"
+	helpItem;
+
+ hotBox -um;
+//check if plugin is loaded
+
+//make sure the window only shows up in modeling mode
+global string $gModelingMenus[];
+$gModelingMenus[size($gModelingMenus)] = "mainBPTMenu";
+updateMenuModeUI;
+
+if($BPTedgeCount[0] != -1) //ansonsten wurde Proc von Plug aufgerufen, weshalb das ganze hier übersprungen wird 
+{
+if(!(`pluginInfo -q -l ByronsPolyTools`))
+{
+	   if(` confirmDialog -title "Plugin NOT loaded" -message "Would you like to load ByronsPolyTools now?"
+    	-button "Yes" -button "No" -defaultButton "Yes"
+    	-cancelButton "No" -dismissString "No"` == "Yes")
+    	{
+    		loadPlugin ByronsPolyTools;
+    		
+				if(` confirmDialog -title "Autoload Plugin?" -message "Would you like to autoload ByronsPolyTools at Maya startup?"
+    		-button "Yes" -button "No" -defaultButton "Yes"
+    		-cancelButton "No" -dismissString "No"` == "Yes")
+    			
+    			pluginInfo -e -a true ByronsPolyTools;
+			}
+			else
+				deleteUI mainBPTMenu;
+				 
+				hotBox -um;
+			}
+}
+else
+	$BPTedgeCount[0] = 0;
+
+}
+
+//-----------------------------------------------------------------------------
+global proc BPT_switchPrefTabs()
+//-----------------------------------------------------------------------------
+{
+	global string $gPreferenceWindow;
+
+	//get the current index of the textScollList
+	//
+	int $index[] = `textScrollList -q -sii prefIndex`;
+	
+	// This is the number of entries in the list
+	//
+	int $base = `textScrollList -q -ni prefIndex`;
+
+
+	// base - 4 == BPT currently adds 4 own entries at the end of the list
+	//
+	if($index[0] <= ($base - 2 ) )
+	{//The index belongs to the default Maya prefs - pass control to default procedure
+		switchPrefTabs 0;
+
+		return;
+	}
+		
+	
+	setParent $gPreferenceWindow;
+	
+	//the tab belongs to me - call my procs to change the preferences window
+	//make sure NT and LinuxIndices are compatible (since in Linux there is one more entry in the list)
+	if( $index[0] == $base - 1 )
+	{
+		//BPT_GeneralPrefs
+
+				prefsCreateBPT_General;
+				tabLayout -e -selectTabIndex $index[0] prefTabs;
+				frameLayout -e 
+					-label "BPT: General Preferences" 
+					prefTitleFrame;
+	}
+	else if( $index[0] == $base )
+	{
+		//BPT_STTPrefs
+
+				prefsCreateBPT_STT;
+				tabLayout -e -selectTabIndex $index[0] prefTabs;
+				frameLayout -e 
+					-label "Soft Transformation Tool(->to be revised ):" 
+					prefTitleFrame;
+
+	}
+	
+	
+
+}
+
+//-----------------------------------------------------------------------------
+global proc showBPTPreferences()
+//-----------------------------------------------------------------------------
+{	//Changes the default MayaPreferences to contain the BPT Prefs too.
+	//This approach allows to add my prefs without overwriting files or overriding 
+	//procedures that may have been changed by third parties. 
+
+
+	//open default Maya Preferences if not there already
+	
+	global string $gPreferenceWindow;
+	if (`window -exists $gPreferenceWindow`) {
+		showWindow $gPreferenceWindow;
+		return;
+	}
+
+	PreferencesWindow;
+
+	//save the current State of the BPT prefs
+	BPT_prefsHoldCurrentState("save");
+
+	//change the window`s size to fit to all the elements at once
+	window -e -wh 633 605 $gPreferenceWindow;
+
+
+	//now add the BPT entries to the textScrollList
+	int $numPrefs = 2;
+	textScrollList -e -a "BPT" prefIndex;
+	textScrollList -e -a "    ST Tool" prefIndex;
+
+
+	setUITemplate -pushTemplate NONE;
+
+	//add the frameLayouts that will hold (and cache) the UI elements
+	setParent prefTabs;
+	frameLayout -lv false -bv false -mw 10 -mh 10;
+			    columnLayout -adj true BPT_prefGeneralCol;
+
+	
+	setParent prefTabs;
+   frameLayout -lv false -bv false -mw 10 -mh 10;
+               columnLayout -adj true BPT_prefSTTCol;
+
+
+	//override the default selectCommand to my one which allows me process the selection first
+	textScrollList -e -selectCommand "BPT_switchPrefTabs"  prefIndex;
+
+	//the editMenu cannot be changed this way because I do not know it`s name - simply add my own entries
+	//to my own edit menu
+	
+	menu -label "BPT Edit";
+    menuItem -label "Revert to Saved"
+			-c "BPT_prefsHoldCurrentState (restore);prefsUpdateBPT";
+        menuItem -label "Restore Default Settings"
+            -c "BPT_revertToFactoryPrefs; prefsUpdateBPT";
+	
+
+
+	//override the saveButtonCommand
+	button -e
+			-c "BPT_savePrefsChanges"
+			prefsSaveBtn;
+
+	//the same with the close Button
+	button -e
+			-c "BPT_cancelPrefsChanges" 
+			prefsCloseBtn;
+
+	
+	// Take into consideration that the number of prefEntries changes from version to version
+	//
+	
+
+	//Finally, set everything to show the general BPT Prefs
+	textScrollList -e -sii ( `textScrollList -q -ni prefIndex` - $numPrefs + 1 ) prefIndex;
+	BPT_switchPrefTabs();
+
+
+
+	
+}
+
+
+//-----------------------------------------------------------------------------
+global proc prefsCreateBPT_Colors()
+//-----------------------------------------------------------------------------
+{
+
+	global string $gPreferenceWindow;
+	setParent $gPreferenceWindow;
+	string $parent = "BPT_prefColorsCol";
+	
+	// Check to see if this has been created already.
+	//
+	if (`columnLayout -q -numberOfChildren $parent` > 0) {
+		return;
+	}
+
+	//Create the UI
+	setParent $parent;
+	setUITemplate -pushTemplate prefsTemplate;		
+
+	// This is used to force the width to fill the window
+	separator -style "none" -h 1 -w 490;
+
+
+	text -l "TO DO COLORS";
+
+
+
+}
+
+//-----------------------------------------------------------------------------
+global proc prefsCreateBPT_STT()
+//-----------------------------------------------------------------------------
+{
+
+	global string $gPreferenceWindow;
+	setParent $gPreferenceWindow;
+	string $parent = "BPT_prefSTTCol";
+	
+	// Check to see if this has been created already.
+	//
+	if (`columnLayout -q -numberOfChildren $parent` > 0) {
+		return;
+	}
+
+	//Create the UI
+	setParent $parent;
+	setUITemplate -pushTemplate prefsTemplate;		
+
+	// This is used to force the width to fill the window
+	separator -style "none" -h 1 -w 490;
+
+
+	frameLayout -l "<- Initial Settings ->";
+	    columnLayout -adj true;
+		
+	separator -style "none" -h 10 -w 490;
+	
+ 		checkBoxGrp -ncb 3
+				-l "" 
+				-la3 "Use Last Distance" "Push FaceSizeRelative" "Visualize Falloff"
+				-cc1 "optionVar -iv BPT_uld #1"
+				-cc2 "optionVar -iv BPT_STnir #1"
+				-cc3 "optionVar -iv BPT_STvf #1"
+				-cw4 20 160 160 160
+				-ann ""
+				bpt_pref_STInitial3;
+
+	setParent ..;
+
+
+	//Finally, make sure the UIElements have the current Values
+	prefsUpdateBPT;
+
+}
+
+
+
+//-----------------------------------------------------------------------------
+global proc prefsCreateBPT_General()
+//-----------------------------------------------------------------------------
+{
+	global string $gPreferenceWindow;
+	setParent $gPreferenceWindow;
+	string $parent = "BPT_prefGeneralCol";
+	
+	// Check to see if this has been created already.
+	//
+	if (`columnLayout -q -numberOfChildren $parent` > 0) {
+		return;
+	}
+
+	//Create the UI
+	setParent $parent;
+	setUITemplate -pushTemplate prefsTemplate;		
+
+	// This is used to force the width to fill the window
+	separator -style "none" -h 1 -w 490;
+	
+	
+	frameLayout -l "<- Initial Settings ->";
+	    columnLayout -adj true;
+		
+	separator -style "none" -h 10 -w 490;
+	frameLayout -l "Sliding";
+	    columnLayout -adj true;
+	
+ 		checkBoxGrp -ncb 3
+				-l "" 
+				-la3 "Slide Not Limited" "Slide Relative" "Normal Relative"
+				-cc1 "optionVar -iv BPT_snl #1"
+				-cc2 "optionVar -iv BPT_ir #1"
+				-cc3 "optionVar -iv BPT_nir #1"
+				-cw4 20 160 160 160
+				-ann "1: If false, sliding will be limited to a 0 - 1 boundary - 2: If true, the slide parameter will map to the edge itself - 3: If true, sliding along the normals will take the face size into account"
+				bpt_pref_slide3;
+
+		setParent ..;
+		setParent ..;
+
+	separator -style "none" -h 10 -w 490;
+
+	frameLayout -l "Visualization";
+	    columnLayout -adj true;
+
+		checkBoxGrp -ncb 1
+				-l "" 
+				-l1 "Visualize Falloff"  
+				-cc1 "optionVar -iv BPT_avt #1"
+				-cw2 20 240
+				-ann "1: Initially visualize the falloff if appropriate"
+				bpt_pref_vis2;
+
+		setParent ..;
+		setParent ..;
+
+
+		separator -style "none" -h 10 -w 490;
+
+		frameLayout -l "Falloff Interpolation Type";
+				  rowColumnLayout -nc 3 	
+					-cal 1 "center" 
+					-cal 2 "center"
+					-cal 3 "center"
+					-cw  1 180 
+					-cw  2 180
+					-cw  3 180;
+		
+		separator -style "none" -h 5 ;
+		separator -style "none" -h 5 ;
+		separator -style "none" -h 5 ;
+
+		optionMenu 
+				-l "Slide Falloff" 
+				-cc "optionVar -iv BPT_slfi (`optionMenu -q -sl bpt_pref_isfslide`-1) "
+				-ann "Determines the initial interpolation type for the slideFalloff"
+				bpt_pref_isfslide;
+				
+			    	menuItem -l "Linear";
+			    	menuItem -l "Smooth";
+					menuItem -l "Spike";
+					menuItem -l "Dome";
+
+		
+		optionMenu 
+				-l "Along Normal Falloff" 
+				-cc "optionVar -iv BPT_anfi (`optionMenu -q -sl bpt_pref_isfan`-1) "
+				-ann "Determines the initial interpolation type for the along normal Falloff"
+				bpt_pref_isfan;
+				
+			    	menuItem -l "Linear";
+			    	menuItem -l "Smooth";
+					menuItem -l "Spike";
+					menuItem -l "Dome";
+
+		optionMenu 
+				-l "ST Tool Falloff" 
+				-cc "optionVar -iv BPT_stfi (`optionMenu -q -sl bpt_pref_isfst`-1) "
+				-ann "Determines the initial interpolation type for the Soft Transformation Tool Falloff"
+				bpt_pref_isfst;
+				
+			    	menuItem -l "Linear";
+			    	menuItem -l "Smooth";
+					menuItem -l "Spike";
+					menuItem -l "Dome";
+
+
+	setParent $parent;			
+
+	separator -style "none" -h 20 -w 490;		
+
+	frameLayout -l "<- Split ->";
+	  rowColumnLayout -nc 2 	-cal 1 "center" 
+					-cal 2 "center"
+					-cw  1 240 
+					-cw  2 220;
+		frameLayout -l "Smart Split";
+			checkBoxGrp -ncb 1
+				-l "" 
+				-l1 "Distuingish Component Types"
+				-cc1 "optionVar -iv BPT_EBWE #1"
+				-cw2 20 240
+				-ann "In case you selected edges and invoke a smartSplit, this will automatically create an edgebased connect node"
+				bpt_pref_ebwe;
+
+
+		setParent ..;
+		
+
+		frameLayout -l "Smart Connect";
+			checkBoxGrp -ncb 1
+				-l "" 
+				-l1 "Center Edges"
+				-cc1 "optionVar -iv BPT_EBCE #1"
+				-cw2 20 240
+				-ann "Connect Nodes will start with a slide twice as high as normal to look equal to"
+				bpt_pref_ebce;
+
+	setParent $parent;
+
+	separator -style "none" -h 20 -w 490;
+
+	frameLayout -l "<- Bevel ->";
+		 columnLayout -adj true;
+			checkBoxGrp -ncb 3
+				-l "" 
+				-la3 "Connect Ends" "Triangulate Ends" "Use Slide Of 0.2"
+				-cc1 "optionVar -iv BPT_ce #1; if(!#1 && !`checkBoxGrp -q -value2 bpt_pref_bevel`){checkBoxGrp -e -value2 0 bpt_pref_bevel; optionVar -iv BPT_te 0;}"
+				-cc2 "optionVar -iv BPT_te #1; if(#1 && !`checkBoxGrp -q -value1 bpt_pref_bevel`){checkBoxGrp -e -value1 1 bpt_pref_bevel; optionVar -iv BPT_ce 1;}"
+				-cc3 "optionVar -iv BPT_ucs #1"
+				-cw4 20 160 160 160
+				-ann "1: Connect the ends of the Bevel to the next available vertex - 2: Triangulate the faces created by the connect ends operation -3: Initially set the slide to 0.2"
+				bpt_pref_bevel;
+
+	setParent $parent;
+	
+	
+	separator -style "none" -h 20 -w 490;
+
+
+
+
+	frameLayout -l "<- Selection ->";
+	columnLayout -adj true;
+	frameLayout -l "Auto Select";
+	
+	    rowColumnLayout -nc 3 	-cal 1 "center" 
+					-cal 2 "center"
+					-cal 3 "center"
+					-cw  1 180 
+					-cw  2 180
+					-cw  3 180;
+
+		separator -style "none" -h 5 ;
+		separator -style "none" -h 5 ;
+		separator -style "none" -h 5 ;
+		
+		
+		optionMenu 
+				-l "Split" 
+				-cc "optionVar -iv BPT_spsl (`optionMenu -q -sl bpt_pref_ASSplit`-1) "
+				-ann "Automatically select the chosen component type after a split"
+				bpt_pref_ASSplit;
+				
+			    	menuItem -l "None";
+			    	menuItem -l "Vertices";
+					menuItem -l "Edges";
+					menuItem -l "Faces";
+		
+
+		optionMenu 
+				-l "Chamfer" 
+				-cc "optionVar -iv BPT_csl (`optionMenu -q -sl bpt_pref_ASChamfer`-1) "
+				-ann "Automatically select the chosen component type after a chamfer"
+				bpt_pref_ASChamfer;
+				
+			    	menuItem -l "None";
+			    	menuItem -l "Vertices";
+					menuItem -l "Edges";
+					menuItem -l "Faces";
+
+		optionMenu 
+				-l "Solid Chamfer" 
+				-cc "optionVar -iv BPT_scsl (`optionMenu -q -sl bpt_pref_ASSolidChamfer`-1) "
+				-w 100
+				-ann "Automatically select the chosen component type after a solid chamfer"
+				bpt_pref_ASSolidChamfer;
+				
+			    	menuItem -l "None";
+			    	menuItem -l "Vertices";
+				menuItem -l "Inner Edges";
+				menuItem -l "Outer Edges";
+				menuItem -l "Inner + Outer Edges";
+				menuItem -l "Faces";
+		
+	
+
+
+
+	setParent ..;
+	setParent ..;
+	
+	separator -style "none" -h 10 -w 490;
+
+	frameLayout -l "Auto Switch Component Mask";
+	    columnLayout -adj true;
+
+		    checkBoxGrp -ncb 4
+				-l "" 
+				-la4 "Split" "Chamfer" "Solid Chamfer" "Selection"
+				-cc1 "optionVar -iv BPT_spast #1"
+				-cc2 "optionVar -iv BPT_cast #1"
+				-cc3 "optionVar -iv BPT_scast #1"
+				-cc4 "optionVar -iv BPT_ascm #1"
+				-cw5 20 120 120 120 120
+				-ann "Automatically switches the component mask to the appropriate type"
+				bpt_pref_ascm;
+	
+	setParent $parent;
+
+	
+	
+		
+
+	//Finally, make sure the UIElements have the current Values
+	prefsUpdateBPT;	
+}
+
+
+//-----------------------------------------------------------------------------
+global proc prefsUpdateBPT()
+//-----------------------------------------------------------------------------
+{
+	//updates the UIElements of every BPT Pref section (if applicable)
+	//with the current optionVarValues
+	
+	string $parent = "BPT_prefGeneralCol";
+	if (`columnLayout -q -numberOfChildren $parent` > 0) 
+	{
+		checkBoxGrp -e
+				-value1 `optionVar -q BPT_snl`
+				-value2 `optionVar -q BPT_ir`
+				-value3 `optionVar -q BPT_nir`
+				bpt_pref_slide3;
+		
+		checkBoxGrp -e 
+				-value1 `optionVar -q BPT_spast`
+				-value2 `optionVar -q BPT_cast`
+				-value3 `optionVar -q BPT_scast`
+				-value4 `optionVar -q BPT_ascm`
+				bpt_pref_ascm;	
+		
+
+		checkBoxGrp -e
+				-value1 `optionVar -q BPT_ce`
+				-value2 `optionVar -q BPT_te`
+				-value3 `optionVar -q BPT_ucs`
+				bpt_pref_bevel;
+
+		optionMenu -e
+				-sl (`optionVar -q BPT_scsl` + 1)
+				bpt_pref_ASSolidChamfer;	
+
+		optionMenu -e
+				-sl (`optionVar -q BPT_csl` + 1)
+				bpt_pref_ASChamfer;
+
+		optionMenu -e
+				-sl (`optionVar -q BPT_spsl` + 1)
+				bpt_pref_ASSplit;
+
+		optionMenu -e
+				-sl (`optionVar -q BPT_anfi` + 1)
+				bpt_pref_isfan;
+
+		
+		optionMenu -e
+				-sl (`optionVar -q BPT_slfi` + 1)
+				bpt_pref_isfslide;
+
+		optionMenu -e
+				-sl (`optionVar -q BPT_stfi` + 1)
+				bpt_pref_isfst;
+
+		
+		checkBoxGrp -e
+				-value1 `optionVar -q BPT_EBWE`
+				bpt_pref_ebwe;
+
+		checkBoxGrp -e
+				-value1 `optionVar -q BPT_EBCE`
+				bpt_pref_ebce;
+
+		checkBoxGrp -e
+				-value1 `optionVar -q BPT_avt`
+				bpt_pref_vis2;
+	}
+
+	string $parent = "BPT_prefSTTCol";
+	if (`columnLayout -q -numberOfChildren $parent` > 0) 
+	{
+		
+
+		// STT
+		//
+		checkBoxGrp -e
+				-value1 `optionVar -q BPT_uld`
+				-value2 `optionVar -q BPT_STnir`
+				-value3 `optionVar -q BPT_STvf`
+				bpt_pref_STInitial3;
+	}
+
+}
+
+//-----------------------------------------------------------------------------
+global proc showBPTHelpWindow()
+//-----------------------------------------------------------------------------
+{
+	//DESCRIPTION:
+
+	//-shows a help window with the most important commands directly inside of Maya
+	
+			
+if(`window -ex BPTHelpWindow`)
+	deleteUI BPTHelpWindow;
+		
+window -title "ByronsPolyTools QuickHelp" -w 400 -h 300 -s 0 "BPTHelpWindow";
+
+	tabLayout "BPT_tabs";
+
+	rowColumnLayout 
+		-nc 1
+		-cw 1 400
+		-cal 1 left
+		smartSplit;
+
+	
+		text -label "\n\n-Splits trough every Face/edge/vertexSelection\n\n Command is:\n ByronsPolyTools -smartSplit\n\nAdditional Flags are:\n\n-slide <floatValue> :Value range from 0.0-1.0,\n determines whether splitline is in the middle (0.5) or not\n\n-relative  : determines whether split is relative or absolute\n\nExample:\nByronsPolyTools -smartSplit -slide 0.375 -relative" ;
+	
+	setParent BPTHelpWindow;
+
+
+	rowColumnLayout 
+		-nc 1
+		-cw 1 400
+		-cal 1 left
+		Bevel;
+
+	
+		text -label "\n\n-Bevels every Face/edge/vertexSelection\n There are two types:\n\n Solid Chamfer: will chamfer the selected edges, keeping the original edge.\n  Command is:\n ByronsPolyTools -Chamfer\n\n Solid Chamfer: will chamfer the selected edges, deleting the original edge.\n  Command is:\n ByronsPolyTools -chamfer\n\n    Additional Flags are:\n\n-slide <floatValue> :Value range from 0.0-1.0,\n determines whether splitline is in the middle (0.5) or not\n\n-connectEnds  : connect the endings of the chamfer or not\n\n -triangulateEnds  : triangulate the ends (if created)\n\nExample:\nByronsPolyTools -solidChamfer -slide 0.2 -connectEnds -triangulateEnds" ;
+	
+	setParent BPTHelpWindow;
+
+	rowColumnLayout 
+		-nc 1
+		-cw 1 400
+		-cal 1 left
+		smartEdgeLoop;
+
+		text -label "\n\n-Selects an EdgeLoop(s) according to your face/Vertex/Edge selection\n\nCommand is:\nByronsPolyTools -edgeLoop\n\nAdditional Flags:\n\n-maxEdgeCount <intValiue> \nDetermines the edgeCount which will stop the edgeLoopsearch\n\nExample:\nByronsPolyTools -edgeLoop -maxEdgeCount 25";
+	
+	setParent BPTHelpWindow;
+		
+	rowColumnLayout 
+		-nc 1
+		-cw 1 400
+		-cal 1 left
+		smartEdgeRing;
+
+		text -label "\n\n-Selects an EdgeRings(s) according to your face/Vertex/Edge selection\n\nCommand is:\nByronsPolyTools -edgeRing\n\nAdditional Flags:\n\n-maxEdgeCount <intValiue> \nDetermines the edgeCount which will stop the edgeRingsearch\n\nExample:\nByronsPolyTools -edgeRing -maxEdgeCount 25";
+
+
+	setParent BPTHelpWindow;
+	
+	rowColumnLayout 
+		-nc 1
+		-cw 1 400
+		-cal 1 left
+		boundary;
+
+		text -label "\n\n-Convert your face/edge/vtx selection to it's outline\n\n-command:\n\nByronsPolyTools -boundary";
+
+
+tabLayout -e -psc "if(`tabLayout -q -sti BPT_tabs` ==2)window -e -w 360 -h 380 BPTHelpWindow; else window -e -w 360 -h 280 BPTHelpWindow;" "BPT_tabs";
+
+
+
+
+showWindow;
+
+window -e -w 360 -h 280 BPTHelpWindow;
+}
+
+
+//-----------------------------------------------------------------------------
+global proc showSmartSplitOptionWindow(string $command)
+//-----------------------------------------------------------------------------
+{
+	//DESCRIPTION:
+		
+	//-shows an optionwindow for smartSplit when the respective optionbox is clicked
+	
+	//-will differ between the commands -sp and -iv and -iv -civ, to show a different window
+
+	
+	global float	$BPTSlide;
+	global int 	$BPT_EBlastCount;
+
+
+
+	//check which command is used
+	string $commandItems[];		//returnvalue of the tokenize command
+	
+	if( !tokenizeList( $command, $commandItems ) )
+	{
+		error "Optionswindow could not be created";
+		return;	
+	}
+
+
+	if(`window -ex SmartSplitOptionsWindow`)
+		deleteUI SmartSplitOptionsWindow;
+	
+
+	window -title "Options" -w 250 -h 87 -s 0 "SmartSplitOptionsWindow";
+		
+		columnLayout;
+
+
+	if( $commandItems[0] == "-sp" )
+	{
+	
+
+	
+		frameLayout -l ("Slide: " + $BPTSlide) -labelAlign "center"
+    					-borderStyle "out" 
+    					smartSPlitFrameLayout;
+
+		columnLayout;
+	
+		floatSliderGrp  -field true
+    		-minValue 0.0 -maxValue 1.0
+    		-step 0.01
+    		-cc "$BPTSlide = `floatSliderGrp -q -v slideFloatGrp`;frameLayout -e -l (\"Slide: \" + $BPTSlide) smartSPlitFrameLayout ; menuItem -e -l (\"Slide = \" + $BPTSlide ) slideItem"
+    		-value $BPTSlide
+    		slideFloatGrp;
+    	
+    		setParent ..;setParent ..;
+    	
+   		rowColumnLayout 
+   		-cw 1 81
+   		-cw 2 81
+   		-cw 3 81
+		-nc 3;
+		
+			button -l "Smart Split" -c "deleteUI SmartSplitOptionsWindow;  eval(generateCmdString(\"-sp \",0))";
+			button -l "Apply" -c "eval(generateCmdString(\"-sp \",0))";
+			button -l "Cancel" -c "deleteUI SmartSplitOptionsWindow"; 
+
+	
+		showWindow;
+	
+		window -e -w 250 -h 87 SmartSplitOptionsWindow;
+
+	}
+	else
+	{
+
+		frameLayout -l ("Slide: " + $BPTSlide) -labelAlign "center"
+    					-borderStyle "out" 
+    					smartSPlitFrameLayout;
+
+		columnLayout;
+	
+		floatSliderGrp  -field true
+    		-minValue 0.0 -maxValue 1.0
+    		-step 0.01
+    		-cc "$BPTSlide = `floatSliderGrp -q -v slideFloatGrp`;frameLayout -e -l (\"Slide: \" + $BPTSlide) smartSPlitFrameLayout ; menuItem -e -l (\"Slide = \" + $BPTSlide ) slideItem"
+    		-value $BPTSlide
+    		slideFloatGrp;
+    	
+    		setParent ..;setParent ..;
+
+
+
+
+		frameLayout -l ("Cut Count: " + $BPT_EBlastCount) -labelAlign "center"
+    				-borderStyle "out" 
+    				cutFrameLayout;
+
+		columnLayout;
+	
+		intSliderGrp  -field true
+    		-minValue 1 -maxValue 5 -fmx 10
+    		-cc "$BPT_EBlastCount = `intSliderGrp -q -v cutIntGrp`;frameLayout -e -l (\"Cut Count: \" + $BPT_EBlastCount) cutFrameLayout;"
+    		-value $BPT_EBlastCount
+    		cutIntGrp;
+    	
+    		setParent ..;setParent ..;
+    	
+   		rowColumnLayout 
+   		-cw 1 81
+   		-cw 2 81
+   		-cw 3 81
+		-nc 3;
+		
+		if( match ("-civ", $command) == "-civ" )
+		{ 
+			button -l "Connect" -c "deleteUI SmartSplitOptionsWindow;  eval(generateCmdString(\"-iv -civ \",0))";
+			button -l "Apply" -c "eval(generateCmdString(\"-iv -civ \",0))";
+			
+		}
+		else
+		{
+			button -l "Insert Vertices" -c "deleteUI SmartSplitOptionsWindow;  eval(generateCmdString(\"-iv \",0))";
+			button -l "Apply" -c "eval(generateCmdString(\"-iv \",0))";
+		}
+		
+		button -l "Cancel" -c "deleteUI SmartSplitOptionsWindow"; 
+
+		showWindow;
+	
+		window -e -w 250 -h 125 SmartSplitOptionsWindow;
+
+	}
+}
+
+//***********************************************
+//------------UI - END---------------------
+//***********************************************
+
+
+//***********************************************
+//------------COMMAND PROCEDURES-----------------
+//***********************************************
+
+
+//-----------------------------------------------------------------------------
+global proc setSoftTool()
+//-----------------------------------------------------------------------------
+{
+		//DESCRIPTION:
+		
+		//starts up the soft transformation tool 
+		
+	
+	
+	//falloffPrefs setzen
+	
+	eval("softTransformationTool -e -ft `optionVar -q BPT_stfi` softTransformationTool1");
+	
+	
+	
+	eval("softTransformationTool -e -uld `menuItem -q -cb STuldItem` softTransformationTool1");
+	eval("softTransformationTool -e -vf `menuItem -q -cb STvfItem` softTransformationTool1");
+	eval("softTransformationTool -e -nir `menuItem -q -cb STnirItem` softTransformationTool1");
+	
+	setToolTo softTransformationTool1;
+}
+
+
+//-----------------------------------------------------------------------------
+global proc string generateCmdString(string $action, int $mode)
+//-----------------------------------------------------------------------------
+{
+	//mode: 0 = smartSplit, 1 = bevel, 2 = selection, 3 transformation
+	
+	global float	$BPTSlide;
+	global int	$BPTedgeCount[];
+		
+	global int	$BPT_EBlastCount;
+	
+	string $cmd = "ByronsPolyTools ";
+	
+	int $isIV = ( match("-iv ", $action) == "-iv ");	//holds info, whether IV is set or not
+
+	$cmd += $action; 	//last character of $action string has to be a space
+	
+
+	//add specific flags
+	switch($mode)
+	{
+	case 0:
+		{
+		
+		//find out which action to use (and which options)
+		
+		if( !$isIV )
+		{
+			$cmd += "-sl " + $BPTSlide + " ";
+
+			if(`optionVar -q BPT_EBWE`)
+				$cmd += "-peb ";	//-peb = prefer EdgeBased
+		}
+		else
+		{
+			//the civ flag has to be inside the $action String			
+
+			if(`optionVar -q BPT_EBCE`)
+				$cmd += "-sl 1 " ;
+			else
+				$cmd += "-sl " + $BPTSlide + " ";
+
+			//add split count
+			$cmd += "-ic " + $BPT_EBlastCount + " ";
+										
+		}
+
+		if(`optionVar-q BPT_ir`)
+			$cmd += "-sir ";
+		
+		if(`optionVar-q BPT_nir`)
+			$cmd += "-nir ";	 
+			
+
+		//add autoSelect Flags
+		if(`optionVar -q BPT_spsl`)
+		{
+			if(`optionVar -q BPT_spsl` == 1)
+				$cmd += "-sv ";
+			
+			else if(`optionVar -q BPT_spsl` == 2)
+				$cmd += "-se ";
+			
+			else if(`optionVar -q BPT_spsl` == 3)
+				$cmd += "-sf ";
+			
+			if(`optionVar -q BPT_spast`)
+				$cmd += "-ast ";
+		}
+
+		break;
+		}
+	case 1:
+		{
+
+		if(`optionVar -q BPT_ce`)
+			$cmd += "-ce ";
+	
+		if(`optionVar -q BPT_te`)
+			$cmd += "-te "; 
+	
+		if(`optionVar -q BPT_ucs`)
+			$cmd += "-sl 0.2 "; 
+			
+		if(`optionVar-q BPT_nir`)
+			$cmd += "-nir ";
+
+
+		if($action == "-c ")
+		{
+			if(`optionVar -q BPT_csl`)
+			{
+				if(`optionVar -q BPT_csl` == 1)
+					$cmd += "-sv ";
+			
+				else if(`optionVar -q BPT_csl` == 2)
+					$cmd += "-se ";
+			
+				else if(`optionVar -q BPT_csl` == 3)
+					$cmd += "-sf ";
+				
+				if(`optionVar -q BPT_cast`)
+				$cmd += "-ast ";
+			}		
+		}
+		else
+		{
+			if(`optionVar -q BPT_scsl`)
+			{
+				if(`optionVar -q BPT_scsl` == 1)
+					$cmd += "-sv ";
+			
+				else if(`optionVar -q BPT_scsl` == 2)
+					$cmd += "-se ";
+			
+				else if(`optionVar -q BPT_scsl` == 3)
+					$cmd += "-oe ";
+				
+				else if(`optionVar -q BPT_scsl` == 4)
+					$cmd += "-se -oe ";
+				
+				else if(`optionVar -q BPT_scsl` == 5)
+					$cmd += "-sf ";
+				
+				if(`optionVar -q BPT_scast`)
+				$cmd += "-ast ";
+			}	
+			
+		}
+		
+		break;
+		}
+	case 2:
+		{
+		if( `optionVar -q BPT_ascm` && !( ($action == "-gro ") || ($action == "-shr ") ))
+				$cmd += "-ast ";
+
+		if( ($BPTedgeCount[1] == 1) && !(($action == "-gro ") || ($action == "-shr ")) )
+				$cmd += "-mec " + $BPTedgeCount[0] + " ";
+
+		break;
+		}
+	case 3:
+		{
+
+		break;
+		}
+
+	}
+
+	//add standard flags
+	
+	if($action == "-smc ")
+	{
+		if(`optionVar -q BPT_snl`)
+			$cmd += "-snl ";
+			
+	}
+	else
+	{	
+		if(`optionVar -q BPT_snl` && $mode != 2)
+			$cmd += "-snl ";
+	}
+
+	if(!$isIV)
+	{
+		if(`optionVar -q BPT_avt` && $mode != 2)
+			$cmd += "-avf ";
+		
+		if(`optionVar -q BPT_avm` && $mode != 2)
+			$cmd += "-avm ";
+	}	
+
+	//for the user
+	print($cmd + "\n");
+
+	return $cmd;
+
+
+}
+
+
+
+//***********************************************
+//------------COMMAND END------------------------
+//***********************************************
+
+
+//***********************************************
+//------------HELPER PROCEDURES-----------------
+//***********************************************
+
+//-----------------------------------------------------------------------------
+global proc int BPT_rbCheckState(string $optionName, int $checkValue)
+//-----------------------------------------------------------------------------
+{
+	if( `optionVar -q $optionName` == $checkValue )
+		return 1;
+	else
+		return 0;
+}
+
+//-----------------------------------------------------------------------------
+global proc BPT_cancelPrefsChanges()
+//-----------------------------------------------------------------------------
+{
+	//revert BPT Vars to saved state and call the native procedure
+	BPT_prefsHoldCurrentState ("restore");
+
+	//cleanup
+	BPT_prefsHoldCurrentState ("delete");
+
+
+	cancelPrefsChanges;
+}
+
+//-----------------------------------------------------------------------------
+global proc BPT_savePrefsChanges()
+//-----------------------------------------------------------------------------
+{
+	//simply remove the optionVarHolders and let the native procedure do the rest
+	BPT_prefsHoldCurrentState ("delete");
+	
+	savePrefsChanges;
+
+}
+
+//-----------------------------------------------------------------------------
+global proc BPT_revertToFactoryPrefs()
+//-----------------------------------------------------------------------------
+{ 
+
+		optionVar -iv BPT_snl 0;
+		optionVar -iv BPT_ascm 1;
+		optionVar -iv BPT_ce 1;
+		optionVar -iv BPT_te 0;
+		optionVar -iv BPT_ucs 0;
+		optionVar -iv BPT_ir 1;
+		optionVar -iv BPT_nir 0;
+		optionVar -iv BPT_avt 1;
+		optionVar -iv BPT_avm 0;
+		optionVar -iv slfi 1;
+		optionVar -iv BPT_anfi 1;
+		optionVar -iv BPT_stfi 1;
+		optionVar -iv BPT_uld 1;
+		optionVar -iv BPT_STvf 1;
+		optionVar -iv BPT_STnir 0;
+		optionVar -iv BPT_spsl 2;
+		optionVar -iv BPT_csl 2;
+		optionVar -iv BPT_scsl 3;
+		optionVar -iv BPT_spast 0;
+		optionVar -iv BPT_cast 1;
+		optionVar -iv BPT_scast 1;
+		optionVar -iv BPT_EBWE 0;
+		optionVar -iv BPT_CE 1;
+
+}
+
+//-----------------------------------------------------------------------------
+global proc BPT_prefsHoldCurrentState (string $mode) 
+//-----------------------------------------------------------------------------
+//
+//	$mode = "save" to save a copy of the current pref optVars
+//		  = "restore" to restore the values from the saved version
+//		  = "delete" to delete the temporary option vars
+//
+{
+	//this methode cares abotu BPT variables and allows me to keep the original files untouched since I only 
+	//replace procedures at runtime, only if BPT is in use
+
+	if($mode == "save")
+	{
+
+		optionVar -iv BPT_snlHold		`optionVar -q BPT_snl` ;
+		optionVar -iv BPT_ascmHold		`optionVar -q BPT_ascm` ;
+		optionVar -iv BPT_ceHold		`optionVar -q BPT_ce` ;
+		optionVar -iv BPT_teHold		`optionVar -q BPT_te` ;
+		optionVar -iv BPT_ucsHold		`optionVar -q BPT_ucs` ;
+		optionVar -iv BPT_irHold		`optionVar -q BPT_ir` ;
+		optionVar -iv BPT_nirHold		`optionVar -q BPT_nir` ;
+		optionVar -iv BPT_avtHold		`optionVar -q BPT_avt`;
+		optionVar -iv BPT_avmHold		`optionVar -q BPT_avm`;
+		optionVar -iv BPT_slfiHold		`optionVar -q BPT_slfi`;
+		optionVar -iv BPT_anfiHold		`optionVar -q BPT_anfi` ;
+		optionVar -iv BPT_stfiHold		`optionVar -q BPT_stfi`;
+		optionVar -iv BPT_uldHold		`optionVar -q BPT_uld` ;
+		optionVar -iv BPT_STvfHold		`optionVar -q BPT_STvf`;
+		optionVar -iv BPT_STnirHold		`optionVar -q BPT_STnir`; 
+		optionVar -iv BPT_spslHold		`optionVar -q BPT_spsl`;
+		optionVar -iv BPT_cslHold		`optionVar -q BPT_csl`;
+		optionVar -iv BPT_scslHold		`optionVar -q BPT_scsl`;
+		optionVar -iv BPT_spastHold		`optionVar -q BPT_spast`;
+		optionVar -iv BPT_castHold		`optionVar -q BPT_cast`;
+		optionVar -iv BPT_scastHold		`optionVar -q BPT_scast`;		
+		optionVar -iv BPT_EBEWHold		`optionVar -q BPT_EBEW`;
+		optionVar -iv BPT_EBCEHold		`optionVar -q BPT_EBCE`;
+
+	}
+	else if($mode == "restore")
+	{
+
+		optionVar -iv BPT_snl		`optionVar -q BPT_snlHold` ;
+		optionVar -iv BPT_ascm		`optionVar -q BPT_ascmHold` ;
+		optionVar -iv BPT_ce		`optionVar -q BPT_ceHold` ;
+		optionVar -iv BPT_te		`optionVar -q BPT_teHold` ;
+		optionVar -iv BPT_ucs		`optionVar -q BPT_ucsHold` ;
+		optionVar -iv BPT_ir		`optionVar -q BPT_irHold` ;
+		optionVar -iv BPT_nir		`optionVar -q BPT_nirHold` ;
+		optionVar -iv BPT_avt		`optionVar -q BPT_avtHold`;
+		optionVar -iv BPT_avm		`optionVar -q BPT_avmHold`;
+		optionVar -iv BPT_slfi		`optionVar -q BPT_slfiHold`;
+		optionVar -iv BPT_anfi		`optionVar -q BPT_anfiHold` ;
+		optionVar -iv BPT_stfi		`optionVar -q BPT_stfiHold`;
+		optionVar -iv BPT_uld		`optionVar -q BPT_uldHold` ;
+		optionVar -iv BPT_STvf		`optionVar -q BPT_STvfHold`;
+		optionVar -iv BPT_STnir		`optionVar -q BPT_STnirHold`; 
+		optionVar -iv BPT_spsl		`optionVar -q BPT_spslHold`;
+		optionVar -iv BPT_csl		`optionVar -q BPT_cslHold`;
+		optionVar -iv BPT_scsl		`optionVar -q BPT_scslHold`;
+		optionVar -iv BPT_spast		`optionVar -q BPT_spastHold`;
+		optionVar -iv BPT_cast		`optionVar -q BPT_castHold`;
+		optionVar -iv BPT_scast		`optionVar -q BPT_scastHold`;		
+		optionVar -iv BPT_EBEW		`optionVar -q BPT_EBEWHold`;
+		optionVar -iv BPT_EBCE		`optionVar -q BPT_EBCEHold`;
+
+	}
+	else
+	{
+		optionVar -rm BPT_snlHold ;
+		optionVar -rm BPT_ascmHold ;
+		optionVar -rm BPT_ceHold ;
+		optionVar -rm BPT_teHold ;
+		optionVar -rm BPT_ucsHold ;
+		optionVar -rm BPT_irHold ;
+		optionVar -rm BPT_nirHold ;
+		optionVar -rm BPT_avtHold ;
+		optionVar -rm BPT_avmHold ;
+		optionVar -rm BPT_slfiHold ;
+		optionVar -rm BPT_anfiHold ;
+		optionVar -rm BPT_stfiHold ;
+		optionVar -rm BPT_uldHold ;
+		optionVar -rm BPT_STvfHold ;
+		optionVar -rm BPT_STnirHold; 
+		optionVar -rm BPT_spslHold ;
+		optionVar -rm BPT_cslHold ;
+		optionVar -rm BPT_scslHold ;
+		optionVar -rm BPT_spastHold ;
+		optionVar -rm BPT_castHold ;
+		optionVar -rm BPT_scastHold ;		
+		optionVar -rm BPT_EBEWHold ;
+		optionVar -rm BPT_EBCEHold ;
+
+	}
+
+
+}
+
+//---------------------------------
+global proc BPT_uninstall()
+//---------------------------------
+{//deletes optionVars
+
+	//delete optionVars
+		
+	optionVar -rm BPT_snl ;
+	
+	optionVar -rm BPT_ascm ;
+	
+	optionVar -rm BPT_ce ;
+	
+	optionVar -rm BPT_te ;
+	
+	optionVar -rm BPT_ucs ;
+	
+	optionVar -rm BPT_ir ;
+	
+	optionVar -rm BPT_nir ;
+	
+	optionVar -rm BPT_avt ;
+	
+	optionVar -rm BPT_avm ;
+	
+	optionVar -rm BPT_slfi ;
+	
+	optionVar -rm BPT_anfi ;
+	
+	optionVar -rm BPT_stfi ;
+	
+	optionVar -rm BPT_uld ;
+	
+	optionVar -rm BPT_STvf ;
+	
+	optionVar -rm BPT_STnir ;
+
+	optionVar -rm BPT_spsl ;
+
+	optionVar -rm BPT_csl ;
+
+	optionVar -rm BPT_scsl ;
+
+	optionVar -rm BPT_spast ;
+
+	optionVar -rm BPT_cast ;
+
+	optionVar -rm BPT_scast ;		
+
+	optionVar -rm BPT_EBEW ;
+
+	optionVar -rm BPT_EBCE ;
+
+
+	//turn off plugin autoload
+	pluginInfo -e -a false ByronsPolyTools;
+
+	//BPT uninstalled successfully
+	warning "BPT uninstalled successfully";
+}
+
+//***********************************************
+//------------HELPER PROCEDURES END--------------
+//***********************************************
+
+

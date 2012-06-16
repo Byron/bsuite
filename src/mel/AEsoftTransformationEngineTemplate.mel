@@ -1,0 +1,72 @@
+global proc AEsoftTransformationEngineTemplate ( string $nodeName )
+{
+	
+
+	editorTemplate -beginLayout "Soft Transformation Engine" -collapse 0;
+		
+
+		////////////////
+		// NUM VALUES //
+		////////////////
+		editorTemplate -beginLayout "Numerical Values" -collapse 0;
+			
+			editorTemplate -label "Show Weights" -addControl "showWeights";
+			
+			editorTemplate -addSeparator;
+			
+			editorTemplate -label "Distance" -addControl "distance";
+			editorTemplate -label "Edge Distance" -addControl "edgeDistance";
+			
+			editorTemplate -addSeparator;
+
+			editorTemplate -label "Push" -addControl "push";
+			editorTemplate -label "Push Is Relative To Face Size " -addControl "pushRelativeToFaceSize";
+
+	
+			editorTemplate -addSeparator;
+				
+			editorTemplate -label "Falloff Type" -addControl "falloffType";
+				
+				
+		editorTemplate -endLayout;	
+
+
+		/////////////////////
+		// QUALITY SECTION //
+		/////////////////////
+		editorTemplate -beginLayout "Quality" -collapse 0;
+
+			editorTemplate -label "Maximum Weights Per Influenced Vtx" -addControl "maximumWeights";
+			editorTemplate -label "Smoothen" -addControl "smoothen";
+			editorTemplate -label "Use Matrix Rotation" -addControl "useMatrixRotation";
+		
+		editorTemplate -endLayout;		
+
+
+		////////////////////
+		// COLORS SECTION //
+		////////////////////
+		editorTemplate -beginLayout "Colors" -collapse 1;
+
+			editorTemplate -label "High Influence Color" -addControl "aColor1";
+			editorTemplate -label "Low Influence Color" -addControl "aColor2";
+			editorTemplate -label "Maximum Point Size" -addControl "pointSize";
+
+		editorTemplate -endLayout;
+
+	
+	editorTemplate -endLayout;
+
+
+		/////////////////
+		// SUPPRESIONS //
+		/////////////////
+		editorTemplate -suppress "meshMatrix";
+		editorTemplate -suppress "matrix";
+		editorTemplate -suppress "cachedVertexPositions";
+		editorTemplate -suppress "vertexList";
+		editorTemplate -suppress "customSlFalloff";
+
+
+
+}

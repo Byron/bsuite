@@ -1,0 +1,332 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="LoopRingMain"></a>&nbsp;Workflow</font></td>
+  </tr>
+</table>
+<p><img src="images/workflowintro2.jpg" border="0"></p>
+
+<br>
+<table width="100%" border="2">
+  <tr> 
+<td bgcolor="#FFF7D9">
+<i>This section is intended to help you using the tools in the fastest way possible,
+and to make Maya a competitor to every modeler out there in terms of handling
+and speed. I will write about it in general and give a detailed example based
+on my own modeling layout.<br>
+To have one of the strongest polymodelling toolsets is the one thing, and the other one will be to use the commands within a fraction of a second - its modeling what counts, so there is not time to click on buttons.<br>
+
+</i>
+</tr>
+
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;The BPT Menu</font></td>
+  </tr>
+</table>
+<br>
+The menu only serves the purpose to give you a fast introduction into the tools,
+to show to you the commands and the modifiers/flags which change the behavior
+of the commands and to manage your preferences.<br>
+It is definitely not meant to be used in everyday modeling because its simply
+to time consuming to move your pointer to the respective buttons.<br>
+In general, it was best when it would take no time to invoke a command, so you
+could completely care about modeling.<br>
+<br>
+
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Using Hotkeys</font></td>
+  </tr>
+</table>
+<br>
+Hotkeys are vital for a good workflow, because they allow to invoke commands extraordinarily quick. <br>
+<br>
+Before we begin to think about creating our own ones, we should always try to keep the following guides in mind:<br>
+<br>
+<b>1.</b> Minimize the amount of special purpose hotkeys (i.e. those for modeling)
+to an absolute minimum - keys should be pressed without having to intentionally
+think about it.<br>
+<br>
+<b>2.</b> All hotkeys necessary should be located in the same quadrant of the keyboard to allow the palm to be static (this quadrant is normally on the left side of the keyboard). The longer the ways of your fingers to the key, the more you will get out of your creative process because you have to wait for an action (which perhaps is already done in your head).<br>
+<br>
+<b>3.</b> Single hotkeys should be assigned the commands you use most often, and complex ones (i.e. Ctrl + Alt + Shift + a) those whose usage is seldom.<br>
+In general you should try to avoid complex hotkeys if possible because it takes longer to press them.<br>
+<br>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Hotkeys - Selection Masks</font></td>
+  </tr>
+</table>
+<br>
+Regarding the above guides, the first thing to change have to be the hotkeys for the polygon component selection masks. <br>
+With default preferences, you would have to move your whole hand to the F8 to F12 keys, which can be real bothering.<br>
+I chose to use the keys <i>1, 2 and 3</i> to be mapped to the component masks for <i>vertices, edges and faces</i> respectively, while <i>shift + 1</i> will change back to object mode.<br>
+Normally these keys are meant to change the display quality of NURBS and Subdivision
+Surfaces, but as a polymodeler, these keys are in use quite seldom.<br>
+<br>
+The following scripts would have to be mapped to the corresponding keys: <br>
+<i>(to learn more about assigning hotkeys, please refer to the Maya Documentation and execute the following: showHelp HotkeyEditora )</i><br>
+<br>
+<pre><b>[ 1 ]</b> : 		setSelectMode components Components;
+			selectType -smp 1 -sme 0 -smf 0 -smu 0 -pv 1 -pe 0 -pf 0 -puv 0; 
+			select -cl;</pre>
+<br>
+<br>
+<pre><b>[ 2 ]</b> :			setSelectMode components Components; 
+			selectType -smp 0 -sme 1 -smf 0 -smu 0 -pv 0 -pe 1 -pf 0 -puv 0; 
+			select -cl;</pre>
+<br>
+<br>
+<pre><b>[ 3 ]</b> :			setSelectMode components Components; 
+			selectType -smp 0 -sme 0 -smf 1 -smu 0 -pv 0 -pe 0 -pf 1 -puv 0; 
+			select -cl;</pre>
+<br>
+<br>
+<pre><b>[SHIFT] + [ 1 ]</b> :	setSelectMode("objects", "Objects");</pre><br>
+<br>	
+
+<br>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Hotkeys - Component Type Conversions</font></td>
+  </tr>
+</table>
+<br>
+It is a fact that is is very usefull to be able to quickly convert between selection
+types. For example, you could select an edge Loop, convert it to faces and then
+invoke a smartMoveComponent which would move this selection then as if it was
+a solid Chamfer.<br>
+<br>
+In my layout, I use the following scheme with the respective MEL Command:<br>
+<pre>
+<b>[Alt] + [ 1 ]</b> :				PolySelectConvert 3;
+					setSelectMode components Components;
+					selectType -smp 1 -sme 0 -smf 0 -smu 0 -pv 1 -pe 0 -pf 0 -puv 0;
+
+<b>[Alt] + [ 2 ]</b> :				PolySelectConvert 2;
+					setSelectMode components Components; 
+					selectType -smp 0 -sme 1 -smf 0 -smu 0 -pv 0 -pe 1 -pf 0 -puv 0;
+
+<b>[Alt] + [ 3 ]</b> :				PolySelectConvert 1;
+					setSelectMode components Components; 
+					selectType -smp 0 -sme 0 -smf 1 -smu 0 -pv 0 -pe 0 -pf 1 -puv 0;
+</pre>
+<p>The hotkeys above will convert the component selection into vertices([alt] + [1]), edges ([alt] + [2]) and faces ([alt] + [3]).<br>
+  If you like wings3D, you could also use these commands and put it onto your standard
+  component Mask hotkeys (for example 1,2 and 3) to automatically convert your
+  selection when you change component masks. <br>
+</p>
+<table width="100%" border="0">
+  <tr>
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Hotkeys
+        - Delete &amp; Move Pivot</font></td>
+  </tr>
+</table>
+<p>If we take into account the guides for hotkeys, then the Delete and InsertKeys
+  are definitely too far away. I personally prefer to use the following layout
+  which allows quick access to these functions:</p>
+<pre>[SHIFT] + [^] : 		delete;
+
+[^]:				EnterEditMode;
+</pre>
+<p>Please Note: The [^]-Key does only work that way when the &quot;EN&quot; Keyboard Layout
+is active.</p>
+<p>By the way, it is very usefull to have the English keyboard layout enabled
+  for the appplication because the undo/redo shortcuts are much closer then (compared
+  to the german layout). As an alternative to switching the layout you could
+  manually
+  change
+  the hotkeys for undo and redo which would have the advantage that you don't
+  have to care about the current layout.</p>
+<p>Often it is necessary to center the pivot when you just created or duplicated
+  an object so there could also be a hotkey for that. I hope, in the next Maya
+  version there will be an option like &quot;AutoCenterPivot&quot; so that the user is
+  not forced to care about that.</p>
+<table width="100%" border="0">
+  <tr>
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Hotkeys
+        - Deleting History</font></td>
+  </tr>
+</table>
+<p>During a modelling session the mesh's history may grow constantly, slowing
+  down the process so there is the necessity to delete it from time to time.</p>
+<p>Unfortunatelly you have to leave the component mode (therefore enter object
+  selection mode) to do that which would force you to pause your modelling process. </p>
+<p>I wrote a little script which goes around this limitation. Simply put <a href="BPTScript_deleteHistory.htm" target="_blank">this
+  Script</a> on a hotkey and delete the history whenever you want.</p>
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="bptHotkeys"></a>&nbsp;Hotkeys - Assigning BPT Commands</font></td>
+  </tr>
+</table>
+<br>
+There are two types of ByronsPolyTools Hotkeys: <b>Static</b> and <b>dynamic</b> ones.<br>
+<br>
+<b>Static Hotkeys</b> consist of a simple lowLevel Command, for example:<br>
+<br>
+<pre>ByronsPolyTools -sp -sl 0.5 -relative -snl -avf -bp</pre><br>
+
+These will always invoke the same action, no matter what options are set in the preferences or in the subMenus.<br>
+To get such a command, you can use the <i>Preferences -- Show Command -- CommandName</i> (<a href="BPT_Prefs.htm#smc" target="main">Explanation</a>)
+options in the BPT Menu.<br>
+Additionally they will be printed into the script Editor when you invoke a command.<br>
+<br>
+<br>
+<b>Dynamic Hotkeys</b> will be mapped to procedures which are located in the <i>ByronsPolyToolsMenu.mel</i>. They generate a command string according to your current preferences. An Example of a Smart Split would be:<br>
+<br>
+<pre>eval(generateCmdString("-sp ",0));</pre>
+
+
+<a href="BPT_dynamicHK.htm" target="main">(Click here to get to an information
+page which will give a more detailed explanation on dynamic Hotkeys)</a><br>
+<br>
+This allows you to use the preferences to change the behavior of the mapped commands
+without having to change your hotkeys every time.
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="bptHotkeys"></a>&nbsp;Hotkeys - Use your mouse</font></td>
+  </tr>
+</table>
+<br>
+Modern mouse devices usually have more than 3 mouse buttons. The additional mouse
+buttons can also be assigned some custom behavior. Pressing one of those is
+incredibly fast and saves you some of the valuable single hotkeys on your keyboard.
+This means, you can of course map something like <i>Ctrl + Alt + SHIFT + x</i> to
+your mouse button and invoke it with a single push.<br>
+In my case, I use the Microsoft Explorer 3.0, which allows me to invoke a smartSplit
+on the 4. button, and "delete edge" (the MEL Command for the hotkey is:<pre> polyPerformAction &quot;polyDelEdge-cv true&quot; e 0 </pre> on the
+5.
+one
+while
+inside
+of
+Maya.<br>
+<br>
+It is a real time saver and very convenient. 
+<br>
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="bptHotkeys"></a>&nbsp;Hotkeys - Merging Components</font></td>
+  </tr>
+</table>
+<br>
+To make merging components more convenient, I prefer to use a little script which allows me to simply select some components (vertices or edges or faces or UVs) and merge the corresponding vertices together.<br>
+<br>
+<a href="BPTScript_mergeVerts.htm" target="new">This Script</a> should be put on a hotkey, and can be invoked then when components are selected.
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F90"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="bptHotkeys"></a>&nbsp;Highspeed pointing
+        with pen and tablet</font></td>
+  </tr>
+</table>
+<br>
+Of course you can be fast with a mouse, but you will be faster with a tablet. Using a pen is more intuitive and more flexible as well.<br>
+Fortunately, Maya seems to be made to be controlled with a pen, so just give it a try.<br>
+But before you go buying a tablet, you should have the following things in mind:<br>
+<br>
+1. It will take some time to get used to using a pen, and to navigate in the
+view port. The beginning will definitely be hard, but when you got it, you won't
+want to work with a ordinary mouse again.<br>
+<br>
+2. When you've got only a small tablet, A5 for example, it may be hard to precisely select those tiny vertices.<br>
+In general, it will be better to use an A4 tablet.<br>
+If you were not happy with the precision even with a big tablet, you could increase your <b>click box size</b> (<i>Window -- Settings/Preferences -- Preferences >> Selection -> Click Box Size</i>)<br>
+
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F90"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="bptHotkeys"></a>&nbsp;Highspeed Selection</font></td>
+  </tr>
+</table>
+<br>
+During the modeling process it is essential to be able to quickly and easily select polygon components. Single picking them is only the last choice. <br>
+I made good experiences with <b>Smart Edge Loop/Ring, Boundary and Paint Select</b> put on hotkeys.<br>
+<br>
+Especially the Paint Select Tool is vital because you can easily and intuitively make complex selections without having to concern about backfaces, which could easily be selected when using marquee select or the lasso tool.<br>
+<br>
+Boundary turned out to be useful too in case of chamfer or solid Chamfer, so you would (paint) select the inner faces of the desired edge selection and hit the Boundary hotkey.
+
+<table width="100%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F90"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="bptHotkeys"></a>&nbsp;UI - Expand your view</font></td>
+  </tr>
+</table>
+<br>
+<p><img src="images/ui.jpg" border="0"></p>
+For modelers that already configured their hotkeys, all the other tiny bars like
+the shelve tend to be useless.<br>
+According to my own experience, the only thing necessary is a modelview and the
+channelbox to access the node's parameters.<br>
+The hotbox will give you access to all those functions that are in use very seldom and therefore don't have an own hotkey.<br>
+<br>
+To get a modelingUI as shown in the picture above, simply deactivate every UI-Element
+except the channelbox.<br>
+To deactivate the menubar, you can press the default hotkey: <br>
+
+<pre><b>[Ctrl] + [m]</b></pre>
+
+OR execute the following command
+
+<pre>setMainMenubarVisible 0;</pre>
+
+One thing necessary (which can normally be achieved by double-clicking on the
+Tool Icon which is not visible anymore) is to get the tools optionswindow. This
+may be necessary for the Paint Select Tool for example.<br>
+<br>
+To achieve this, you should have a hotkey which executes the following command:
+
+<pre>toolPropertyWindow;</pre>
+
+The hotkey will open the optionswindow for the tool currently active.<br>
+<br>
+Please remember that you can easily change the space in which a translation or
+rotation or scaling occurs and other options by pressing and holding
+<pre>[w] or [e] or [r] + LeftMouseButton(hold)</pre>
+
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F90"><font face="Arial, Helvetica, sans-serif" size="4" color="#FF0000"><a name="ringLoopPhilo"></a>&nbsp;About your health</font></td>
+  </tr>
+</table>
+<br>
+Now, you could consider yourself an unbeatable modeling machine, which could be true regarding the quality and speed of your work.<br>
+But unfortunately, this won't be true for your physical hull, also called body
+;).<br>
+<br>
+With today's screens, it might be very hard to damage your eyes, but with today's
+input devices and chairs, the hand's muscles could be damaged or a damage of
+the back could occur. These illnesses could easily keep you off your work for
+weeks, so you could loose your job in the worst case.<br>
+<br>
+Keeping an eye on your health is essential to be able to stay healthy and productive, so I made up some guides which could help to stay healthy.<br>
+<pre>
+1. Try to work relaxed. When you stay in tension all the time, this 
+may result in tendonitis.<br>
+2. Be active! When you sit most of the day in front of the screen, 
+the brain does all the work, while your body is quite inactive. Try 
+to keep a balance between brain and body activity and do some sports 
+several times a week. You will definitely feel better when sports 
+are a part of your life.<br>
+
+
+</pre>
+</body>
+</html>

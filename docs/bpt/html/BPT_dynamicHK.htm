@@ -1,0 +1,82 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="LoopRingMain"></a>&nbsp;Dynamic Hotkeys - Additional Information</font></td>
+  </tr>
+</table>
+
+
+<br>
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#FFF7D9">
+Understanding the procedure:<br>
+<br>
+<pre>generateCmdString(string $command,int $type));</pre><br>
+<b>$Command</b> will be a string for the main command, like "-sp" (smartSplit) or "-er" (edgeRing)<br>
+<br>
+<b>$type</b> will be an int representing the submenu, or type of the supplied $command, i.e. <br>
+0 = smartSplit<br>
+1 = bevel<br>
+2 = selection<br>
+3 = transformation<br>
+<br>
+The $type ID is necessary to be able to generate a "clean" command string, meaning that flags which are useless for a certain type of command will be ommited. This is for brevity only - the ByronsPolyToolsCmd won't consider these "useless" flags if they were given.
+</tr>
+
+
+<table width="640" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Dynamic Command List</font></td>
+  </tr>
+</table>
+<br>
+
+Just map one of these to a hotkey:<br>
+<br>
+<pre>
+eval(generateCmdString("-sp ",0));	// = smart Split
+
+//Bevel
+
+invokeBevelCmd(generateCmdString("-c ",1)); // = chamfer, currently the bevel commands use an additional procedure
+
+invokeBevelCmd(generateCmdString("-sc ",1)); // = solid chamfer
+
+
+
+//Selection
+
+eval(generateCmdString("-er ",2));	// = edgeRing
+
+eval(generateCmdString("-el ",2));	// = edgeLoop
+
+eval(generateCmdString("-bnd ",2));	// = boundary
+
+eval(generateCmdString("-gro ",2));	// = grow
+
+eval(generateCmdString("-shr ",2));	// = shrink
+
+
+
+//Transformation
+
+eval(generateCmdString("-smc ",3) );	// = smart Move Component
+
+setSoftTool();				//   enter the soft transformation tool
+
+
+</pre>
+
+<a href="BPT_workflow.htm#bptHotkeys" target="main">Back</a>
+
+</body>
+</html>

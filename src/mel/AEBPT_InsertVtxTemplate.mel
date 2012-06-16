@@ -1,0 +1,62 @@
+global proc AEBPT_InsertVtxTemplate ( string $nodeName )
+{
+
+editorTemplate -beginScrollLayout;
+
+
+	///////////////////////
+	// SLIDE ATTRIBUTES //
+	/////////////////////		
+	editorTemplate -beginLayout "Slide Attributes" -collapse 0;
+		editorTemplate -label "Slide Relative" -addControl "slideRelative";
+		editorTemplate -label "Normal Relative" -addControl "normalRelative";
+		editorTemplate -label "Along Normal" -addControl "alongNormal";
+		editorTemplate -label "Slide" -addControl "slide";
+		editorTemplate -label "Side" -addControl "side";
+	
+			editorTemplate	-addSeparator;
+	
+		editorTemplate -label "slideLimited" -addControl "slideLimited";	
+	
+	editorTemplate -endLayout;
+
+
+	/////////////////////////
+	// CONNECT ATTRIBUTES //
+	///////////////////////		
+	editorTemplate -beginLayout "Connect Attributes" -collapse 0;
+		editorTemplate -label "Spin" -addControl "spin";	
+		editorTemplate -label "Count" -addControl "count";
+	editorTemplate -endLayout;
+
+
+	/////////////////////////////////
+	// SOFT TRANSFORMATION ENGINE //
+	///////////////////////////////		
+
+	AEsoftTransformationEngineTemplate ( $nodeName );
+
+
+	editorTemplate  -addControl "nodeState";
+	
+
+	//Activate Label "ExtraAttributes 
+	//
+	editorTemplate -addExtraControls;	
+
+
+
+	//////////////////
+	// SUPRESSIONS //
+	////////////////			
+	editorTemplate -suppress "inMesh";
+	editorTemplate -suppress "caching";
+
+		
+		
+	
+
+editorTemplate -endScrollLayout;
+
+
+}

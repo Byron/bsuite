@@ -17,7 +17,11 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LO
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LOWER})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE_LOWER})
 
-message(STATUS "In QtCreator, when running cmake, make sure you specify -DQTCREATOR as additional commandline arguments to have the maya headers parsed.")
+if(NOT QTCREATOR)
+	message(STATUS "In QtCreator, when running cmake, make sure you specify -DQTCREATOR=1 as additional commandline arguments to have the maya headers parsed.")
+else()
+	message(WARNING "The QTCREATOR variable is set - disable it in your builds, otherwise the maya plugins may not work correctly. It needs to be set when updating the creator project only !")
+endif()
 
 # add the profiling configuration. Its essentially the release config, but
 # compiles with profiling instructions, enabling gprof
@@ -78,7 +82,7 @@ endif()
 # MAYA CONFIGURATION
 ######################
 set(DEFAULT_MAYA_VERSIONS 2012 2011 2010 2009 2008)
-set(DEFAULT_MAYA_LIBRARIES Foundation OpenMaya OpenMayaUI OpenMayaAnim OpenMayaRender)
+set(DEFAULT_MAYA_LIBRARIES Foundation OpenMaya OpenMayaAnim OpenMayaRender OpenMayaFX OpenMayaUI)
 
 if(UNIX AND NOT APPLE AND ${CMAKE_CXX_SIZEOF_DATA_PTR} EQUAL 8)
 	set(DEFAULT_MAYA_INSTALL_SUFFIX -x64)

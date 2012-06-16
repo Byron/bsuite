@@ -1,0 +1,163 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="intro"></a>&nbsp;Preferences</font></td>
+  </tr>
+</table>
+<p><img src="images/prefs.gif" border="0"></p>
+
+
+<table width="90%" border="2">
+  <tr> 
+<td bgcolor="#FFF7D9">
+<i>The Preferences allow you to save several parameters between the runs of Maya.<br>
+</i>
+</tr>
+
+
+<br>
+
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;<i>General</i></font></td>
+  </tr>
+</table>
+<p><br>
+  <b>Auto Switch Component Mask: </b>Automatically switches to the edge component mask when you invoked an edge Ring/edge Loop or boundary with a different component type.<br>
+  <br>
+  <b>Slide without Bounds:</b> When selected, the slide parameter will have no limits, which are normally 0 to 1<br>
+  <br>
+  <b>Slide is Relative:</b> Will enable the <i>"slideRelative"</i> parameter when
+invoking
+a smart split.</p>
+<p><b>Normal is Relative:</b> Will enable the <i>"normalRelative"</i> parameter
+  when
+invoking
+a smart split.<br>
+  <br>
+  <b>Boost Performance: </b> If enabled, the performance of every deformation
+        will be improved by 10% to 25% in shaded mode. This is possible by changing
+        the meshes triangulation routine to a one which is optimized for speed. This
+        routine resists in the &quot;<em>fastTrgNode1</em>&quot;. There may only be <strong>one</strong> triangulation
+        node of this type, otherwise BPT won't work as expected.<br>
+    <i>Please Note:</i> When the routine has been set once, it will speed
+        up <b>every</b> deformation,
+        beginning with a simple move, ending with skin and complex deformers
+        on the affected mesh, but it is not suited if there are any concave nGons
+        in the mesh.<br>
+</p>
+<table width="90%" border="2">
+  <tr>
+    <td bgcolor="#FFF7D9"> <p><i><b>Important:</b></i> To make sure the triangulation
+        function will be found if you export your mesh, the &quot;<em>fastTrgNode1</em>&quot; will
+      be connected to your mesh, so that it gets exported as well.</p>
+      <p>In case you duplicate your mesh, please make sure that &quot;Duplicate Input
+      Graph&quot; is not selected, because it would duplicate the &quot;fastTrgNode1&quot; which
+      will lead to errors with the MEL routine which drives BPT.</p>
+  </tr>
+</table>
+<table width="90%" border="2">
+  <tr> 
+<td bgcolor="#FFF7D9">
+<i><b>Please Note:</b><br>
+Because this triangulation function creates static triangles, this may lead to triangle overlaps in certain situations. To restore the native Maya triangulation, you just have to execute the following command:<br>
+<pre>setAttr meshShapeName.userTrg -type "string" "";</pre>
+where meshShapeName is the name of your meshes shape which resides below its transform node.<br>
+<br>
+Additionally, boost performance will be used automatically while inside the Soft Transformation Tool.
+
+<br></i>
+</tr>
+</table>
+<br>
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;<i>Bevel</i></font></td>
+  </tr>
+</table>
+<br>
+<b>Connect Ends: </b>Determines whether to connect the ends of the chamfer operation
+or leave them open creating nGons<br>
+<br>
+<b>Triangulate Ends: </b>Determines whether to triangulate the connected ends
+or not<br>
+<br>
+<b>Use Slide of 0.2: </b>If active, the slide will be set to 0.2 initially<br>
+<br>
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;<i>Initial Settings</i></font></td>
+  </tr>
+</table>
+<br>
+<b>Always Visualize Falloff: </b>Starts Up the BPTNode with Falloff Visualization enabled<br>
+<br>
+<b>Always Visualize Original Mesh: </b>Starts Up the BPTNode with Mesh Visualization enabled<br>
+<br>
+
+<table width="80%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;<i>Falloff Options</i></font></td>
+  </tr>
+</table>
+In the <i>Slide Falloff</i> and <i>Along Normal Falloff</i> sub menus you can
+change which falloff type to use initially. As all the values in the preferences,
+these settings will be saved and therefore be consistent between different runs
+of Maya.<br>
+
+<table width="80%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;<i>STTool Settings</i></font></td>
+  </tr>
+</table>
+<p>In this submenu, you can change the initial falloff for the Soft Transformation Tool. <br>
+  The <i>Always Visualize Falloff</i> parameter will determine whether the weights should be visualized when entering the tool or not.<br>
+The <i>Use Last Distance</i> parameter will determine whether the last distance
+set should be used when you change selections.<br>
+Finally, the <em>Normal is Relative</em> switch will enable the normalIsRelative
+  parameter on the softTransformationNode (which actually performs the deformation<br>
+</p>
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;<i>Additional Options</i></font></td>
+  </tr>
+</table>
+<br>
+<b>Update Preferences: </b>Gather the option values of all sub menus and set
+the preferences accordingly<br>
+<br>
+<b>Propagate Preferences: </b>The option values of the sub menus will be set
+according to your preferences<br>
+<br>
+
+<table width="90%" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="smc"></a>&nbsp;<i>Show Command</i></font></td>
+  </tr>
+</table>
+
+<table width="90%" border="2">
+  <tr> 
+<td bgcolor="#FFF7D9">
+<i>When you click on a menu item, a command string according to your preferences
+will be printed into the script editor. This shall assist you in creating your
+hotkey configuration.<br>
+See the <a href="BPT_workflow.htm#intro" target="main">Workflow</a> for more information on hotkeys and possibilities to improve your workflow.</i>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<html>
+<head>
+<title>Untitled Document</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="arialStyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="LoopRingMain"></a>&nbsp;Selection</font></td>
+  </tr>
+</table>
+<br><br>
+The Selection Commands you learn about here will help you to quickly select the components you want without having to single-pick them.
+<br><br>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F99"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="LoopRingMain"></a>&nbsp;Smart Edge Loop/Loop</font></td>
+  </tr>
+</table>
+<p><img src="images/ringLoop.gif" border="0"></p>
+
+<br>
+<table width="640" border="2">
+  <tr> 
+<td bgcolor="#FFF7D9">
+<i>Edge Ring and Edge Loop allows you to select a ring or loop of edges just by picking a component.</i>
+</tr>
+
+</table>
+<br>
+  <table width="640" border="1" cellspacing="0" cellpadding="0" bordercolor="#666666">
+    <tr valign="top" bgcolor="#99CCFF"> 
+      <td colspan="3"><b>ByronsPolyTools -Flag ...</b><b></b><b></b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="76%" valign="top"><b>Description</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-edgeRing</i></td>
+      <td width="7%"><i>-er</i></td>
+      <td width="76%" valign="top">- Selects the edgeRing corresponding to your componentSelection</td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"><i>-edgeLoop</i></td>
+      <td width="7%"><i>-el</i></td>
+      <td width="76%" valign="top">- Selects the edgeLoop corresponding to your componentSelection</td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><b>LongName</b></td>
+      <td width="7%"><b>ShortName</b></td>
+      <td width="72%" valign="top"><b>--Additional Flags--</b></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="17%"></td>
+      <td width="7%"></td>
+      <td width="76%" valign="top"></td>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><i>-maxEdgeCount</i></td>
+      <td width="7%"><i>-mec</i></td>
+      <td width="72%" valign="top">- Limit the ring/loop to to the specified count<br>
+	<i>Example:</i> ByronsPolyTools -er -mec 10</td>
+    </tr>
+    <tr valign="top"> 
+      <td width="21%"><i>-autoSwitchComponentType</i></td>
+      <td width="7%"><i>-ast</i></td>
+      <td width="72%" valign="top">- automatically switch the component mask to edges<br>
+	<i>Example:</i> ByronsPolyTools -er -ast -mec 10</td>
+    </tr>
+  </table>
+<br>
+
+<table width="100%" border="0">
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="ringLoopPhilo"></a>&nbsp;Philosophy</font></td>
+  </tr>
+</table>
+<p>The main idea behind the edge Ring and edge Loop command is based on two things:
+  First, you
+  are not limited to a specific component type. This means, you can also select
+  faces and/or
+  vertices and select their corresponding ring or loop paths.
+  On the other hand, you will be able to block a path by selecting another component
+  (typically
+  edges) on it. The created path will be between these stop Edges. If you use this
+  feature on a
+  ring/loop cycle, it will select the shortest path.</p>
+<p>You can also select pathes on boundaries and use the stop feature on them.</p>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F80"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="loopRingAbs"></a>&nbsp;Abilities</font></td>
+  </tr>
+</table>
+
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="loopRingAbs"></a>&nbsp;Stopping
+    Paths with Edges</font></td>
+  </tr>
+</table>
+
+<p><img src="images/ringLoop.gif" border="0"></p>
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF">
+<i>Select another component (edge recommended) on the path to limit it between these bounds</i>
+</tr>
+</table>
+<br><br>
+
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="loopRingAbs"></a>&nbsp;Creating
+    quadratic Paths</font></td>
+  </tr>
+</table>
+<p><img src="images/faceRing.gif" border="0"></p>
+
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF">
+<i>Select faces as shown above and invoke the edge Ring command to get such a
+quadratic path</i>
+</tr>
+</table>
+<br><br>
+<table width="640" border="0">
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="loopRingAbs"></a>&nbsp;Component
+    Paths</font></td>
+  </tr>
+</table>
+<p><img src="images/componentSelect.gif" border="0"></p>
+<table width="640" border="2">
+  <tr> 
+	<td bgcolor="#99CCFF">
+<i>Select edges and/or vertices and/or faces and create their corresponding paths.<br>
+Note that every component other than edges is just being converted to edges internally </i>
+</tr>
+</table>
+
+<table width="640" border="0">
+<br>
+  <tr> 
+    <td bgcolor="#3D3F60"><font face="Arial, Helvetica, sans-serif" size="4" color="#FFFFFF"><a name="loopRingAbs"></a>&nbsp;Boundary</font></td>
+  </tr>
+</table>
+
+<a href="BPT_Boundary.htm" target="main">Advance to Boundary</a>
+
+</body>
+</html>
