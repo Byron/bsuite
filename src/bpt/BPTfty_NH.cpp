@@ -21,7 +21,7 @@
 //test
 #include "BPT_BA.h"
 
-
+#include <cassert>
 
 
 
@@ -302,7 +302,7 @@ void		BPTfty_NH::selectComponents(MIntArray& edgeIndices, MString mode, MString 
 	MPRINT("Selecting")
 
 	MDagPath::getAPathTo(fMesh,meshPath);
-	MFn::Type type;
+	MFn::Type type = MFn::kInvalid;
 	////cout<<"Bin in `selectComponents`"<<endl;
 //	MString	type;
 	if(mode == "edges")
@@ -312,6 +312,7 @@ void		BPTfty_NH::selectComponents(MIntArray& edgeIndices, MString mode, MString 
 	else if(mode == "vertices")
 		type = MFn::kMeshVertComponent;
 
+	assert(type != MFn::kInvalid);
 
 	MFnSingleIndexedComponent compFn;
 	MObject	comps = compFn.create(type);
@@ -959,7 +960,7 @@ bool		BPTfty_NH::stopLoopSearch(MIntArray& loopResult, MIntArray& stopEdges, MIn
 {
 	int			l; loopResult.length();
 	int			d = 99999;		//entfernung einer gefundenen Edge im Array
-	int			bestMatch;			//enthält den index vom nächstgelegenen match
+	int			bestMatch = 0;			//enthält den index vom nächstgelegenen match
 	MIntArray	match;
 
 

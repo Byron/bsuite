@@ -27,7 +27,7 @@
 //
 
 #include "ByronsPolyToolsNode.h"
-
+#include "cassert"
 
 //------------------------
 //statische ELEMENTE
@@ -415,7 +415,7 @@ void	makeSelection(void* data)
 	{
 		MFnSingleIndexedComponent compFn;
 		
-		MFn::Type type;
+		MFn::Type type = MFn::kInvalid;
 		if(nodePtr->validIndices[0] == 1)
 			type = MFn::kMeshEdgeComponent;
 		else if(nodePtr->validIndices[0] == 2)
@@ -423,6 +423,7 @@ void	makeSelection(void* data)
 		else if(nodePtr->validIndices[0] == 3)
 			type = MFn::kMeshVertComponent;
 
+		assert(type != MFn::kInvalid);
 		//flag wieder entfernen
 		nodePtr->validIndices.remove(0);
 

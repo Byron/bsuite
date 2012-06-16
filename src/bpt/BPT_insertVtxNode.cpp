@@ -28,7 +28,7 @@
 
 #include "BPT_insertVtxNode.h"
 
-
+#include <cassert>
 
 //------------------------
 //Statische Variablen
@@ -373,14 +373,15 @@ void	IV_makeSelection(void* data)
 	{
 		MFnSingleIndexedComponent compFn;
 		
-		MFn::Type type;
+		MFn::Type type = MFn::kInvalid;
 		if(nodePtr->validIndices[0] == 1)
 			type = MFn::kMeshEdgeComponent;
 		else if(nodePtr->validIndices[0] == 2)
 			type = MFn::kMeshPolygonComponent;
 		else if(nodePtr->validIndices[0] == 3)
 			type = MFn::kMeshVertComponent;
-
+		
+		assert(type != MFn::kInvalid);
 		//flag wieder entfernen
 		nodePtr->validIndices.remove(0);
 
@@ -601,7 +602,7 @@ MStatus		BPT_InsertVtx::doCompleteCompute( MDataBlock& data )
 					//component Mode umschalten bei bedarf
 					if(optionsArray[5])
 					{
-						MSelectionMask::SelectionType type;
+						MSelectionMask::SelectionType type = MSelectionMask::kSelectMeshVerts;
 						
 						if(optionsArray[6] == 5)
 						{

@@ -1000,7 +1000,7 @@ void		face::SplitTypeOne()
 	//jetzt Slide zu neuem Vtx hinzufügen
 	//erst datenObject aufbauen, alles ausser start/endAbsIDs und nachbarID egal
 	int middleID = (vtxPerCorner[endCornerEdgeID].length() - 1)/2;
-	int fakeNachbarID;
+	int fakeNachbarID = 0;
 	//locID von erstem nachbarn finden
 
 	unsigned l = nachbarIDs.length();
@@ -1029,7 +1029,7 @@ void		face::SplitTypeOne()
 
 
 			//da nur die abs IDs mit sicherheit korrekt sind, müssen jetzt anhand der abs IDs die relativen IDs bestimmt werden
-			int correctStart, correctEnd;
+			int correctStart = 0, correctEnd = 0;
 			
 			unsigned int l = vtx.length();
 			UINT x;
@@ -1069,7 +1069,7 @@ void		face::SplitTypeOne()
 	{//UVs bearbeiten, aber garantiert ohne slide
 
 
-			int correctStart, correctEnd;
+			int correctStart = 0, correctEnd = 0;
 
 			unsigned int l = vtx.length();
 			UINT x;
@@ -1272,7 +1272,7 @@ void	face::splitType3()
 	}
 
 	//Start/end/alone und freeCornerEdge herausfinden; routine  geht davon aus, dass 4 Corners vorhanden sind
-	int startEdge,endEdge,aloneEdge,freeEdge;
+	int startEdge = 0,endEdge = 0,aloneEdge = 0,freeEdge = 0;
 	
 	
 	for(i = 0; i < 2;i++)
@@ -1821,7 +1821,7 @@ void	face::splitControlTwo()
 
 
 	//oneEdge und twoEdge bestimmen. Sie liegen immer aneinander. Zuerst kommt one, dann twoEdge
-	int oneEdge, twoEdge;
+	int oneEdge = 0, twoEdge = 0;
 
 	for(i = 0; i < 4;i++)
 	{
@@ -2465,7 +2465,7 @@ void	face::findOppositeCorner(int startCornerID,int iterCount,int& newStart, int
 	//typ 4: 2
 	//typ 3: 1
 	//und bei Typ 2 kann es die übergeordnete Proc selbst machen
-	int currentCorner,nextCorner;
+	int currentCorner = 0,nextCorner = 0;
 	currentCorner = startCornerID;
 
 	for(int i = 0; i < iterCount;i++)
@@ -2682,7 +2682,7 @@ void	face::processCornerEdges(MIntArray& processedVtx,MIntArray& newVtxCount,MIn
 			
 			lastVtxLocID = findLastNachbarVtx(i);
 			
-			int myType; //extraTypeDef für Faces: nonControl = 0, typ 1 == 1, typ2Control == 2
+			int myType = 0; //extraTypeDef für Faces: nonControl = 0, typ 1 == 1, typ2Control == 2
 			if(type == 0 || type == -1 || type == 3 || type == 4)
 				myType = 0;
 			else if(type == 1)
@@ -2903,7 +2903,7 @@ void	face::splitType4()
 	}
 
 	
-	int first,last,second,third;
+	int first = 0,last = 0,second = 0,third = 0;
 	switch(numCorners)
 	{
 	case 4:

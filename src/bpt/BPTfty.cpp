@@ -51,7 +51,7 @@
 #include "BPTfty.h"
 #include "BPT_BA.h"
 
-
+#include <cassert>
 
 //-----------------------------------------------------------------
 BPTfty::BPTfty()
@@ -948,7 +948,7 @@ int		BPTfty::SMC_processLine(int currentVtx,
 		//jetzt die Position des endVtx holen
 		//index = SMC_getIndex(currentVtx,linedVtx); //index ist noch vom letzten durchlauf gesetzt
 		
-		int endVtx;
+		int endVtx = 0;
 
 		int l = connectionsList[index]->length();
 		
@@ -1669,8 +1669,8 @@ void		BPTfty::processUncontrolledLines(MIntArray& linedVtx,
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 {//wenna hier hinkommt sind nur noch normaleTypeTwo und type One Vtx 
 	MIntArray	vtxRemovals;	//vtxRemovals: bei übereinstimmung werden die IDs -1 gesetzt
-	int			currentVtx,lastVtx,firstVtx;
-	int			dVtx,origDVtx;		//directionalVtx
+	int			currentVtx,lastVtx = 0,firstVtx = 0;
+	int			dVtx,origDVtx = 0;		//directionalVtx
 	int			tmp,index;
 
 	int			counter = 0;
@@ -1818,7 +1818,7 @@ void		BPTfty::processUncontrolledLines(MIntArray& linedVtx,
 					//jetzt die Position des endVtx holen
 					//index = SMC_getIndex(currentVtx,linedVtx); //index ist noch vom letzten durchlauf gesetzt
 					
-					int endVtx;
+					int endVtx = 0;
 					l = connectionsList[index]->length();
 					for(x = 0; x < l;x++)
 					{
@@ -2253,7 +2253,7 @@ void		BPTfty::processLinedVtx(MIntArray startIDs,
 	
 	MIntArray	vtxRemovals;	//vtxRemovals: bei übereinstimmung werden die IDs -1 gesetzt, nur lokal gültig/per pathSection
 	int			currentVtx,lastVtx;
-	int			dVtx;		//directionalVtx
+	int			dVtx = 0;		//directionalVtx
 	int			tmp,index,faceID;
 
 	bool		isFlipped = false;
@@ -3212,7 +3212,7 @@ void		BPTfty::selectComponents(MIntArray& edgeIndices, MString mode, MString sel
 	MPRINT("Selecting")
 
 	MDagPath::getAPathTo(fMesh,meshPath);
-	MFn::Type type;
+	MFn::Type type = MFn::kInvalid;
 	////cout<<"Bin in `selectComponents`"<<endl;
 //	MString	type;
 	if(mode == "edges")
@@ -3222,6 +3222,7 @@ void		BPTfty::selectComponents(MIntArray& edgeIndices, MString mode, MString sel
 	else if(mode == "vertices")
 		type = MFn::kMeshVertComponent;
 
+	assert(type != MFn::kInvalid);
 
 	MFnSingleIndexedComponent compFn;
 	MObject	comps = compFn.create(type);

@@ -387,7 +387,7 @@ void	edgeMeshCreator::changeSideFace(int origVtx, int newVtxID, int faceID, MInt
 	int offset = getValidAbsoluteOffset(faceID);
 	int count = offset + (*offsets)[faceID];
 	
-	int newVtxLocID;		//hält den faceRelativen index des newVtxID, wird von UVs benoetigt, um schneller arbeiten zu koennen
+	int newVtxLocID = 0;		//hält den faceRelativen index des newVtxID, wird von UVs benoetigt, um schneller arbeiten zu koennen
 	//ZUERST DEN ORIGVTX IN FACEARRAY MIT DEM NEWVTX TAUSCHEN
 	int i;
 	for(i = offset; i < count; i++)	
@@ -500,7 +500,7 @@ void	edgeMeshCreator::changeEndFace(int origID,int newID, int direction, edgeFac
 	
 	
 	//suchen nach vtxMatch
-	int refVtx;
+	int refVtx = 0;
 
 	UINT l = faceData->faceVertices.length();
 	
