@@ -19,7 +19,7 @@
 
 #include <cstring>
 #ifdef WIN32
-	#include <Winsock2.h 
+	#include <Winsock2.h>
 #else
 	#include <arpa/inet.h>
 #endif
@@ -115,6 +115,9 @@ IStream::Status IStream::reset_point_iteration()
 
 types::Header13 &types::Header13::to_host_order()
 {
+	// TODO: this method is not used.
+	// If it should be used one day, on windows the libs containing ntohl need to be linked in as well.
+	/*
 	source_id = ntohs(source_id);
 	global_encoding = ntohs(global_encoding);
 	
@@ -137,8 +140,9 @@ types::Header13 &types::Header13::to_host_order()
 		*npbr = ntohl(*npbr);
 	}
 	
-	start_of_waveform_data_packet_record = ((uint64_t)ntohl(start_of_waveform_data_packet_record)) << 32 | ntohl(start_of_waveform_data_packet_record>>32);
-	
+	// TODO: fix the parans in a proper ide :) !
+	// start_of_waveform_data_packet_record = static_cast<uint64_t>(ntohl(static_cast<uint32_t>(start_of_waveform_data_packet_record)) << 32) | ntohl(static_cast<uint32_t>(start_of_waveform_data_packet_record >> 32));
+	*/
 	return *this;
 }
 

@@ -126,6 +126,10 @@ function(add_project)
 						"${ADD_PROJECT_MULTI_ARG_OPTS}"
 						${ARGN})
 	
+	if(PROJECT_UNPARSED_ARGUMENTS)
+		message(SEND_ERROR "Failed to parse all arguments, please check for spelling mistakes in ${PROJECT_UNPARSED_ARGUMENTS}")		
+	endif()
+						
 	if(NOT PROJECT_NAME)
 		message(SEND_ERROR "NAME must be set")
 	endif()
@@ -133,6 +137,8 @@ function(add_project)
 	if (NOT PROJECT_TYPE)
 		message(SEND_ERROR "TYPE must be set")
 	endif()
+	
+	
 	
 	# FIGURE OUT TYPE
 	##################
@@ -273,7 +279,11 @@ function(add_maya_project)
 						"${ADD_PROJECT_SINGLE_ARG_OPTS}"
 						"LINK_MAYA_LIBRARIES;MAYA_VERSIONS;${ADD_PROJECT_MULTI_ARG_OPTS}"
 						${ARGN})
-	
+
+	if(PROJECT_UNPARSED_ARGUMENTS)
+		message(SEND_ERROR "Failed to parse all arguments, please check for spelling mistakes in ${PROJECT_UNPARSED_ARGUMENTS}")		
+	endif()
+						
 	if(NOT PROJECT_NAME)
 		message(SEND_ERROR "NAME must be set")
 	endif()
@@ -333,7 +343,7 @@ function(add_maya_project)
 	endif()
 	
 	if(WIN32)
-		set(LINK_DIR_FLAG "/LIBPATH ")
+		set(LINK_DIR_FLAG "/LIBPATH:")
 		set(INCL_DIR_FLAG "/I ")
 	else()
 		set(LINK_DIR_FLAG "-L")
@@ -415,9 +425,9 @@ function(add_maya_project)
 		# Sometimes ... we use a different library version than one maya provides (on osx, it may be ptx)
 		# Thus we have to put the project library directories on target level, and BEFORE the maya link directory !
 		foreach(PLIB_DIR IN LISTS PROJECT_LIBRARY_DIRS)
-			append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}${PLIB_DIR}" YES)
+			append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}\"${PLIB_DIR}\"" YES)
 		endforeach()
-		append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}${MAYA_LIB_DIR}" YES)
+		append_to_target_property(${PROJECT_ID} LINK_FLAGS "${LINK_DIR_FLAG}\"${MAYA_LIB_DIR}\"" YES)
 		if (${CMAKE_BUILD_TYPE} MATCHES Release AND UNIX AND NOT APPLE)
 			append_to_target_property(${PROJECT_ID} LINK_FLAGS "-Wl,--strip-all,-O2" YES)
 		endif()
@@ -443,7 +453,7 @@ function(add_maya_project)
 		
 		# Make sure we get the osx 10.6 libs
 		if(APPLE)
-			append_to_target_property(${PROJECT_ID} LINK_FLAGS "-isysroot ${CMAKE_FRAMEWORK_PATH}" YES)
+			append_to_target_property(${PROJECT_ID} LINK_FLAGS "-isysroot \"${CMAKE_FRAMEWORK_PATH}\"" YES)
 		endif()
 		
 		target_link_libraries(${PROJECT_ID} 

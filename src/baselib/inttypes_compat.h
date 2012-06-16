@@ -18,23 +18,20 @@
 #ifndef INTTYPESCOMPAT_H
 #define INTTYPESCOMPAT_H
 
-#ifdef WIN32
 // On windows, inttypes.h doesn't exist, and I thought it was a c standard library ... 
-
-/* Signed */
-typedef signed char			int8_t;
-typedef short				int16_t;
-typedef int					int32_t;
-typedef long long int		int64_t;
-
-/* Unsigned.  */
-typedef unsigned char		uint8_t;
-typedef unsigned short		uint16_t;
-typedef unsigned int		uint32_t;
-typedef unsigned long long int uint64_t;
-
+#if defined(_MSC_VER) && _MSC_VER < 1600
+	#if !defined(THIRD_PARTY_INTTYPES)
+		typedef __int8            int8_t;
+		typedef __int16           int16_t;
+		typedef __int32           int32_t;
+		typedef __int64           int64_t;
+		typedef unsigned __int8   uint8_t;
+		typedef unsigned __int16  uint16_t;
+		typedef unsigned __int32  uint32_t;
+		typedef unsigned __int64  uint64_t;
+	#endif
 #else
-#include <inttypes.h>
+	#include <stdint.h>
 #endif
 
 #endif // INTTYPESCOMPAT_H

@@ -3,6 +3,6 @@ add_project(	NAME
 					base
 				TYPE
 					STATIC
-				INCLUDEDIR
+				INCLUDE_DIRS
 					..
 				)

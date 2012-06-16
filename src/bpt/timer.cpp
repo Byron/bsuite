@@ -53,7 +53,7 @@ timer::~timer(void)
 	
 	_LARGE_INTEGER end;
 	QueryPerformanceCounter(&end);
-	double elapsedTime = ((double)end.QuadPart - (double)start.QuadPart) / (double)freq.QuadPart
+	double elapsedTime = ((double)end.QuadPart - (double)start.QuadPart) / (double)freq.QuadPart;
 	
 	#else
 
@@ -62,10 +62,5 @@ timer::~timer(void)
 	unsigned long elapsedTime =
 		(now.tv_sec - startTime.tv_sec) * 1000 + ( now.tv_usec - startTime.tv_usec ) / 1000;
 	#endif
-	
-	cout << endl;	
-	cout << messageStr.data() << endl;
-	cout << "ELAPSED TIME: "<< elapsedTime << endl;
-	cout << "------------------------------" << endl;
 }
 
