@@ -49,6 +49,8 @@
 
 #include <maya/MFnPlugin.h>
 
+#include "mayabaselib/base.h"
+
 
 //-----------------------------------------------------------------
 ByronsPolyTools::ByronsPolyTools():	chamferFlagSet(false), 
@@ -652,15 +654,8 @@ MStatus ByronsPolyTools::directModifier(MObject mesh)
 }
 
 
-#ifdef WIN32
-	#define MAYAEXPORT __declspec( dllexport )
-#else
-	#define MAYAEXPORT extern "C"
-#endif
-
-
 //-----------------------------------------------------------------
-MAYAEXPORT MStatus initializePlugin( MObject obj )
+EXPORT MStatus initializePlugin( MObject obj )
 //-----------------------------------------------------------------
 
 { 
@@ -802,7 +797,7 @@ MAYAEXPORT MStatus initializePlugin( MObject obj )
 
 
 //-----------------------------------------------------------------
-MAYAEXPORT MStatus uninitializePlugin( MObject obj )
+EXPORT MStatus uninitializePlugin( MObject obj )
 //-----------------------------------------------------------------
 {
 	MStatus   status;
