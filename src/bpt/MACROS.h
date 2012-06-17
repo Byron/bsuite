@@ -107,9 +107,10 @@ typedef	unsigned int uint;
 #ifndef WIN32
 //das hier ist eigentlich ABSOLUTER UNFUG - wieso immer ULONG schreiben und es ersetzen lassen, wenn man auch gleich ulong verwenden kann..
 //naja, so hat man immerhin maximale Kontrolle ueber das, was ULONG wirklich ist
-	#define ULONG ulong		
-	#define UINT uint
-	#define UCHAR unsigned char
+	typedef unsigned long ULONG;
+	typedef ULONG ulong;
+	typedef unsigned int UINT;
+	typedef unsigned char UCHAR;
 
 #endif
 

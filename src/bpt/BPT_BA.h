@@ -22,7 +22,7 @@
 
 
 #include <maya/MIntArray.h>
-#include <malloc.h>
+#include <cstring>
 
 
 #include <MACROS.h>

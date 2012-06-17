@@ -44,7 +44,6 @@
 
 // Diese Node enthlt alles was man braucht, um mit openGl zu zeichnen
 //
-#include <GL/glu.h>
 
 
 namespace BPT

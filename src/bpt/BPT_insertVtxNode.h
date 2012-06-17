@@ -74,8 +74,6 @@
 // Eigene
 #include <softTransformationEngine.h>
 
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <maya/M3dView.h>
 
 #include <iostream>
