@@ -769,7 +769,7 @@ MStatus BPTfty::doIt()//int slideInt)
 		//nun durch die FaceData gehen und diese OriginalFaces wiederherstellen und 
 		//dann alle Faces loeschen
 		
-		l = edge::MAINFaceDataPtrs.size();
+		l = static_cast<int>(edge::MAINFaceDataPtrs.size());
 		std::list<edgeFaceData*>::iterator fIter = edge::MAINFaceDataPtrs.begin();
 
 //		edgeFaceData* fTmp;
@@ -784,7 +784,7 @@ MStatus BPTfty::doIt()//int slideInt)
 		
 
 		//jetzt die nSelEdges wiederherstellen und loeschen, genauso wie ihre edgePtr
-		l = edge::nSelEdgeDataArray.size();
+		l = static_cast<int>(edge::nSelEdgeDataArray.size());
 		std::list<nSelEdgeData*>::iterator nIter = edge::nSelEdgeDataArray.begin();
 
 		//BA mit anzahl der Faces erstellen - wird an changeFace übrgeben als LUT
@@ -819,7 +819,7 @@ MStatus BPTfty::doIt()//int slideInt)
 		edge::nSelEdgeDataArray.clear();
 	
 		//jetzt die endFaces erstellen
-		l = edge::endFacePtrs.size();
+		l = static_cast<int>(edge::endFacePtrs.size());
 		std::list<endFaceData*>::iterator eIter = edge::endFacePtrs.begin();
 		endFaceData* eTmp;	//tmpVariable
 
@@ -909,7 +909,7 @@ MStatus BPTfty::doIt()//int slideInt)
 		}
 
 		
-		l = edge::MAINFaceDataPtrs.size();
+		l = static_cast<int>(edge::MAINFaceDataPtrs.size());
 		fIter = edge::MAINFaceDataPtrs.begin();
 		for(i = 0; i < l; i++)
 		{

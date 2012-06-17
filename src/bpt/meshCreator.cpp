@@ -1811,7 +1811,10 @@ void	meshCreator::createUV(int			currentFace,
 				UVEnd[1] += VArray[endUV];
 
 				
-				float2 resultUV = {UVStart[0] + ((UVEnd[0] - UVStart[0])*slide),UVStart[1] + ((UVEnd[1] - UVStart[1])*slide)};
+				float2 resultUV = {
+									static_cast<float>(UVStart[0] + ((UVEnd[0] - UVStart[0])*slide)),
+									static_cast<float>(UVStart[1] + ((UVEnd[1] - UVStart[1])*slide))
+									};
 
 				UArray.append(resultUV[0]);
 				VArray.append(resultUV[1]);
@@ -2021,7 +2024,10 @@ void	meshCreator::checkForUV(int thisFaceID,
 			UVEnd[1] += VArray[endUV];
 			
 			
-			float2 resultUV = {UVStart[0] + ((UVEnd[0] - UVStart[0])*slide),UVStart[1] + ((UVEnd[1] - UVStart[1])*slide)};
+			float2 resultUV = {
+								static_cast<float>(UVStart[0] + ((UVEnd[0] - UVStart[0])*slide)),
+								static_cast<float>(UVStart[1] + ((UVEnd[1] - UVStart[1])*slide))
+								};
 			
 			UArray.append(resultUV[0]);
 			VArray.append(resultUV[1]);

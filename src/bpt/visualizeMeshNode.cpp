@@ -361,7 +361,7 @@ void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize, M
 
 				dTmp = vtxWeightArray[i];
 
-				glf->glPointSize( (fPointSize * dTmp) + 3.0 );
+				glf->glPointSize( static_cast<MGLfloat>((fPointSize * dTmp) + 3.0));
 
 				glf->glBegin( GL_POINTS );	
 
@@ -374,7 +374,7 @@ void	visualizeMeshNode::drawPoints( MItMeshVertex& vertIter, float fPointSize, M
 	
 
 				tmpColor = getCalColor(vtxColor, vtxColor2, dTmp );
-				glf->glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, dTmp );
+				glf->glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, static_cast<MGLfloat>(dTmp));
 				glf->glVertex3f( (float)point.x, (float)point.y, (float)point.z);
 
 				glf->glEnd();
@@ -410,14 +410,14 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 				
 				
 				//Dass muss aussserhalb der displayList bleiben, weil dieser Wert nicht precompiliert werden darf
-				float param1 = 0.45, param2 = 0.55;
+				float param1 = 0.45f, param2 = 0.55f;
 
 				// im DebugMode werden die Params anhand der NodeParameter gesetzt
 
 				if(style == M3dView::kWireFrame)
 				{
 
-						param1 = 0.45; param2 = 0.55;
+						param1 = 0.45f; param2 = 0.55f;
 
 				}
 				else
@@ -426,13 +426,13 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 					{
 					case kNone:
 						{
-							param1 = -0.5; param2 = -0.6;
+							param1 = -0.5f; param2 = -0.6f;
 
 							break;
 						}
 					case kHilited:
 						{
-							param1 = 0.45; param2 = 0.55;
+							param1 = 0.45f; param2 = 0.55f;
 							
 							break;
 						}
@@ -476,16 +476,16 @@ void	visualizeMeshNode::drawShadedTriangles(MItMeshPolygon& polyIter, MItMeshVer
 					for(x = 0; x < l ; x+=3)
 					{
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x] ]);
-						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x] ]);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, static_cast<MGLfloat>(vtxWeightArray[ triVtx[x] ]));
 						glf->glVertex3d(triPoints[x].x, triPoints[x].y, triPoints[x].z);
 						
 			
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x+1] ]);
-						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x+1] ]);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, static_cast<MGLfloat>(vtxWeightArray[ triVtx[x+1] ]));
 						glf->glVertex3d(triPoints[x+1].x, triPoints[x+1].y, triPoints[x+1].z);
 
 						tmpCol = getCalColor(vtxColor, vtxColor2 ,  vtxWeightArray[ triVtx[x+2] ]);
-						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, vtxWeightArray[ triVtx[x+2] ]);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, static_cast<MGLfloat>(vtxWeightArray[ triVtx[x+2] ]));
 						glf->glVertex3d(triPoints[x+2].x, triPoints[x+2].y, triPoints[x+2].z);
 
 					}

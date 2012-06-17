@@ -1794,8 +1794,8 @@ endIt:;
 								newUVPos.setLength(2*creator->numUVSets);
 								for(UINT n = 0; n < creator->numUVSets; n++)
 								{
-									newUVPos[n*2] = UVPos[i][n*2] + r * (UVPos[1-i][n*2] - UVPos[i][n*2]);
-									newUVPos[n*2+1] = UVPos[i][n*2+1] + r * (UVPos[1-i][n*2+1] - UVPos[i][n*2+1]);
+									newUVPos[n*2] = static_cast<float>(UVPos[i][n*2] + r * (UVPos[1-i][n*2] - UVPos[i][n*2]));
+									newUVPos[n*2+1] = static_cast<float>(UVPos[i][n*2+1] + r * (UVPos[1-i][n*2+1] - UVPos[i][n*2+1]));
 								}
 
 								//UVs erzeugen
@@ -1850,7 +1850,7 @@ endIt:;
 						changed = false;
 						endIter = edge::endFacePtrs.end();
 						//jetzt von hinten angefangen die Liste durchsuchen nach der passenden FaceData
-						for(UINT x = edge::endFacePtrs.size(); x > 0; x--)
+						for(UINT x = static_cast<unsigned>(edge::endFacePtrs.size()); x > 0; x--)
 						{
 
 							endIter--;

@@ -303,15 +303,15 @@ MManipData	moveManip::getCachedTranslation(double xOffset,double yOffset,double 
 
 		if (upDir.isEquivalent(MVector::zNegAxis,0.01)) 
 		{
-			view.viewToWorld(px + (xOffset / bbScaleFactor) * v_x,py + (yOffset / bbScaleFactor),point,vec);
+			view.viewToWorld(static_cast<short>(px + (xOffset / bbScaleFactor) * v_x), static_cast<short>(py + (yOffset / bbScaleFactor)),point,vec);
 		} 
 		else if (rightDir.isEquivalent(MVector::xAxis,0.01)) 
 		{
-			view.viewToWorld(px + (xOffset / bbScaleFactor) * v_x,py + (yOffset / bbScaleFactor) * v_y,point,vec);
+			view.viewToWorld(static_cast<short>(px + (xOffset / bbScaleFactor) * v_x), static_cast<short>(py + (yOffset / bbScaleFactor) * v_y),point,vec);
 		} 
 		else  
 		{
-			view.viewToWorld(px,py + (yOffset /  bbScaleFactor) * v_y,point,vec);
+			view.viewToWorld(px, static_cast<short>(py + (yOffset /  bbScaleFactor) * v_y),point,vec);
 		}
         
 		numFn.setData(point.x,point.y,point.z);

@@ -98,14 +98,14 @@ public:
 
 	void		setSlide(double inSlide){slide = inSlide;};
 	void		setNormal(double inNormal){normal = inNormal;};
-	void		setSide(int inSide){side = (bool)inSide;};
+	void		setSide(int inSide){side = (inSide != 0);};
 
 	void		setEdgeIDs(const MIntArray& array){MIntArray tmp = array; edgeIDs = tmp;};	//!< dies musste irgendwie so umständlich gemacht werden, da man ansonsten drekt auf den NodeDaten gearbeitet hätte
 	void		setVertIDs(const MIntArray& array){vertIDs = array;};
 
 	void		setOptions(const MIntArray& o){options = o;};
-	void		setRelative(int value){isSlideRelative = (bool)value;};
-	void		setNormalRelative(int value){isNormalRelative = (bool)value;};
+	void		setRelative(int value){isSlideRelative = (value != 0);};
+	void		setNormalRelative(int value){isNormalRelative = (value != 0);};
 
 	void		setMeshPath(MDagPath& inMeshPath){meshPath = inMeshPath;};
 

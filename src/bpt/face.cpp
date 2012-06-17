@@ -419,7 +419,7 @@ void	face::splitTypeMinusOne()
 	//zwischenräume erstellen
 	unsigned i;
 	for(i = 1; i < ID;i++)
-		corners.append(-(ID - i));
+		corners.append( - static_cast<int>((ID - i)));
 
 	corners.append(vtx[ID]);
 	
@@ -2563,7 +2563,7 @@ void	face::flipData(dData& data)
 	data.startAbsID = data.endAbsID;
 	data.endAbsID = tmp;
 
-	data.isFlipped = bool(1 - int(data.isFlipped));
+	data.isFlipped = ((1 - int(data.isFlipped)) != 0);
 
 	/*
 	tmp = data.startAbsCorner;
@@ -3474,7 +3474,7 @@ bool	face::gatherSlideData(dData& data)
 				tmpData = convertData(data,errCode);
 				data = tmpData;
 				if(errCode == -1)
-					return bool(errCode);
+					return errCode != 0;
 
 				//cout<<"GATHER SLIDE DATA: AKTUELLE ID IST: "<<id<<endl;
 				//printData("DATA nach REQUEST+CONVERT: ",data);
@@ -3888,7 +3888,7 @@ dData	face::convertData(dData& data, int& errCode)
 		myData.endAbsCorner = tmp;
 
 		//test: wenn corners geflipped werden, muss flippedWert umgekehrt werden
-		myData.isFlipped = bool(1 - int(myData.isFlipped));
+		myData.isFlipped = (1 - int(myData.isFlipped)) != 0;
 
 		//cout<<"CONVERT DATA: "<<"Habe CornerEdges geflippt"<<endl;
 		//cout<<"CONVERT DATA: "<<"StartCornerID ist jetzt "<<myData.startAbsCorner<<endl;

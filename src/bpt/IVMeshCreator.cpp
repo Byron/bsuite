@@ -571,13 +571,13 @@ void	IVMeshCreator::createUVs(	int&		 minIndex,
 	UINT i;
 	for(i = 0; i < splitCount; i++)
 	{
-		UArray.append(startPoint[0] + (r++ * factor) * mySlide * direction[0]);
+		UArray.append(static_cast<float>(startPoint[0] + (r++ * factor) * mySlide * direction[0]));
 	}
 
 	r = 1.0;
 	for(i = 0; i < splitCount; i++)
 	{
-		VArray.append(startPoint[1] + (r++ * factor) * mySlide * direction[1]);
+		VArray.append(static_cast<float>(startPoint[1] + (r++ * factor) * mySlide * direction[1]));
 	}
 
 

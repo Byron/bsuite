@@ -3616,7 +3616,7 @@ void BPTfty::doUVSlide()
 	unsigned int numUVSets = 1;		//da er e nur auf einem UVSet arbeiten kann ... 
 
 	//lokaoe#le float kopie von slide, um ständiges konvertieren zu vermeiden;
-	float fSlide = slide;
+	float fSlide = static_cast<float>(slide);
 	
 	//iteratoren
 	std::list<MIntArray>::iterator iterSlideIDs = UVSlideIndices->begin();
@@ -3957,7 +3957,7 @@ void	BPTfty::doUVSlideSMC()
 	unsigned int numUVSets = 1;	
 
 	//lokaoe#le float kopie von slide, um ständiges konvertieren zu vermeiden;
-	float fSlide = slide;
+	float fSlide = static_cast<float>(slide);
 
 	//iteratoren
 	std::list<MIntArray>::iterator iterSlideIDs = UVSlideIndices->begin();
@@ -4696,7 +4696,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 										}
 										
 										
-										uIDs[i*2+a] = nFaces[a]*3.75 + 4.75*helper.matchArray(ceFaces,lastEdgeFaces)[0];
+										uIDs[i*2+a] = static_cast<int>(nFaces[a]*3.75 + 4.75*helper.matchArray(ceFaces,lastEdgeFaces)[0]);
 										INVIS(cout<<"HABE UID ADDIERT! ( "<<nFaces[a]*1.25<<" + "<<helper.matchArray(ceFaces,lastEdgeFaces)[0]*4.75<<endl;)
 											
 											
@@ -5157,7 +5157,7 @@ void		BPTfty::initEdges(MIntArray& allEdges,MIntArray& edgeIDs,simpleLinkedList<
 		}
 */
 
-		if((bool)options[8])
+		if(options[8])
 		{//wennnormalen verwendet werden, benoetigen die NSelEdges auch noch VtxInfos, damit sie als referenz dienen koennen
 			//jetzt noch die VtxIDs setzen
 			int nVtx[2];

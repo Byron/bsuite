@@ -348,7 +348,7 @@ protected:
 	
 
 	MIntArray*		offsetsLUT;			//!< beinhaltet index, an dem vtx hinzufgefuegt/genommen wurde
-	MIntArray*		offsetsLUTValues;	//!< Beinhaltet den Wert zum entsprechenden Slot in <offsetsALookUp>
+	MIntArray*		offsetsLUTValues;	//!< Beinhaltet den Wert zum entsprechenden Slot in offsetsALookUp
 	int				minID;				//!< die kleinste ID im LUT, efizienzsteigerung
 	int				maxID;				//!< die gsste ID usw.
 

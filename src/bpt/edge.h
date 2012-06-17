@@ -248,7 +248,7 @@ protected:
 	int				id;						//!< wird im grund nur fuers debuggung gebraucht;
 
 	//FLAGS
-	bool			clean;					//!< wird am ende der engageMethode auf <true> gesetzt	
+	bool			clean;					//!< wird am ende der engageMethode auf true gesetzt	
 
 	bool			onlyOneNSelNachbar[4];	//!< true (pro seite, pro richtimg), wenn es nur einen nSelNachbarn gibt, welcher dann auf jeden Fall herangezogen werden muss
 
