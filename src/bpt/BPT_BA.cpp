@@ -18,6 +18,7 @@
 
 #include "BPT_BA.h"
 
+#include <cstdlib>
 
 
 INVIS(ULONG		BPT_BA::counter = 0;)

@@ -380,7 +380,7 @@ MSyntax		ByronsPolyTools::newSyntax()
 
 	syntax.addFlag("-se","-selectEdges",MSyntax::kNoArg);
 	syntax.addFlag("-sf","-selectFaces",MSyntax::kNoArg);
-	syntax.addFlag("-","-outerEdges",MSyntax::kNoArg);
+	syntax.addFlag("-oe","-outerEdges",MSyntax::kNoArg);
 	syntax.addFlag("-sv","-selectVertices",MSyntax::kNoArg);
 	
 
