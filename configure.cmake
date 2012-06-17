@@ -13,6 +13,11 @@ set(${PROJECT_NAME}_VERSION_MINOR 0)
 
 # general path configuration
 string(TOLOWER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_LOWER)
+if(WIN32 AND MSVC)
+	# on windows, and with visual studio, the build output will be in a subdirectory automatically - can't help it
+	# ours would be redundant.
+	set(CMAKE_BUILD_TYPE_LOWER)
+endif()
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LOWER})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin/${CMAKE_BUILD_TYPE_LOWER})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib/${CMAKE_BUILD_TYPE_LOWER})
