@@ -389,7 +389,7 @@ MManipData ByronsPolyToolsNodeManip::toggleSideCallback(unsigned index) const
 
 	int i;
 	sidePlug.getValue(i);
-	return	MManipData((bool)i);
+	return	MManipData(i != 0);
 }
 
 //-------------------------------------------------------------------------
@@ -462,8 +462,8 @@ MManipData	ByronsPolyToolsNodeManip::directionCallback(unsigned index)
 
 
 	//hier muessen die Werte eigenticht nur zurueckgerechnet werden.
-	int newX = slide * breite;
-	int newY = 100 * normalVal + hoch/2;
+	int newX = static_cast<int>(slide * breite);
+	int newY = static_cast<int>(100 * normalVal + hoch/2);
 
 	
 	MPoint	startPoint;
@@ -554,19 +554,12 @@ void ByronsPolyToolsNodeManip::draw(M3dView & view,
 	 view.beginGL(); 
 	//view.beginSelect();
 
-    char str[100];
-    MString distanceText;
-   
-
-    sprintf(str, "    Side");
-	distanceText = str;
-
+	MString distanceText = "    Side";
 	view.drawText(distanceText, getRightScreenPoint(), M3dView::kLeft);
 	
 
-	sprintf(str, "sideRelative    ");
-	distanceText = str;
-
+	
+	distanceText = "sideRelative     ";
 	view.drawText(distanceText, getLeftScreenPoint(), M3dView::kRight);
 	
 

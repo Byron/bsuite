@@ -526,7 +526,7 @@ machWeiter:;
 	//aufs nächste Face schalten
 	++iter;
 
-	l = newFaces.size();
+	l = static_cast<uint>(newFaces.size());
 	for(i = 1; i < l; i++)
 	{//jetzt die anderen faces erstellen
 

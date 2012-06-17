@@ -293,7 +293,7 @@ void	IVfty::insertVertices(		IVMeshCreator&	 creator,
 	std::list<MIntArray>::iterator iter = validPathes.begin();
 	std::list<MIntArray>::iterator iterSE = startEndIDs.begin();
 
-	l = validPathes.size();
+	l = static_cast<unsigned>(validPathes.size());
 	UINT l2;
 	for(i = 0; i < l; i++)
 	{
@@ -833,7 +833,7 @@ void	IVfty::doUVSlide(MObject& mesh)
 	unsigned int numUVSets = 1;		//da er e nur auf einem UVSet arbeiten kann ... 
 
 	//lokaoe#le float kopie von slide, um ständiges konvertieren zu vermeiden;
-	float fSlide = slide;
+	float fSlide = static_cast<float>(slide);
 
 	//iteratoren
 	std::list<MIntArray>::iterator iterSlideIDs = UVSlideIndices->begin();
@@ -897,7 +897,7 @@ void	IVfty::doUVSlide(MObject& mesh)
 					for(UINT y = minUVID; y < maxUVID; y++)
 					{
 						tf = factor * r++;
-						FnMesh.setUV(y,start[x].x + (fSlide * dirs[x].x * tf), start[x].y + (fSlide * dirs[x].y * tf));
+						FnMesh.setUV(y, static_cast<float>(start[x].x + (fSlide * dirs[x].x * tf)), static_cast<float>(start[x].y + (fSlide * dirs[x].y * tf)));
 					}
 
 					c2n  +=  2;
@@ -913,7 +913,7 @@ void	IVfty::doUVSlide(MObject& mesh)
 					for(UINT y = maxUVID; y > minUVID; y--)
 					{
 						tf = factor * r++;
-						FnMesh.setUV(y,end[x].x - (fSlide * dirs[x].x * tf), end[x].y - (fSlide * dirs[x].y * tf));
+						FnMesh.setUV(y, static_cast<float>(end[x].x - (fSlide * dirs[x].x * tf)), static_cast<float>(end[x].y - (fSlide * dirs[x].y * tf)));
 					}
 					c2n  +=  2;
 					c2n1 +=  2;
@@ -932,7 +932,7 @@ void	IVfty::doUVSlide(MObject& mesh)
 					for(UINT y = minUVID; y < maxUVID; y++)
 					{
 						tf = factor * r++;
-						FnMesh.setUV(y,start[x].x + (fSlide * scale[x] * dirs[x].x * tf), start[x].y + (fSlide * scale[x] * dirs[x].y * tf));
+						FnMesh.setUV(y, static_cast<float>(start[x].x + (fSlide * scale[x] * dirs[x].x * tf)), static_cast<float>(start[x].y + (fSlide * scale[x] * dirs[x].y * tf)));
 					}
 
 					c2n  +=  2;
@@ -948,7 +948,7 @@ void	IVfty::doUVSlide(MObject& mesh)
 					for(UINT y = maxUVID; y > minUVID; y--)
 					{
 						tf = factor * r++;
-						FnMesh.setUV(y,end[x].x - (fSlide * scale[x] * dirs[x].x * tf), end[x].y - (fSlide * scale[x] * dirs[x].y * tf));
+						FnMesh.setUV(y, static_cast<float>(end[x].x - (fSlide * scale[x] * dirs[x].x * tf)), static_cast<float>(end[x].y - (fSlide * scale[x] * dirs[x].y * tf)));
 					}
 					c2n  +=  2;
 					c2n1 +=  2;

@@ -553,7 +553,7 @@ MStatus softTransformationToolCtx::doPress(MEvent &event)
 			MVector vec;
 			view.viewToWorld(0, 0, pWorld1, vec );
 			view.viewToWorld( view.portWidth(), view.portHeight() , pWorld2, vec );
-			maxScreenDistance = pWorld1.distanceTo(pWorld2);
+			maxScreenDistance = static_cast<float>(pWorld1.distanceTo(pWorld2));
 		}
         
 
@@ -603,11 +603,11 @@ MStatus softTransformationToolCtx::doDrag(MEvent & event)
 					if(isOrthoCam)
 					{
 						int v_w = view.portWidth();
-						value = initialMask + (double((endPos_x - startPos_x)) / double(v_w) ) * 5;
+						value = static_cast<int>(initialMask + (double((endPos_x - startPos_x)) / double(v_w) ) * 5);
 					}
 					else
 					{
-						value = initialMask + ((endPos_x - startPos_x) /*+ sqrt(pow(endPos_y - startPos_y,2))*/ * bbScaleFactor * 3);
+						value = static_cast<int>(initialMask + ((endPos_x - startPos_x) /*+ sqrt(pow(endPos_y - startPos_y,2))*/ * bbScaleFactor * 3));
 					}
 
 					depNodeFn.findPlug("maskSize").setValue( value );

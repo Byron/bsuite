@@ -52,6 +52,8 @@ public:
 	
 	/** Konstruktor
 	@param
+		initialArray to serve as initial values
+	@param
 		alwaysStartAtZero baut das BA mit lowBound = 0 auf
 	@param 
 		initialValue false bedeutet, dass der BA defalt wert false ist, ansonsten ist es true (und IntArrayIndices sind false)

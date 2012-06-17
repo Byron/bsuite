@@ -1066,7 +1066,7 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 				
 			
 			
-			newVector = UVVector * rl;
+			newVector = UVVector * static_cast<float>(rl);
 			
 			//lueuenge des vektors zischenspeichern
 			length = UVVector.length();
@@ -1076,7 +1076,7 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 			//erst CCW um 90ueue drehen
 			tmp = UVVector.x;
 			UVVector.x = -UVVector.y;
-			UVVector.y = tmp;
+			UVVector.y = static_cast<float>(tmp);
 			
 
 			//wenn punkt NICHT inside, dann andere Richtung nehmen
@@ -1089,7 +1089,7 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 			
 			//jetzt den vektor normalisieren, und ihn entsprechend verlueuengern anhand der lengthratio der hueuehe
 			UVVector.normalize();
-			UVVector = UVVector  * (length  * h);
+			UVVector = UVVector  * static_cast<float>(length  * h);
 
 			newVector = UVVector + newVector;
 			//jetzt die gewichtung errechnen anhand der entfernung des newVtx zur currentEdge
@@ -1147,8 +1147,8 @@ void	edge::getUVPos(MPoint newVtxPos, edgeFaceData* thisFace, MFloatArray& newUV
 	
 		}
 		
-		newUVPos[i*2] = tmpPos.x / nmw;	//zum schluss muss die ganze sache noch normalisiert werden
-		newUVPos[i*2+1] = tmpPos.y / nmw;
+		newUVPos[i*2] = static_cast<float>(tmpPos.x / nmw);	//zum schluss muss die ganze sache noch normalisiert werden
+		newUVPos[i*2+1] = static_cast<float>(tmpPos.y / nmw);
 	//	newUVPos[i*2] = tmpPos.x / (float)l;
 	//	newUVPos[i*2+1] = tmpPos.y / (float)l;
 
@@ -1579,8 +1579,8 @@ outOfLoops:
 				//jetzt die UVPositionen fueuer dieses UVset fueuer das entsprechende Face erstellen	
 				
 				
-				resultPos[z++] = ( startUVPos[i][n*2] + r*(endUVPos[i][n*2] - startUVPos[i][n*2]) );	// == UPosition
-				resultPos[z++] = ( startUVPos[i][n*2+1] + r*(endUVPos[i][n*2+1] - startUVPos[i][n*2+1]) );	// == VPosition
+				resultPos[z++] = static_cast<float>( startUVPos[i][n*2] + r*(endUVPos[i][n*2] - startUVPos[i][n*2]) );	// == UPosition
+				resultPos[z++] = static_cast<float>( startUVPos[i][n*2+1] + r*(endUVPos[i][n*2+1] - startUVPos[i][n*2+1]) );	// == VPosition
 				
 				
 				

@@ -364,7 +364,7 @@ bool	BPT_BA::operator [] (long index) const
 		//wert zurückgeben
 		ULONG wert = one << index % nBitsInUlong;
 		
-		return ( ( (array[ (ULONG) (index / nBitsInUlong)] ) & wert ) );
+		return (( array[ (ULONG) (index / nBitsInUlong)] ) & wert ) > 0U;
 		
 
 }
@@ -440,7 +440,7 @@ bool		BPT_BA::isFlagSet ( unsigned index) const
 		//		? true
 		//		: false;
 		
-		return (bool)(array[ (ULONG)(index / nBitsInUlong ) ] & wert);
+		return (array[ (ULONG)(index / nBitsInUlong ) ] & wert) > 0U;
 }
 
 //--------------------------------------------------------------------

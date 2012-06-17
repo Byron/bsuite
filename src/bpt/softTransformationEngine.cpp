@@ -682,7 +682,7 @@ void	softTransformationEngine::generateEdgeWeights(	const MIntArray& vtxSet,
 		
 		
 		// Nun die Weigths entsprechend des maxWeigthsParams
-		maxWeights = (weights.size() < (uint)nd.maxWeights) ? weights.size() : (uint)nd.maxWeights ; 
+		maxWeights = static_cast<unsigned>((weights.size() < (uint)nd.maxWeights) ? weights.size() : (uint)nd.maxWeights) ; 
 		
 		
 		
@@ -882,7 +882,7 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 
 		
 		// jetzt edgeLength mal iterieren
-		for( i = lastEdgeDistance; i < nd.edgeDistance; i++)
+		for( i = lastEdgeDistance; i < static_cast<unsigned>(nd.edgeDistance); i++)
 		{
 			converter.vtxToConnectedFaceVtx(vtxSet[cvs], vtxSet[ocvs]);
 			
@@ -923,7 +923,7 @@ void	softTransformationEngine::createWeightsBasedOnEdgeDistance()
 		// Die bedeutet, dass die letzten, nun veralteten ringe geluescht werden muessen, danach resampled
 		// Auueerdem muss man den ec updaten
 		uint delIDRange = 0;			// zusammenfassung aller IDs,welche gelueschgt werden sollen
-		for( i = lastEdgeDistance - 1; i > nd.edgeDistance - 1; i--)
+		for( i = lastEdgeDistance - 1; i > static_cast<unsigned>(nd.edgeDistance - 1); i--)
 		{
 			 delIDRange += ec.ringCounts[i];
 
@@ -1022,7 +1022,7 @@ void	softTransformationEngine::createWeightsBasedOnDistance()
 		
 		
 		// Es soll die grueuetMuegliche zahl an weights genommen werden
-		maxWeights = ((uint)nd.maxWeights < weights.size() ) ? (uint)nd.maxWeights : weights.size();
+		maxWeights = ((size_t)nd.maxWeights < weights.size() ) ? (uint)nd.maxWeights : (uint)weights.size();
 		
 		
 		if(maxWeights > 0 )
@@ -2027,7 +2027,7 @@ softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize,
 
 				dTmp = wa[i];
 
-				glf->glPointSize( (fPointSize * dTmp) + 3.0 );
+				glf->glPointSize( static_cast<MGLfloat>((fPointSize * dTmp) + 3.0) );
 
 				glf->glBegin( GL_POINTS );	
 
@@ -2040,7 +2040,7 @@ softTransformationEngine::drawPoints( MItMeshVertex& vertIter, float fPointSize,
 	
 
 				tmpColor = getCalColor(dd.vtxColor1, dd.vtxColor2, dTmp );
-				glf->glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, dTmp );
+				glf->glColor4f(tmpColor.x,tmpColor.y,tmpColor.z, static_cast<MGLfloat>(dTmp) );
 				glf->glVertex3f( (float)point.x, (float)point.y, (float)point.z);
 
 				glf->glEnd();
@@ -2080,14 +2080,14 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 				
 				
 				//Dass muss ausueerhalb der displayList bleiben, weil dieser Wert nicht precompiliert werden darf
-				float param1 = 0.45, param2 = 0.55;
+				float param1 = 0.45f, param2 = 0.55f;
 
 				// im DebugMode werden die Params anhand der NodeParameter gesetzt
 
 				if(style == M3dView::kWireFrame)
 				{
 
-						param1 = 0.45; param2 = 0.55;
+						param1 = 0.45f; param2 = 0.55f;
 
 				}
 				else
@@ -2096,13 +2096,13 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 					{
 					case kNone:
 						{
-							param1 = -0.5; param2 = -0.6;
+							param1 = -0.5f; param2 = -0.6f;
 
 							break;
 						}
 					case kHilited:
 						{
-							param1 = 0.45; param2 = 0.55;
+							param1 = 0.45f; param2 = 0.55f;
 							
 							break;
 						}
@@ -2142,16 +2142,16 @@ softTransformationEngine::drawShadedTriangles(	MItMeshPolygon& polyIter,
 						//glColor4f(0.0f, 0.0f, 1.0f, vtxWeightArray[ polyVtx[x] ]);
 						
 						tmpCol = getCalColor(dd.vtxColor1, dd.vtxColor2 ,  wa[ triVtx[x] ]);
-						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x] ]);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, static_cast<MGLfloat>(wa[ triVtx[x] ]));
 						glf->glVertex3d(triPoints[x].x, triPoints[x].y, triPoints[x].z);
 						
 			
 						tmpCol = getCalColor(dd.vtxColor1, dd.vtxColor2 ,  wa[ triVtx[x+1] ]);
-						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x+1] ]);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, static_cast<MGLfloat>(wa[ triVtx[x+1] ]));
 						glf->glVertex3d(triPoints[x+1].x, triPoints[x+1].y, triPoints[x+1].z);
 
 						tmpCol = getCalColor(dd.vtxColor1, dd.vtxColor2 ,  wa[ triVtx[x+2] ]);
-						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, wa[ triVtx[x+2] ]);
+						glf->glColor4f(tmpCol.x, tmpCol.y,tmpCol.z, static_cast<MGLfloat>(wa[ triVtx[x+2] ]));
 						glf->glVertex3d(triPoints[x+2].x, triPoints[x+2].y, triPoints[x+2].z);
 
 					}
