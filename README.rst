@@ -3,6 +3,8 @@ About B-Suite
 #############
 The B-Suite (pronounced *Be Sweet*) is a conglomerate of maya plugins that I wrote because I really wanted to try something.
 The respective plugins where written with quality in mind. Additionally you will find auto-tests, code-docs and end-user docs.
+
+All plugins and tools work on Linux, OSX and Windows.
   
 ###########
 Lidar Tools
@@ -13,8 +15,6 @@ Lidar Tools
 
 The lidar visualization tools consist of a locator which efficiently reads LAS files and displays them. Various options allow you to set a tradeoff between display performance and memory consumption.
     
-The lidar tools work for Maya 2008 to Maya 2013, on Linux and OSX.
-
 ====================
 Lidar Tools Features
 ====================
@@ -47,8 +47,6 @@ PTexVis
 
 PTexVis is a locator which can display ptex textures s point clouds on top of the corresponding mesh. For now it is only used as research project and to obtain an understanding on how ptex works.
 
-PTexVis works for Maya 2008 to Maya 2013, on Linux and OSX.
-
 ================
 PTexVis Features
 ================
@@ -65,6 +63,35 @@ PTexVis Features
  
   * Can currently only sample *triangle* meshes when *not* only displaying pure texel samples. 
   
+
+#################
+Byrons Poly Tools
+#################
+
+.. image:: http://old.byronimo.de/img/content/main/BPTImage.gif
+.. image:: http://old.byronimo.de/img/content/products/BPT/mov_stt.gif
+.. image:: http://old.byronimo.de/img/content/products/BPT/mov_chamfer.gif
+.. image:: http://old.byronimo.de/img/content/products/BPT/mov_smartsplit.gif
+
+This plugin is my very first C++ project, and was written more than 10 years ago. This, of course, shows in the code, which is a premium example on how to **not** write code. Code-wise, its clearly a sin of my youth, however, it still works and is usable, which is why I added it to the bsuite.
+
+On the end-user side, you will find various tools to speed up your modeling and to make it more convenient.
+
+The online documentation can be found here: http://old.byronimo.de/docs/BPT/1.0
+
+Please note that this is **legacy** code which is entirely unsupported in case you want to use it.
+
+============
+BPT Features
+============
+
+* Tweak your Meshes in realtime and split trough it almost instantly.
+* You can procedurally slide or push your split, or align it to it's boundary.
+* Soft Selection functionality is directly integrated into the node and can be used in conjuctions with every action which changes the mesh's topology.
+* The Tools will not be limited to a specific component type, and you decide whether you want to work with vertices, edges or faces. Additionally, Smart Split is actually 3 in 1: Split through geometry, poke faces or connect vertices.
+* Byrons Poly Tools bring to you a chamfer and solid chamfer. Due to new algorithms it will give higher quality bevels compared to other packages.
+ 
+
 ########
 Building
 ########
@@ -116,7 +143,6 @@ Launch maya and load the plugin::
     # In the attribute editor, select a ptx texture to display.
     # You will see error messages in the viewport if something doesn't work.
 
-.. note:: Tested only on Linux and OSX currently, but should be usable on Windows as well.
 
 #######
 Testing
