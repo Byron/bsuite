@@ -389,11 +389,15 @@ function(add_maya_project)
 	# FOR EACH MAYA VERSION TO GENERATE
 	####################################
 	foreach(MAYA_VERSION IN LISTS PROJECT_MAYA_VERSIONS)
-		set(_MAYA_LOCATION ${MAYA_INSTALL_BASE_PATH}/maya${MAYA_VERSION}${MAYA_INSTALL_BASE_SUFFIX})
+		set(MAYA_LOCATION_VAR MAYA_${MAYA_VERSION}_LOCATION)
+		set(${MAYA_LOCATION_VAR} "${MAYA_INSTALL_BASE_PATH}/maya${MAYA_VERSION}${MAYA_INSTALL_BASE_SUFFIX}" CACHE PATH
+			"Path containing the directory containing your ${MAYA_VERSION} installation directory, containing the lib and include subdirectories.")
+		set(_MAYA_LOCATION ${${MAYA_LOCATION_VAR}})
+		
 		_maya_project_id(${PROJECT_NAME} ${MAYA_VERSION} PROJECT_ID)
 		
 		if(NOT EXISTS ${_MAYA_LOCATION})
-			message(SEND_ERROR "maya was not found at ${_MAYA_LOCATION} - please assure your MAYA_VERSIONS are set correctly, as well as your MAYA_INSTALL_BASE_SUFFIX, which could be -x64 on 64 bit systems")
+			message(SEND_ERROR "maya was not found at ${_MAYA_LOCATION} - please assure your MAYA_VERSIONS are set correctly. Otherwise set the ${MAYA_LOCATION_VAR} variable.")
 			return()
 		endif()
 		
