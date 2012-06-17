@@ -5,7 +5,41 @@ The B-Suite (pronounced *Be Sweet*) is a conglomerate of maya plugins that I wro
 The respective plugins where written with quality in mind. Additionally you will find auto-tests, code-docs and end-user docs.
 
 All plugins and tools work on Linux, OSX and Windows.
-  
+
+########
+Download
+########
+
+The plugins have been compiled on *Linux*, *OSX* and *Windows*, for maya *2013*, *2012* and *2011*, and on some platforms for even older maya versions.
+
+* *Linux*
+
+ * https://dl.dropbox.com/u/17820808/bsuite/linux/bsuite_linux_x64.zip
+ 
+* *OSX*
+
+ * https://dl.dropbox.com/u/17820808/bsuite/osx/bsuite_osx_x64.zip
+ 
+* *Windows*
+
+ * https://dl.dropbox.com/u/17820808/bsuite/windows/bsuite_windows_x64.zip
+
+============
+Installation
+============
+
+Extract the archive destined for your operating system into a place of your choice.
+
+In your *Maya.env* file, setup the *MAYA_PLUG_IN_PATH* environment variable to point to the plugin directory containing the plugins compiled for it.
+Additionally, set the *MAYA_SCRIPT_PATH* to the *mel* subdirectory.
+
+Start maya and load the plugins, which should be listed in your plugin editor.
+
+An example Maya.env file might look like this::
+    
+    MAYA_PLUG_IN_PATH=/home/user/downloads/bsuite/2012
+    MAYA_SCRIPT_PATH=/home/user/downloads/bsuite/mel
+    
 ###########
 Lidar Tools
 ###########
