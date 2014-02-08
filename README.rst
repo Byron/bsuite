@@ -184,7 +184,7 @@ Testing
 
 In short:
 
- * Make sure cmake knows where your tmrv executable is. Its part of the `mrv development framework<https://github.com/mrv-developers/mrv>`
+ * Make sure cmake knows where your tmrv executable is. Its part of the `mrv development framework<https://github.com/mrv-developers/mrv>`_
  * run **ctest** to invoke the test-suite.
 
 ########

@@ -134,7 +134,7 @@ if(APPLE)
 		"Directory containing all the osx 10.6 headers")
 	
 	if(NOT EXISTS ${CMAKE_FRAMEWORK_PATH})
-		message(SEND_ERROR "SYSROOT include directory not found at ${CMAKE_FRAMEWORK_PATH} - please configure it in your cmake cache and try again")
+		message(SEND_ERROR "SYSROOT include directory not found at ${CMAKE_FRAMEWORK_PATH} - please configure the CMAKE_FRAMEWORK_PATH cmake cache and try again")
 	endif()
 endif()
 
