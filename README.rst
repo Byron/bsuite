@@ -5,6 +5,11 @@ The B-Suite (pronounced *Be Sweet*) is a conglomerate of maya plugins that I wro
 The respective plugins where written with quality in mind. Additionally you will find auto-tests, code-docs and end-user docs.
 
 All plugins and tools work on Linux, OSX and Windows.
+
+#########
+Downloads
+#########
+Please find precompiled versions for maya and all major platforms in my `public dropbox share<https://www.dropbox.com/sh/p1z6b2b5s0s0dai/azCR1LbAUZ>`_.
   
 ###########
 Lidar Tools
@@ -150,7 +155,7 @@ Testing
 
 In short:
 
- * Make sure cmake knows where your tmrv executable is. Its part of the `mrv development framework<https://github.com/mrv-developers/mrv>`
+ * Make sure cmake knows where your tmrv executable is. Its part of the `mrv development framework<https://github.com/mrv-developers/mrv>`_
  * run **ctest** to invoke the test-suite.
 
 ########
