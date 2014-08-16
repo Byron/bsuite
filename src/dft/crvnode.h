@@ -51,14 +51,11 @@ class MeshCurvatureNode : public MPxNode
 		// Input attributes
 		static MObject aCurveMap;				//!< a ramp attribute to allow mapping 
 		static MObject aInMesh;					//!< size of a point when drawing
-		static MObject aMapName;			 	//!< name of the vtx color map to be added to the mesh
 		
 		// output attributes
 		static MObject aOutMesh;				//!< the mesh we produce, just inMesh, but with added vtx color map
 
 	protected:
-
-		MStatus attachCurvatureToMesh(MDataBlock& data);
 };
 
 #endif

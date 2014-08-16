@@ -25,6 +25,8 @@
 #include <maya/MFnTypedAttribute.h>
 #include <maya/MFloatPointArray.h>
 #include <maya/MRampAttribute.h>
+#include <maya/MColorArray.h>
+#include <maya/MItMeshVertex.h>
 
 
 #include "mayabaselib/base.h"
@@ -50,7 +52,6 @@ const MString MeshCurvatureNode::typeName("MeshCurvatureNode");
 // Attributes
 MObject MeshCurvatureNode::aCurveMap;
 MObject MeshCurvatureNode::aInMesh;
-MObject MeshCurvatureNode::aMapName;
 
 MObject MeshCurvatureNode::aOutMesh;
 
@@ -86,10 +87,6 @@ MStatus MeshCurvatureNode::initialize()
 	aOutMesh = fnType.create("outMesh", "om", MFnData::kMesh, &status);
 	CHECK_MSTATUS(status);
 
-	MObject vtxMapDefault(MFnStringData().create("curvatureMap"));
-	aMapName = fnType.create("vertexColorMapName", "vcmn", MFnData::kString, vtxMapDefault, &status);
-	CHECK_MSTATUS(status);
-
 	aCurveMap = MRampAttribute::createColorRamp("curvatureMap", "cm", &status);
 	CHECK_MSTATUS(status);
 
@@ -97,27 +94,34 @@ MStatus MeshCurvatureNode::initialize()
 	/////////////////
 	CHECK_MSTATUS(addAttribute(aInMesh));
 	CHECK_MSTATUS(addAttribute(aOutMesh));
-	CHECK_MSTATUS(addAttribute(aMapName));
 	CHECK_MSTATUS(addAttribute(aCurveMap));
 
 	// All input affect the output color
 	CHECK_MSTATUS(attributeAffects(aInMesh, aOutMesh));
-	CHECK_MSTATUS(attributeAffects(aMapName, aOutMesh));
 	CHECK_MSTATUS(attributeAffects(aCurveMap, aOutMesh));
 
 	return MS::kSuccess;
 }
 
-MStatus attachCurvatureToMesh(MFnMesh& mesh, const MString& ctxMapName)
+// Compute colors per vertex, and map them according to the given ramp attribute
+MStatus recomputeCurvatureToMesh(MFnMesh& mesh)
 {
 	MStatus stat;
+	MColorArray vtxColors(mesh.numVertices());
+	// Yes, we have to provide an array of vtx indices ... inredible ...
+	MIntArray vtxIds(mesh.numVertices());
+	MObject meshObject = mesh.object();
 
+	for (MItMeshVertex iVtx(meshObject); !iVtx.isDone(); iVtx.next()) {
+		const int vid = iVtx.index();
+		MColor& c = vtxColors[vid];
+		vtxIds[vid] = vid;
+		c.r = 1.0f;
+	}// end for each vtx to compute color for
 
-	//
-
+	stat = mesh.setVertexColors(vtxColors, vtxIds, NULL, MFnMesh::kRGB);
 	return stat;
 }
-
 
 MStatus MeshCurvatureNode::compute(const MPlug& plug, MDataBlock& data)
 {
@@ -125,17 +129,18 @@ MStatus MeshCurvatureNode::compute(const MPlug& plug, MDataBlock& data)
 	MStatus stat;
 	if (plug == aOutMesh) {
 		// Copy data, so that we can work on the out mesh
-		stat = data.outputValue(aOutMesh).copy(data.inputValue(aInMesh));
+		stat = data.outputValue(aOutMesh).set(data.inputValue(aInMesh).data());
 		CHECK_MSTATUS(stat);
 
-		MFnMesh mesh(data.inputValue(aOutMesh).asMesh(), &stat);
+		MFnMesh mesh(data.outputValue(aOutMesh).asMesh(), &stat);
 		CHECK_MSTATUS(stat);
 
-		attachCurvatureToMesh(mesh);
-
+		stat = recomputeCurvatureToMesh(mesh);
+		CHECK_MSTATUS(stat);
 	} else {
 		return MS::kUnknownParameter;
 	}
 
+	return stat;
 }
 
