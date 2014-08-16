@@ -7,11 +7,11 @@
  *   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
  *   in the documentation and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
- * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -27,6 +27,8 @@
 #include <maya/MRampAttribute.h>
 #include <maya/MColorArray.h>
 #include <maya/MItMeshVertex.h>
+#include <maya/MDrawRequest.h>
+#include <maya/MFloatVector.h>
 
 
 #include "mayabaselib/base.h"
@@ -35,112 +37,148 @@
 
 #include "assert.h"
 
-#ifdef _OPENMP
-	#include <omp.h>
-#endif
-
 
 //********************************************************************
 //**	Class Implementation
 //********************************************************************
 /////////////////////////////////////////////////////////////////////
 
-const MTypeId MeshCurvatureNode::typeId(0x00108bf9);
-const MString MeshCurvatureNode::typeName("MeshCurvatureNode");
+const MTypeId MeshCurvatureHWShader::typeId(0x00108bf9);
+const MString MeshCurvatureHWShader::typeName("MeshCurvatureHWShader");
 
 
 // Attributes
-MObject MeshCurvatureNode::aCurveMap;
-MObject MeshCurvatureNode::aInMesh;
-
-MObject MeshCurvatureNode::aOutMesh;
+MObject MeshCurvatureHWShader::aCurveMap;
 
 
-MeshCurvatureNode::MeshCurvatureNode()
+MeshCurvatureHWShader::MeshCurvatureHWShader()
 {}
 
-MeshCurvatureNode::~MeshCurvatureNode()
+MeshCurvatureHWShader::~MeshCurvatureHWShader()
 {}
 
-void MeshCurvatureNode::postConstructor()
+void MeshCurvatureHWShader::postConstructor()
 {
-	setMPSafe(true);
+	setMPSafe(false);
 }
 
 // DESCRIPTION:
 // creates an instance of the node
-void* MeshCurvatureNode::creator()
+void* MeshCurvatureHWShader::creator()
 {
-	return new MeshCurvatureNode();
+	return new MeshCurvatureHWShader();
 }
 
 // DESCRIPTION:
 //
-MStatus MeshCurvatureNode::initialize()
+MStatus MeshCurvatureHWShader::initialize()
 {
 	MStatus status;
 
 	MFnTypedAttribute fnType;
-	
-	aInMesh = fnType.create("inMesh", "im", MFnData::kMesh, &status);
-	CHECK_MSTATUS(status);
-	aOutMesh = fnType.create("outMesh", "om", MFnData::kMesh, &status);
-	CHECK_MSTATUS(status);
 
 	aCurveMap = MRampAttribute::createColorRamp("curvatureMap", "cm", &status);
 	CHECK_MSTATUS(status);
 
 	// Add attributes
 	/////////////////
-	CHECK_MSTATUS(addAttribute(aInMesh));
-	CHECK_MSTATUS(addAttribute(aOutMesh));
 	CHECK_MSTATUS(addAttribute(aCurveMap));
 
-	// All input affect the output color
-	CHECK_MSTATUS(attributeAffects(aInMesh, aOutMesh));
-	CHECK_MSTATUS(attributeAffects(aCurveMap, aOutMesh));
-
 	return MS::kSuccess;
+}
+
+MStatus MeshCurvatureHWShader::bind(const MDrawRequest& request, M3dView& view)
+{
+    view.beginGL();
+
+    glPushAttrib( GL_ALL_ATTRIB_BITS );
+    glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+
+    view.endGL();
+
+    return MS::kSuccess;
+}
+
+
+MStatus MeshCurvatureHWShader::unbind(const MDrawRequest& request,
+               M3dView& view)
+{
+    view.beginGL(); 
+
+    glPopClientAttrib();
+    glPopAttrib();
+
+    view.endGL();
+
+    return MS::kSuccess;
+}
+
+bool MeshCurvatureHWShader::setInternalValueInContext( const MPlug& plug,
+												   const MDataHandle& handle,
+												   MDGContext& ctx)
+{
+	return MPxHwShaderNode::setInternalValueInContext(plug, handle, ctx);
 }
 
 // Compute colors per vertex, and map them according to the given ramp attribute
 MStatus recomputeCurvatureToMesh(MFnMesh& mesh)
 {
 	MStatus stat;
-	MColorArray vtxColors(mesh.numVertices());
-	// Yes, we have to provide an array of vtx indices ... inredible ...
-	MIntArray vtxIds(mesh.numVertices());
-	MObject meshObject = mesh.object();
-
-	for (MItMeshVertex iVtx(meshObject); !iVtx.isDone(); iVtx.next()) {
-		const int vid = iVtx.index();
-		MColor& c = vtxColors[vid];
-		vtxIds[vid] = vid;
-		c.r = 1.0f;
-	}// end for each vtx to compute color for
-
-	stat = mesh.setVertexColors(vtxColors, vtxIds, NULL, MFnMesh::kRGB);
 	return stat;
 }
 
-MStatus MeshCurvatureNode::compute(const MPlug& plug, MDataBlock& data)
+MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
+			                            M3dView& view,
+			                            int prim,
+			                            unsigned int writable,
+			                            int indexCount,
+			                            const unsigned int * indexArray,
+			                            int vertexCount,
+			                            const int * vertexIDs,
+			                            const float * vertexArray,
+			                            int normalCount,
+			                            const float ** normalArrays,
+			                            int colorCount,
+			                            const float ** colorArrays,
+			                            int texCoordCount,
+			                            const float ** texCoordArrays)
 {
-	data.setClean(plug);
-	MStatus stat;
-	if (plug == aOutMesh) {
-		// Copy data, so that we can work on the out mesh
-		stat = data.outputValue(aOutMesh).set(data.inputValue(aInMesh).data());
-		CHECK_MSTATUS(stat);
+	// 
+    // if( colorCount > 0 && colorArrays[ colorCount - 1] != NULL )
+    // {
+    //     glPushAttrib(GL_ALL_ATTRIB_BITS);
+    //     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+    //     glDisable(GL_LIGHTING);
 
-		MFnMesh mesh(data.outputValue(aOutMesh).asMesh(), &stat);
-		CHECK_MSTATUS(stat);
+    //     glEnableClientState(GL_COLOR_ARRAY);
+    //     glColorPointer( 4, GL_FLOAT, 0, &colorArrays[colorCount - 1][0]);
 
-		stat = recomputeCurvatureToMesh(mesh);
-		CHECK_MSTATUS(stat);
-	} else {
-		return MS::kUnknownParameter;
-	}
+    //     glEnableClientState(GL_VERTEX_ARRAY);
+    //     glVertexPointer ( 3, GL_FLOAT, 0, &vertexArray[0] );
+    //     glDrawElements ( prim, indexCount, GL_UNSIGNED_INT, indexArray );
 
-	return stat;
+    //     glEnableClientState(GL_COLOR_ARRAY);
+
+    //     glPopClientAttrib();
+    //     glPopAttrib();
+
+    //     return MS::kSuccess;
+    // }
+    return MS::kSuccess;
+}
+
+
+MStatus MeshCurvatureHWShader::compute(
+const MPlug&      plug,
+      MDataBlock& block ) 
+{ 
+    MDataHandle outColorHandle = block.outputValue( outColor );
+    MFloatVector& outColor = outColorHandle.asFloatVector();
+	outColor.x = 0.0f;
+	outColor.y = 0.0f;
+	outColor.z = 0.0f;
+    outColorHandle.setClean();
+
+    return MS::kSuccess;
 }
 

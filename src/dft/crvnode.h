@@ -18,31 +18,51 @@
 #ifndef CURVATURE_VISUALIZATION_NODE
 #define CURVATURE_VISUALIZATION_NODE
 
-#include <maya/MPxNode.h>
+#include <maya/MPxHwShaderNode.h>
 
 #include <fstream>
 #include <memory>
 #include <vector>
 
 
-class MGLFunctionTable;
-
 
 //! Node helping to visualize lidar data
-class MeshCurvatureNode : public MPxNode
+class MeshCurvatureHWShader : public MPxHwShaderNode
 {
 	public:
 	
 	public:
-		MeshCurvatureNode();
-		virtual ~MeshCurvatureNode();
+		MeshCurvatureHWShader();
+		virtual ~MeshCurvatureHWShader();
 
 		virtual void postConstructor();
+		virtual bool provideVertexIDs() { return true; }
 
-		virtual MStatus compute(const MPlug&, MDataBlock&);
+		MStatus bind(const MDrawRequest&, M3dView&);
+		MStatus unbind(const MDrawRequest&, M3dView&);
+		virtual MStatus     geometry( const MDrawRequest& request,
+								M3dView& view,
+								int prim,
+								unsigned int writable,
+								int indexCount,
+								const unsigned int * indexArray,
+								int vertexCount,
+								const int * vertexIDs,
+								const float * vertexArray,
+								int normalCount,
+								const float ** normalArrays,
+								int colorCount,
+								const float ** colorArrays,
+								int texCoordCount,
+								const float ** texCoordArrays);
 
 		static  void*   creator();
 		static  MStatus initialize();
+		MStatus compute( const MPlug&, MDataBlock&);
+		
+		virtual bool setInternalValueInContext( const MPlug&,
+											  	const MDataHandle&,
+											  	MDGContext&);
 
 		static const MTypeId typeId;				//!< binary file type id
 		static const MString typeName;				//!< node type name
@@ -50,11 +70,7 @@ class MeshCurvatureNode : public MPxNode
 	protected:
 		// Input attributes
 		static MObject aCurveMap;				//!< a ramp attribute to allow mapping 
-		static MObject aInMesh;					//!< size of a point when drawing
 		
-		// output attributes
-		static MObject aOutMesh;				//!< the mesh we produce, just inMesh, but with added vtx color map
-
 	protected:
 };
 

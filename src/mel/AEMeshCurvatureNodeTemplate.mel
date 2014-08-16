@@ -1,14 +1,14 @@
 
-global proc AEMeshCurvatureNodeTemplate(string $nodeName)
+global proc AEMeshCurvatureHWShaderTemplate(string $nodeName)
 {
 	editorTemplate -beginScrollLayout;
 
-	editorTemplate -beginLayout "Curvature Attributes" -collapse 0;
-	{
-		editorTemplate -addControl "vertexColorMapName";
-		AEaddRampControl($nodeName+".curvatureMap");
-	}
-	editorTemplate -endLayout;
+	// editorTemplate -beginLayout "Curvature Attributes" -collapse 0;
+	// {
+	// 	editorTemplate -addControl "vertexColorMapName";
+	// 	AEaddRampControl($nodeName+".curvatureMap");
+	// }
+	// editorTemplate -endLayout;
 	
 	editorTemplate -addExtraControls;
 	editorTemplate -endScrollLayout;

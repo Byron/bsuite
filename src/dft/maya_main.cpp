@@ -7,11 +7,11 @@
  *   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer
  *   in the documentation and/or other materials provided with the distribution.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, 
- * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT 
- * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
@@ -25,12 +25,13 @@ EXPORT MStatus initializePlugin(MObject obj)
 {
 	MFnPlugin plugin(obj, "Sebastian Thiel", "0.1");
 	MStatus stat;
-	
-	stat = plugin.registerNode(MeshCurvatureNode::typeName, MeshCurvatureNode::typeId,
-								MeshCurvatureNode::creator, MeshCurvatureNode::initialize,
-								MPxNode::kDependNode);
+	const MString classification = "shader/surface/utility/:drawdb/shader/surface/hwColorPerVertexShader";
+
+	stat = plugin.registerNode( MeshCurvatureHWShader::typeName, MeshCurvatureHWShader::typeId,
+								MeshCurvatureHWShader::creator, MeshCurvatureHWShader::initialize,
+								MPxNode::kHardwareShader, &classification);
 	if (stat.error()){
-		stat.perror("register lidar visualization node");
+		stat.perror("register dft nodes");
 		return stat;
 	}
 
@@ -43,12 +44,12 @@ EXPORT MStatus uninitializePlugin(MObject obj)
 	MFnPlugin plugin(obj);
 	MStatus stat;
 
-	stat = plugin.deregisterNode(MeshCurvatureNode::typeId);
+	stat = plugin.deregisterNode(MeshCurvatureHWShader::typeId);
 	if (stat.error()){
-		stat.perror("deregister CurvatureVisualizer");
+		stat.perror("deregister dft");
 		return stat;
 	}
-	
+
 	return stat;
 }
 
