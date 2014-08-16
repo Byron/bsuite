@@ -1,0 +1,16 @@
+
+global proc AEMeshCurvatureNodeTemplate(string $nodeName)
+{
+	editorTemplate -beginScrollLayout;
+
+	editorTemplate -beginLayout "Ptex Texture Attributes" -collapse 0;
+	{
+		editorTemplate -addControl "vertexColorMapName";
+		AEaddRampControl($nodeName+".curvatureMap");
+	}
+	editorTemplate -endLayout;
+	
+	editorTemplate -addExtraControls;
+	editorTemplate -endScrollLayout;
+}
+
