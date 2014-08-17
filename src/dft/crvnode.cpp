@@ -52,15 +52,11 @@ MObject MeshCurvatureHWShader::aCurveMap;
 
 
 MeshCurvatureHWShader::MeshCurvatureHWShader()
+	: _colorsPerFaceVtx(0)
 {}
 
 MeshCurvatureHWShader::~MeshCurvatureHWShader()
 {}
-
-void MeshCurvatureHWShader::postConstructor()
-{
-	setMPSafe(false);
-}
 
 // DESCRIPTION:
 // creates an instance of the node
@@ -89,12 +85,20 @@ MStatus MeshCurvatureHWShader::initialize()
 
 MStatus MeshCurvatureHWShader::bind(const MDrawRequest& request, M3dView& view)
 {
-    view.beginGL();
+	if (request.displayStyle() == M3dView::kPoints ||
+		request.displayStyle() == M3dView::kWireFrame) {
+		return MS::kFailure;
+	}
 
-    glPushAttrib( GL_ALL_ATTRIB_BITS );
-    glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
+	view.beginGL();
+	glPushAttrib( GL_ALL_ATTRIB_BITS );
+	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
 
-    view.endGL();
+
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+//	glEnableClientState(GL_COLOR_ARRAY);
+	view.endGL();
 
     return MS::kSuccess;
 }
@@ -103,12 +107,15 @@ MStatus MeshCurvatureHWShader::bind(const MDrawRequest& request, M3dView& view)
 MStatus MeshCurvatureHWShader::unbind(const MDrawRequest& request,
                M3dView& view)
 {
-    view.beginGL(); 
+	view.beginGL();
 
-    glPopClientAttrib();
-    glPopAttrib();
+	glPopClientAttrib();
+	glPopAttrib();
 
-    view.endGL();
+	view.endGL();
+
+	delete [] _colorsPerFaceVtx;
+	_colorsPerFaceVtx = 0;
 
     return MS::kSuccess;
 }
@@ -124,6 +131,7 @@ bool MeshCurvatureHWShader::setInternalValueInContext( const MPlug& plug,
 MStatus recomputeCurvatureToMesh(MFnMesh& mesh)
 {
 	MStatus stat;
+
 	return stat;
 }
 
@@ -143,28 +151,21 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 			                            int texCoordCount,
 			                            const float ** texCoordArrays)
 {
-	// 
-    // if( colorCount > 0 && colorArrays[ colorCount - 1] != NULL )
-    // {
-    //     glPushAttrib(GL_ALL_ATTRIB_BITS);
-    //     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-    //     glDisable(GL_LIGHTING);
 
-    //     glEnableClientState(GL_COLOR_ARRAY);
-    //     glColorPointer( 4, GL_FLOAT, 0, &colorArrays[colorCount - 1][0]);
+	// For now, only do triangles, our cache is somewhat
+	if (prim != GL_TRIANGLES) {
+		return MS::kInvalidParameter;
+	}
+	glDisable(GL_LIGHTING);
 
-    //     glEnableClientState(GL_VERTEX_ARRAY);
-    //     glVertexPointer ( 3, GL_FLOAT, 0, &vertexArray[0] );
-    //     glDrawElements ( prim, indexCount, GL_UNSIGNED_INT, indexArray );
+//	glEnableClientState(GL_COLOR_ARRAY);
+//	glColorPointer( 4, GL_FLOAT, 0, &colorArrays[colorCount - 1][0]);
+	std::cout << indexCount << " " << vertexCount << std::endl;
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertexPointer( 3, GL_FLOAT, 0, vertexArray );
+	glDrawElements( prim, indexCount, GL_UNSIGNED_INT, indexArray );
 
-    //     glEnableClientState(GL_COLOR_ARRAY);
-
-    //     glPopClientAttrib();
-    //     glPopAttrib();
-
-    //     return MS::kSuccess;
-    // }
-    return MS::kSuccess;
+	return MS::kSuccess;
 }
 
 

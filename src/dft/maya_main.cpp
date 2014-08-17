@@ -25,11 +25,11 @@ EXPORT MStatus initializePlugin(MObject obj)
 {
 	MFnPlugin plugin(obj, "Sebastian Thiel", "0.1");
 	MStatus stat;
-	const MString classification = "shader/surface/utility/:drawdb/shader/surface/hwColorPerVertexShader";
 
+	const MString classification = "shader/surface/utility";
 	stat = plugin.registerNode( MeshCurvatureHWShader::typeName, MeshCurvatureHWShader::typeId,
 								MeshCurvatureHWShader::creator, MeshCurvatureHWShader::initialize,
-								MPxNode::kHardwareShader, &classification);
+								MPxNode::kHwShaderNode, &classification);
 	if (stat.error()){
 		stat.perror("register dft nodes");
 		return stat;

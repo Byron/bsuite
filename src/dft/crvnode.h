@@ -15,8 +15,8 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CURVATURE_VISUALIZATION_NODE
-#define CURVATURE_VISUALIZATION_NODE
+#ifndef CURVATURE_VISUALIZATION_SHADER
+#define CURVATURE_VISUALIZATION_SHADER
 
 #include <maya/MPxHwShaderNode.h>
 
@@ -35,7 +35,6 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 		MeshCurvatureHWShader();
 		virtual ~MeshCurvatureHWShader();
 
-		virtual void postConstructor();
 		virtual bool provideVertexIDs() { return true; }
 
 		MStatus bind(const MDrawRequest&, M3dView&);
@@ -61,8 +60,8 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 		MStatus compute( const MPlug&, MDataBlock&);
 		
 		virtual bool setInternalValueInContext( const MPlug&,
-											  	const MDataHandle&,
-											  	MDGContext&);
+												const MDataHandle&,
+												MDGContext&);
 
 		static const MTypeId typeId;				//!< binary file type id
 		static const MString typeName;				//!< node type name
@@ -70,8 +69,9 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 	protected:
 		// Input attributes
 		static MObject aCurveMap;				//!< a ramp attribute to allow mapping 
-		
-	protected:
+
+	private:
+		float* _colorsPerFaceVtx;				//!< one triplet of floats per face-vertex, suitable for drawing triangles
 };
 
 #endif
