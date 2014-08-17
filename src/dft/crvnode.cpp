@@ -136,30 +136,13 @@ void vnorm(const float*const v, float* out) {
 }
 
 inline
-void computeVertexCurvature(const MVector& cn, const MIntArray& nvtx, MItMeshVertex& itVtx, float outColor[3])
+void computeVertexCurvature(const float triNormal[3], const float vtxNormal[3], float outColor[3])
 {
-	outColor[0] = 0.0f;
+	// TODO: color remapping
+	// We remap the value to be 1.0 at 90DEG, and 2.0 at 180DEG
+	outColor[0] = acosf(dot(vtxNormal, triNormal)) / M_PI_2;
 	outColor[1] = 0.0f;
 	outColor[2] = 0.0f;
-
-	const int ne = nvtx.length();
-	int prevIndex;
-	MVector en;
-
-	for (int eid = 0; eid < ne; ++eid) {
-		itVtx.setIndex(nvtx[eid], prevIndex);
-		itVtx.getNormal(en);
-		en.normalize();
-
-		// TODO: color remapping
-		outColor[0] = cn.angle(en);
-	}
-
-	// normalize
-	const float factor = ((float)ne * M_PI_2) / 10.0f;
-	outColor[0] /= factor;
-	outColor[1] /= factor;
-	outColor[2] /= factor;
 }
 
 MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
@@ -180,23 +163,17 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 {
 
 	// For now, only do triangles, our cache is somewhat
-	if (prim != GL_TRIANGLES || vertexIDs == NULL) {
+	if (prim != GL_TRIANGLES || normalArrays == NULL || normalArrays[0] == NULL) {
 		return MS::kInvalidParameter;
 	}
+
 	MStatus stat;
 	glDisable(GL_LIGHTING);
-
-	MItMeshVertex itVtx(request.multiPath(), MObject::kNullObj, &stat);
-	CHECK_MSTATUS(stat);
-	MFnMesh mesh(request.multiPath(), &stat);
+	
+	float vtxColor[3];
 	CHECK_MSTATUS(stat);
 
-	MIntArray edgeVtxIds;
-	float vtxColor[3] = {1.0f, 0.0f, 0.0f};
-	int prevIndex = -1;
-	MVector vtxNormal;
-	CHECK_MSTATUS(stat);
-
+	const float*const normals = normalArrays[0];
 
 	const unsigned int*const indexArrayEnd = indexArray + indexCount;
 
@@ -204,20 +181,23 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 		glBegin(prim);
 		{
 			// I expect this to be unrolled when optimized
+
+			float triNormal[3] = {0.0f, 0.0f, 0.0f};
+
+			// compute face normal, as average of all given normals
+			for (uint i = 0; i < 3; ++i) {
+				const unsigned id = cIndex[i]*3;
+				triNormal[0] += normals[id+0] / 3.0f;
+				triNormal[1] += normals[id+1] / 3.0f;
+				triNormal[2] += normals[id+2] / 3.0f;
+			}
+
 			for (unsigned int i = 0; i < 3; ++i, ++cIndex) {
-				const unsigned drawIndex = *cIndex;
-				const unsigned vtxId = vertexIDs[drawIndex];
-
-				itVtx.setIndex(vtxId, prevIndex);
-				itVtx.getConnectedVertices(edgeVtxIds);
-				itVtx.getNormal(vtxNormal);
-
-				vtxNormal.normalize();
-				computeVertexCurvature(vtxNormal, edgeVtxIds, itVtx, vtxColor);
+				const unsigned drawIndex = *cIndex * 3;
+				computeVertexCurvature(triNormal, &normals[drawIndex], vtxColor);
 
 				glColor3fv(vtxColor);
-				glVertex3fv(&vertexArray[drawIndex*3]);
-				std::cout << vtxColor[0] << " " << vtxColor[1] << " "<< vtxColor[2] << std::endl;
+				glVertex3fv(&vertexArray[drawIndex]);
 			}
 		}
 		glEnd();

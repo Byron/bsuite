@@ -34,9 +34,10 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 	public:
 		MeshCurvatureHWShader();
 		virtual ~MeshCurvatureHWShader();
-
-		virtual bool provideVertexIDs() { return true; }
+		
 		virtual void postConstructor() { setMPSafe(true); }
+		virtual int normalsPerVertex() { return 1; }
+
 		MStatus bind(const MDrawRequest&, M3dView&);
 		MStatus unbind(const MDrawRequest&, M3dView&);
 		virtual MStatus     geometry( const MDrawRequest& request,
