@@ -69,6 +69,7 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 
 	protected:
 		// Input attributes
+		static MObject aUseMap;					//!< a switch to enable expensive color remapping
 		static MObject aCurveMap;				//!< a ramp attribute to allow mapping 
 
 };

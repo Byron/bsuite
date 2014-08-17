@@ -29,6 +29,7 @@
 #include <maya/MItMeshVertex.h>
 #include <maya/MDrawRequest.h>
 #include <maya/MFloatVector.h>
+#include <maya/MFnNumericAttribute.h>
 
 
 #include "mayabaselib/base.h"
@@ -52,6 +53,7 @@ const MString MeshCurvatureHWShader::typeName("MeshCurvatureHWShader");
 
 // Attributes
 MObject MeshCurvatureHWShader::aCurveMap;
+MObject MeshCurvatureHWShader::aUseMap;
 
 
 MeshCurvatureHWShader::MeshCurvatureHWShader()
@@ -73,13 +75,16 @@ MStatus MeshCurvatureHWShader::initialize()
 {
 	MStatus status;
 
-	MFnTypedAttribute fnType;
+	MFnNumericAttribute fnNum;
 
 	aCurveMap = MRampAttribute::createColorRamp("curvatureMap", "cm", &status);
+	CHECK_MSTATUS(status);
+	aUseMap = fnNum.create("useCurvatureMap", "ucm", MFnNumericData::kBoolean, 0.0, &status);
 	CHECK_MSTATUS(status);
 
 	// Add attributes
 	/////////////////
+	CHECK_MSTATUS(addAttribute(aUseMap));
 	CHECK_MSTATUS(addAttribute(aCurveMap));
 
 	return MS::kSuccess;
@@ -136,13 +141,22 @@ void vnorm(const float*const v, float* out) {
 }
 
 inline
-void computeVertexCurvature(const float triNormal[3], const float vtxNormal[3], float outColor[3])
+void computeVertexCurvature(const float triNormal[3], const float vtxNormal[3], MRampAttribute* map, float outColor[3])
 {
-	// TODO: color remapping
 	// We remap the value to be 1.0 at 90DEG, and 2.0 at 180DEG
-	outColor[0] = acosf(dot(vtxNormal, triNormal)) / M_PI_2;
-	outColor[1] = 0.0f;
-	outColor[2] = 0.0f;
+	const float angle = acosf(dot(vtxNormal, triNormal)) / M_PI_2;
+
+	if (map) {
+		MColor col;
+		map->getColorAtPosition(angle, col);
+		outColor[0] = (float)col.r;
+		outColor[1] = (float)col.g;
+		outColor[2] = (float)col.b;
+	} else {
+		outColor[0] = angle;
+		outColor[1] = 0.0f;
+		outColor[2] = 0.0f;
+	}
 }
 
 MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
@@ -171,10 +185,11 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 	glDisable(GL_LIGHTING);
 	
 	float vtxColor[3];
+	MRampAttribute mapper(thisMObject(), aCurveMap, &stat);
 	CHECK_MSTATUS(stat);
+	MRampAttribute* mapPtr = MPlug(thisMObject(), aUseMap).asBool() ? &mapper : NULL;
 
 	const float*const normals = normalArrays[0];
-
 	const unsigned int*const indexArrayEnd = indexArray + indexCount;
 
 	for (const unsigned int* cIndex = indexArray; cIndex < indexArrayEnd;) {
@@ -194,7 +209,7 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 
 			for (unsigned int i = 0; i < 3; ++i, ++cIndex) {
 				const unsigned drawIndex = *cIndex * 3;
-				computeVertexCurvature(triNormal, &normals[drawIndex], vtxColor);
+				computeVertexCurvature(triNormal, &normals[drawIndex], mapPtr, vtxColor);
 
 				glColor3fv(vtxColor);
 				glVertex3fv(&vertexArray[drawIndex]);

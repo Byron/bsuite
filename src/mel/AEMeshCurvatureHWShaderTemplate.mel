@@ -3,11 +3,9 @@ global proc AEMeshCurvatureHWShaderTemplate(string $nodeName)
 {
 	editorTemplate -beginScrollLayout;
 
-	editorTemplate -beginLayout "Curvature Attributes" -collapse 0;
-	{
-		AEaddRampControl($nodeName+".curvatureMap");
-	}
-	editorTemplate -endLayout;
+	editorTemplate -ann "If enabled, a color ramp is used to generate different colors. 0 = flat surface, 1 = 90DEG, 2 = 180DEG"
+					-l "Use Color Map" -addControl "useCurvatureMap";
+	AEaddRampControl($nodeName+".curvatureMap");
 	
 	editorTemplate -addExtraControls;
 	editorTemplate -endScrollLayout;
