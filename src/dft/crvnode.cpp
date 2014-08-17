@@ -94,12 +94,6 @@ MStatus MeshCurvatureHWShader::bind(const MDrawRequest& request, M3dView& view)
 
 	view.beginGL();
 	glPushAttrib( GL_ALL_ATTRIB_BITS );
-	glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
-
-
-
-//	glEnableClientState(GL_VERTEX_ARRAY);
-//	glEnableClientState(GL_COLOR_ARRAY);
 	view.endGL();
 
     return MS::kSuccess;
@@ -110,10 +104,7 @@ MStatus MeshCurvatureHWShader::unbind(const MDrawRequest& request,
                M3dView& view)
 {
 	view.beginGL();
-
-	glPopClientAttrib();
 	glPopAttrib();
-
 	view.endGL();
 
     return MS::kSuccess;
@@ -145,24 +136,30 @@ void vnorm(const float*const v, float* out) {
 }
 
 inline
-void computeVertexCurvature(const uint32_t cvtx, const MIntArray& nvtx, const float* pos, float outColor[3])
+void computeVertexCurvature(const MVector& cn, const MIntArray& nvtx, MItMeshVertex& itVtx, float outColor[3])
 {
 	outColor[0] = 0.0f;
 	outColor[1] = 0.0f;
 	outColor[2] = 0.0f;
 
-	const float*const cvtxp = &pos[cvtx*3];
 	const int ne = nvtx.length();
+	int prevIndex;
+	MVector en;
 
 	for (int eid = 0; eid < ne; ++eid) {
+		itVtx.setIndex(nvtx[eid], prevIndex);
+		itVtx.getNormal(en);
+		en.normalize();
 
+		// TODO: color remapping
+		outColor[0] = cn.angle(en);
 	}
 
 	// normalize
-	const float nnvtx = (float)nvtx.length();
-	outColor[0] /= nnvtx;
-	outColor[1] /= nnvtx;
-	outColor[2] /= nnvtx;
+	const float factor = ((float)ne * M_PI_2) / 10.0f;
+	outColor[0] /= factor;
+	outColor[1] /= factor;
+	outColor[2] /= factor;
 }
 
 MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
@@ -189,10 +186,6 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 	MStatus stat;
 	glDisable(GL_LIGHTING);
 
-//	glEnableClientState(GL_COLOR_ARRAY);
-//	glColorPointer( 4, GL_FLOAT, 0, &colorArrays[colorCount - 1][0]);
-// 	glVertexPointer( 3, GL_FLOAT, 0, vertexArray );
-
 	MItMeshVertex itVtx(request.multiPath(), MObject::kNullObj, &stat);
 	CHECK_MSTATUS(stat);
 	MFnMesh mesh(request.multiPath(), &stat);
@@ -201,7 +194,7 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 	MIntArray edgeVtxIds;
 	float vtxColor[3] = {1.0f, 0.0f, 0.0f};
 	int prevIndex = -1;
-	const float* vtxPos = mesh.getRawPoints(&stat);
+	MVector vtxNormal;
 	CHECK_MSTATUS(stat);
 
 
@@ -217,10 +210,14 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 
 				itVtx.setIndex(vtxId, prevIndex);
 				itVtx.getConnectedVertices(edgeVtxIds);
-				computeVertexCurvature(vtxId ,edgeVtxIds, vtxPos, vtxColor);
+				itVtx.getNormal(vtxNormal);
 
-				glVertex3fv(&vertexArray[drawIndex*3]);
+				vtxNormal.normalize();
+				computeVertexCurvature(vtxNormal, edgeVtxIds, itVtx, vtxColor);
+
 				glColor3fv(vtxColor);
+				glVertex3fv(&vertexArray[drawIndex*3]);
+				std::cout << vtxColor[0] << " " << vtxColor[1] << " "<< vtxColor[2] << std::endl;
 			}
 		}
 		glEnd();
