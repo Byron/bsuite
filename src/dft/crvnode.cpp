@@ -154,7 +154,7 @@ void computeVertexCurvature(const float triNormal[3], const float vtxNormal[3], 
 		outColor[2] = (float)col.b;
 	} else {
 		outColor[0] = angle;
-		outColor[1] = 0.0f;
+		outColor[1] = (1-angle) * 0.75f;
 		outColor[2] = 0.0f;
 	}
 }

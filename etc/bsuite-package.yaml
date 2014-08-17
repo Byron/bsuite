@@ -1,5 +1,7 @@
+bsuite-release-type: release
+
 packages:
-  bsuite-maya-debug:
+  bsuite-maya:
     name: BSuite Maya-Plugins
     description: |
       A package to setup paths for use of bsuite plugins for maya
@@ -9,11 +11,11 @@ packages:
       - '{yaml.bsuite-package.dirname}/..'
     environment:
       variables:
-        MAYA_PLUG_IN_PATH: 'bin/debug/{packages.maya.version.major}'
+        MAYA_PLUG_IN_PATH: 'bin/{bsuite-release-type}/{packages.maya.version.major}'
         MAYA_SCRIPT_PATH: src/mel
 
   # inject requirements
   maya:
     requires:
-      - bsuite-maya-debug
+      - bsuite-maya
 
