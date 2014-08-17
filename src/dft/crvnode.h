@@ -36,7 +36,7 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 		virtual ~MeshCurvatureHWShader();
 
 		virtual bool provideVertexIDs() { return true; }
-
+		virtual void postConstructor() { setMPSafe(true); }
 		MStatus bind(const MDrawRequest&, M3dView&);
 		MStatus unbind(const MDrawRequest&, M3dView&);
 		virtual MStatus     geometry( const MDrawRequest& request,
@@ -70,8 +70,6 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 		// Input attributes
 		static MObject aCurveMap;				//!< a ramp attribute to allow mapping 
 
-	private:
-		float* _colorsPerFaceVtx;				//!< one triplet of floats per face-vertex, suitable for drawing triangles
 };
 
 #endif

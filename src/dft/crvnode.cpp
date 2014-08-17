@@ -32,10 +32,13 @@
 
 
 #include "mayabaselib/base.h"
+#include "baselib/math_util.h"
+
 #include "util.h"
 #include "crvnode.h"
 
-#include "assert.h"
+#include <assert.h>
+#include <math.h>
 
 
 //********************************************************************
@@ -52,7 +55,6 @@ MObject MeshCurvatureHWShader::aCurveMap;
 
 
 MeshCurvatureHWShader::MeshCurvatureHWShader()
-	: _colorsPerFaceVtx(0)
 {}
 
 MeshCurvatureHWShader::~MeshCurvatureHWShader()
@@ -96,7 +98,7 @@ MStatus MeshCurvatureHWShader::bind(const MDrawRequest& request, M3dView& view)
 
 
 
-	glEnableClientState(GL_VERTEX_ARRAY);
+//	glEnableClientState(GL_VERTEX_ARRAY);
 //	glEnableClientState(GL_COLOR_ARRAY);
 	view.endGL();
 
@@ -114,9 +116,6 @@ MStatus MeshCurvatureHWShader::unbind(const MDrawRequest& request,
 
 	view.endGL();
 
-	delete [] _colorsPerFaceVtx;
-	_colorsPerFaceVtx = 0;
-
     return MS::kSuccess;
 }
 
@@ -127,12 +126,43 @@ bool MeshCurvatureHWShader::setInternalValueInContext( const MPlug& plug,
 	return MPxHwShaderNode::setInternalValueInContext(plug, handle, ctx);
 }
 
-// Compute colors per vertex, and map them according to the given ramp attribute
-MStatus recomputeCurvatureToMesh(MFnMesh& mesh)
-{
-	MStatus stat;
+inline 
+float dot(const float*const l, const float*const r) {
+	return l[0]*r[0] + l[1]*r[1] + l[2]*r[2];
+}
 
-	return stat;
+inline
+float vlen(const float*const v) {
+	return sqrtf(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+}
+
+inline
+void vnorm(const float*const v, float* out) {
+	const float l = vlen(v);
+	out[0] = v[0] / l;
+	out[1] = v[1] / l;
+	out[2] = v[2] / l;
+}
+
+inline
+void computeVertexCurvature(const uint32_t cvtx, const MIntArray& nvtx, const float* pos, float outColor[3])
+{
+	outColor[0] = 0.0f;
+	outColor[1] = 0.0f;
+	outColor[2] = 0.0f;
+
+	const float*const cvtxp = &pos[cvtx*3];
+	const int ne = nvtx.length();
+
+	for (int eid = 0; eid < ne; ++eid) {
+
+	}
+
+	// normalize
+	const float nnvtx = (float)nvtx.length();
+	outColor[0] /= nnvtx;
+	outColor[1] /= nnvtx;
+	outColor[2] /= nnvtx;
 }
 
 MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
@@ -153,17 +183,48 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 {
 
 	// For now, only do triangles, our cache is somewhat
-	if (prim != GL_TRIANGLES) {
+	if (prim != GL_TRIANGLES || vertexIDs == NULL) {
 		return MS::kInvalidParameter;
 	}
+	MStatus stat;
 	glDisable(GL_LIGHTING);
 
 //	glEnableClientState(GL_COLOR_ARRAY);
 //	glColorPointer( 4, GL_FLOAT, 0, &colorArrays[colorCount - 1][0]);
-	std::cout << indexCount << " " << vertexCount << std::endl;
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertexPointer( 3, GL_FLOAT, 0, vertexArray );
-	glDrawElements( prim, indexCount, GL_UNSIGNED_INT, indexArray );
+// 	glVertexPointer( 3, GL_FLOAT, 0, vertexArray );
+
+	MItMeshVertex itVtx(request.multiPath(), MObject::kNullObj, &stat);
+	CHECK_MSTATUS(stat);
+	MFnMesh mesh(request.multiPath(), &stat);
+	CHECK_MSTATUS(stat);
+
+	MIntArray edgeVtxIds;
+	float vtxColor[3] = {1.0f, 0.0f, 0.0f};
+	int prevIndex = -1;
+	const float* vtxPos = mesh.getRawPoints(&stat);
+	CHECK_MSTATUS(stat);
+
+
+	const unsigned int*const indexArrayEnd = indexArray + indexCount;
+
+	for (const unsigned int* cIndex = indexArray; cIndex < indexArrayEnd;) {
+		glBegin(prim);
+		{
+			// I expect this to be unrolled when optimized
+			for (unsigned int i = 0; i < 3; ++i, ++cIndex) {
+				const unsigned drawIndex = *cIndex;
+				const unsigned vtxId = vertexIDs[drawIndex];
+
+				itVtx.setIndex(vtxId, prevIndex);
+				itVtx.getConnectedVertices(edgeVtxIds);
+				computeVertexCurvature(vtxId ,edgeVtxIds, vtxPos, vtxColor);
+
+				glVertex3fv(&vertexArray[drawIndex*3]);
+				glColor3fv(vtxColor);
+			}
+		}
+		glEnd();
+	}// for each triangle
 
 	return MS::kSuccess;
 }

@@ -1,0 +1,15 @@
+
+global proc AEMeshCurvatureHWShaderTemplate(string $nodeName)
+{
+	editorTemplate -beginScrollLayout;
+
+	editorTemplate -beginLayout "Curvature Attributes" -collapse 0;
+	{
+		AEaddRampControl($nodeName+".curvatureMap");
+	}
+	editorTemplate -endLayout;
+	
+	editorTemplate -addExtraControls;
+	editorTemplate -endScrollLayout;
+}
+
