@@ -161,10 +161,10 @@ void vnorm(const float*const v, float* out) {
 }
 
 inline
-void computeVertexCurvature(const float triNormal[3], const float vtxNormal[3], MRampAttribute* map, float outColor[3])
+void computeVertexCurvature(const float triNormal[3], const float vtxNormal[3], MRampAttribute* map, const float normalizer, float outColor[3])
 {
 	// We remap the value to be 1.0 at 90DEG, and 2.0 at 180DEG
-	const float angle = acosf(dot(vtxNormal, triNormal)) / (float)pi_2;
+	const float angle = acosf(dot(vtxNormal, triNormal)) / ((float)pi_2 * normalizer);
 
 	if (map) {
 		MColor col;
@@ -239,9 +239,41 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 				triNormal[2] += normals[id+2] / 3.0f;
 			}
 
+			float extend = 0.0f;
+			float edge[3];
+			for (uint i = 0; i < 3; ++i) {
+				int a; int b;
+				switch(i) {
+					case 0: {
+						a = 0;
+						b = 1;
+						break;
+					}
+					case 1: {
+						a = 0;
+						b = 2;
+						break;
+					}
+					case 2: {
+						a = 1;
+						b = 2;
+						break;
+					}
+				}
+				const float* va = &vertexArray[cIndex[a] * 3];
+				const float* vb = &vertexArray[cIndex[b] * 3];
+
+				edge[0] = va[0] - vb[0];
+				edge[1] = va[1] - vb[1];
+				edge[2] = va[2] - vb[2];
+
+				extend += vlen(edge);
+			}
+
+
 			for (unsigned int i = 0; i < 3; ++i, ++cIndex) {
 				const unsigned drawIndex = *cIndex * 3;
-				computeVertexCurvature(triNormal, &normals[drawIndex], mapPtr, vtxColor);
+				computeVertexCurvature(triNormal, &normals[drawIndex], mapPtr, extend, vtxColor);
 
 				gl->glColor3fv(vtxColor);
 				if (!flatShading) {
