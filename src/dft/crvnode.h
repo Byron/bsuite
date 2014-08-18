@@ -67,7 +67,8 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 		// Input attributes
 		static MObject aUseMap;					//!< a switch to enable expensive color remapping
 		static MObject aCurveMap;				//!< a ramp attribute to allow mapping 
-		static MObject aFlatShading;				//!< if set, we will also light the surface
+		static MObject aFlatShading;			//!< if set, we will also light the surface
+		static MObject aScale;					//!< a scale factor, to handle differently scaled scenes
 
 };
 

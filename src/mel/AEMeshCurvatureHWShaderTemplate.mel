@@ -7,9 +7,10 @@ global proc AEMeshCurvatureHWShaderTemplate(string $nodeName)
 					-l "Use Color Map" -addControl "useCurvatureMap";
 	editorTemplate -ann "If enabled, surfaces will be flat, as to not be distracted from surface shading"
 					-l "Flat Shading" -addControl "flatShading";
+	editorTemplate -ann "Allows to scale ramp values to match the scaling of your respective scene"
+					-l "Scale" -addControl "scaleFactor";
 	AEaddRampControl($nodeName+".curvatureMap");
 	
 	editorTemplate -addExtraControls;
 	editorTemplate -endScrollLayout;
 }
-

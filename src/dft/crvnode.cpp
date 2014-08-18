@@ -75,6 +75,7 @@ const double pi_2 = 1.57079632679489661923132169163975144;
 MObject MeshCurvatureHWShader::aCurveMap;
 MObject MeshCurvatureHWShader::aUseMap;
 MObject MeshCurvatureHWShader::aFlatShading;
+MObject MeshCurvatureHWShader::aScale;
 
 
 MeshCurvatureHWShader::MeshCurvatureHWShader()
@@ -104,12 +105,17 @@ MStatus MeshCurvatureHWShader::initialize()
 	CHECK_MSTATUS(status);
 	aFlatShading = fnNum.create("flatShading", "fs", MFnNumericData::kBoolean, 1.0, &status);
 	CHECK_MSTATUS(status);
+	aScale = fnNum.create("scaleFactor", "sf", MFnNumericData::kFloat, 1.0, &status);
+	CHECK_MSTATUS(status);
+	fnNum.setMin(0.0);
+	fnNum.setSoftMax(5.0);
 
 	// Add attributes
 	/////////////////
 	CHECK_MSTATUS(addAttribute(aUseMap));
 	CHECK_MSTATUS(addAttribute(aCurveMap));
 	CHECK_MSTATUS(addAttribute(aFlatShading));
+	CHECK_MSTATUS(addAttribute(aScale));
 
 	return MS::kSuccess;
 }
@@ -216,6 +222,7 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 		return stat;
 	}
 	const bool flatShading = MPlug(thisMObject(), aFlatShading).asBool();
+	const float scale = MPlug(thisMObject(), aScale).asFloat();
 
 	if (flatShading) {
 		gl->glDisable(GL_LIGHTING);
@@ -282,7 +289,7 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 
 			for (unsigned int i = 0; i < 3; ++i, ++cIndex) {
 				const unsigned drawIndex = *cIndex * 3;
-				computeVertexCurvature(triNormal, &normals[drawIndex], mapPtr, extend, vtxColor);
+				computeVertexCurvature(triNormal, &normals[drawIndex], mapPtr, extend / scale, vtxColor);
 
 				gl->glColor3fv(vtxColor);
 				if (!flatShading) {
