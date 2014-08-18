@@ -30,17 +30,26 @@
 #include <maya/MDrawRequest.h>
 #include <maya/MFloatVector.h>
 #include <maya/MFnNumericAttribute.h>
+#include <maya/MHardwareRenderer.h>
 
 
 #include "mayabaselib/base.h"
 #include "baselib/math_util.h"
 
-#include "util.h"
 #include "crvnode.h"
 
 #include <assert.h>
 #include <math.h>
 
+inline
+MGLFunctionTable* getGL(MStatus& stat){
+	MHardwareRenderer* renderer = MHardwareRenderer::theRenderer();
+	if (!renderer) {
+		stat.perror("There was no hardware renderer");
+		return NULL;
+	}
+	return renderer->glFunctionTable();
+}
 
 //********************************************************************
 //**	Class Implementation
@@ -49,6 +58,8 @@
 
 const MTypeId MeshCurvatureHWShader::typeId(0x00108bf9);
 const MString MeshCurvatureHWShader::typeName("MeshCurvatureHWShader");
+
+const double pi_2 = 1.57079632679489661923132169163975144;
 
 
 // Attributes
@@ -101,8 +112,14 @@ MStatus MeshCurvatureHWShader::bind(const MDrawRequest& request, M3dView& view)
 		return MS::kFailure;
 	}
 
+	MStatus stat;
+	MGLFunctionTable* gl = getGL(stat);
+	if (!gl) {
+		return stat;
+	}
+
 	view.beginGL();
-	glPushAttrib( GL_ALL_ATTRIB_BITS );
+	gl->glPushAttrib( GL_ALL_ATTRIB_BITS );
 	view.endGL();
 
     return MS::kSuccess;
@@ -112,8 +129,14 @@ MStatus MeshCurvatureHWShader::bind(const MDrawRequest& request, M3dView& view)
 MStatus MeshCurvatureHWShader::unbind(const MDrawRequest& request,
                M3dView& view)
 {
+	MStatus stat;
+	MGLFunctionTable* gl = getGL(stat);
+	if (!gl) {
+		return stat;
+	}
+
 	view.beginGL();
-	glPopAttrib();
+	gl->glPopAttrib();
 	view.endGL();
 
     return MS::kSuccess;
@@ -141,7 +164,7 @@ inline
 void computeVertexCurvature(const float triNormal[3], const float vtxNormal[3], MRampAttribute* map, float outColor[3])
 {
 	// We remap the value to be 1.0 at 90DEG, and 2.0 at 180DEG
-	const float angle = acosf(dot(vtxNormal, triNormal)) / M_PI_2;
+	const float angle = acosf(dot(vtxNormal, triNormal)) / (float)pi_2;
 
 	if (map) {
 		MColor col;
@@ -179,14 +202,18 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 	}
 
 	MStatus stat;
+	MGLFunctionTable* gl = getGL(stat);
+	if (!gl) {
+		return stat;
+	}
 	const bool flatShading = MPlug(thisMObject(), aFlatShading).asBool();
 
 	if (flatShading) {
-		glDisable(GL_LIGHTING);
+		gl->glDisable(GL_LIGHTING);
 	} else {
-		glEnable(GL_LIGHTING);
-		glEnable(GL_COLOR_MATERIAL);
-		glColorMaterial(GL_FRONT, GL_DIFFUSE);
+		gl->glEnable(GL_LIGHTING);
+		gl->glEnable(GL_COLOR_MATERIAL);
+		gl->glColorMaterial(GL_FRONT, GL_DIFFUSE);
 	}
 	
 	float vtxColor[3];
@@ -198,7 +225,7 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 	const unsigned int*const indexArrayEnd = indexArray + indexCount;
 
 	for (const unsigned int* cIndex = indexArray; cIndex < indexArrayEnd;) {
-		glBegin(prim);
+		gl->glBegin(prim);
 		{
 			// I expect this to be unrolled when optimized
 
@@ -216,14 +243,14 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 				const unsigned drawIndex = *cIndex * 3;
 				computeVertexCurvature(triNormal, &normals[drawIndex], mapPtr, vtxColor);
 
-				glColor3fv(vtxColor);
+				gl->glColor3fv(vtxColor);
 				if (!flatShading) {
-					glNormal3fv(&normals[drawIndex]);
+					gl->glNormal3fv(&normals[drawIndex]);
 				}
-				glVertex3fv(&vertexArray[drawIndex]);
+				gl->glVertex3fv(&vertexArray[drawIndex]);
 			}
 		}
-		glEnd();
+		gl->glEnd();
 	}// for each triangle
 
 	return MS::kSuccess;
