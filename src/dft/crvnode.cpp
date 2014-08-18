@@ -54,6 +54,7 @@ const MString MeshCurvatureHWShader::typeName("MeshCurvatureHWShader");
 // Attributes
 MObject MeshCurvatureHWShader::aCurveMap;
 MObject MeshCurvatureHWShader::aUseMap;
+MObject MeshCurvatureHWShader::aFlatShading;
 
 
 MeshCurvatureHWShader::MeshCurvatureHWShader()
@@ -81,11 +82,14 @@ MStatus MeshCurvatureHWShader::initialize()
 	CHECK_MSTATUS(status);
 	aUseMap = fnNum.create("useCurvatureMap", "ucm", MFnNumericData::kBoolean, 0.0, &status);
 	CHECK_MSTATUS(status);
+	aFlatShading = fnNum.create("flatShading", "fs", MFnNumericData::kBoolean, 1.0, &status);
+	CHECK_MSTATUS(status);
 
 	// Add attributes
 	/////////////////
 	CHECK_MSTATUS(addAttribute(aUseMap));
 	CHECK_MSTATUS(addAttribute(aCurveMap));
+	CHECK_MSTATUS(addAttribute(aFlatShading));
 
 	return MS::kSuccess;
 }
@@ -113,13 +117,6 @@ MStatus MeshCurvatureHWShader::unbind(const MDrawRequest& request,
 	view.endGL();
 
     return MS::kSuccess;
-}
-
-bool MeshCurvatureHWShader::setInternalValueInContext( const MPlug& plug,
-												   const MDataHandle& handle,
-												   MDGContext& ctx)
-{
-	return MPxHwShaderNode::setInternalValueInContext(plug, handle, ctx);
 }
 
 inline 
@@ -182,7 +179,15 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 	}
 
 	MStatus stat;
-	glDisable(GL_LIGHTING);
+	const bool flatShading = MPlug(thisMObject(), aFlatShading).asBool();
+
+	if (flatShading) {
+		glDisable(GL_LIGHTING);
+	} else {
+		glEnable(GL_LIGHTING);
+		glEnable(GL_COLOR_MATERIAL);
+		glColorMaterial(GL_FRONT, GL_DIFFUSE);
+	}
 	
 	float vtxColor[3];
 	MRampAttribute mapper(thisMObject(), aCurveMap, &stat);
@@ -212,6 +217,9 @@ MStatus MeshCurvatureHWShader::geometry(const MDrawRequest& request,
 				computeVertexCurvature(triNormal, &normals[drawIndex], mapPtr, vtxColor);
 
 				glColor3fv(vtxColor);
+				if (!flatShading) {
+					glNormal3fv(&normals[drawIndex]);
+				}
 				glVertex3fv(&vertexArray[drawIndex]);
 			}
 		}

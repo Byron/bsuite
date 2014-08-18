@@ -60,10 +60,6 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 		static  MStatus initialize();
 		MStatus compute( const MPlug&, MDataBlock&);
 		
-		virtual bool setInternalValueInContext( const MPlug&,
-												const MDataHandle&,
-												MDGContext&);
-
 		static const MTypeId typeId;				//!< binary file type id
 		static const MString typeName;				//!< node type name
 
@@ -71,6 +67,7 @@ class MeshCurvatureHWShader : public MPxHwShaderNode
 		// Input attributes
 		static MObject aUseMap;					//!< a switch to enable expensive color remapping
 		static MObject aCurveMap;				//!< a ramp attribute to allow mapping 
+		static MObject aFlatShading;				//!< if set, we will also light the surface
 
 };
 
