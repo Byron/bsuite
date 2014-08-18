@@ -31,6 +31,7 @@
 #include <maya/MFloatVector.h>
 #include <maya/MFnNumericAttribute.h>
 #include <maya/MHardwareRenderer.h>
+#include <maya/MGLFunctionTable.h>
 
 
 #include "mayabaselib/base.h"
@@ -40,6 +41,14 @@
 
 #include <assert.h>
 #include <math.h>
+#include <float.h>
+
+
+#ifdef WIN32
+float fminf(float a, float b) {
+	return (a < b) ? a : b;
+}
+#endif
 
 inline
 MGLFunctionTable* getGL(MStatus& stat){
@@ -164,7 +173,7 @@ inline
 void computeVertexCurvature(const float triNormal[3], const float vtxNormal[3], MRampAttribute* map, const float normalizer, float outColor[3])
 {
 	// We remap the value to be 1.0 at 90DEG, and 2.0 at 180DEG
-	const float angle = acosf(dot(vtxNormal, triNormal)) / ((float)pi_2 * normalizer);
+	const float angle = acosf(fminf(dot(vtxNormal, triNormal), 1.0f-FLT_EPSILON)) / ((float)pi_2 * 2 * normalizer);
 
 	if (map) {
 		MColor col;
@@ -174,7 +183,7 @@ void computeVertexCurvature(const float triNormal[3], const float vtxNormal[3], 
 		outColor[2] = (float)col.b;
 	} else {
 		outColor[0] = angle;
-		outColor[1] = (1-angle) * 0.75f;
+		outColor[1] = (1.0f-angle) * 0.75f;
 		outColor[2] = 0.0f;
 	}
 }
