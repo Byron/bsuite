@@ -31,7 +31,7 @@ EXPORT MStatus initializePlugin(MObject obj)
 								MeshCurvatureHWShader::creator, MeshCurvatureHWShader::initialize,
 								MPxNode::kHwShaderNode, &classification);
 	if (stat.error()){
-		stat.perror("register dft nodes");
+		stat.perror("register shader nodes");
 		return stat;
 	}
 
@@ -46,7 +46,7 @@ EXPORT MStatus uninitializePlugin(MObject obj)
 
 	stat = plugin.deregisterNode(MeshCurvatureHWShader::typeId);
 	if (stat.error()){
-		stat.perror("deregister dft");
+		stat.perror("deregister shader nodes");
 		return stat;
 	}
 

@@ -1,6 +1,6 @@
 
 add_maya_project(NAME
-					dft
+					shaders
 				INCLUDE_DIRS
 					. 
 					..
