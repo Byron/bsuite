@@ -102,7 +102,7 @@ PTexVis Features
 Curvature HW Shader
 ###################
 
-.. image:: http://old.byronimo.de/download/crvshader.png
+.. image:: http://old.byronimo.de/download/crvshader2.png
     :width: 900 px
 
 Implements a (by now) legacy viewport hardware shader to display the curvature of triangle-vertices relative to the interpolated direction of their respective triangle.
