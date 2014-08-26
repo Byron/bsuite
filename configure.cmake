@@ -92,9 +92,8 @@ endif()
 set(DEFAULT_MAYA_VERSIONS 2012 2011 2010 2009 2008)
 set(DEFAULT_MAYA_LIBRARIES Foundation OpenMaya OpenMayaAnim OpenMayaRender OpenMayaFX OpenMayaUI)
 
-if(UNIX AND NOT APPLE AND ${CMAKE_CXX_SIZEOF_DATA_PTR} EQUAL 8)
-	set(DEFAULT_MAYA_INSTALL_SUFFIX -x64)
-endif()
+# Assume 64 bit - as this is to be replaced by bbuild, we don't mind the hack here.
+set(DEFAULT_MAYA_INSTALL_SUFFIX -x64)
 
 set(CUSTOM_DEFINITIONS -DREQUIRE_IOSTREAM -D_BOOL)
 
@@ -108,7 +107,7 @@ if(UNIX)
 	endif()
 else()
 	set(MAYA_INSTALL_BASE_DEFAULT "c:/Program Files/Autodesk")
-	list(APPEND CUSTOM_DEFINITIONS -D_AFXDLL -D_MBCS -DNT_PLUGIN)
+	list(APPEND CUSTOM_DEFINITIONS -D_AFXDLL -D_MBCS -DNT_PLUGIN -D_HAS_ITERATOR_DEBUGGING=0 -D_SECURE_SCL=0 -D_SECURE_SCL_THROWS=0 -D_SECURE_SCL_DEPRECATE=0 -D_CRT_SECURE_NO_DEPRECATE -DTBB_USE_DEBUG=0 -DAW_NEW_IOSTREAMS -DBits64_)
 	
 	set(LOCAL_WARNING_FLAGS /W3)
 	set(LOCAL_RTTI_FLAGS /GR)
@@ -130,7 +129,7 @@ if(NOT EXISTS ${MAYA_INSTALL_BASE_PATH})
 endif()
 
 if(APPLE)
-	set(CMAKE_FRAMEWORK_PATH "/Developer/SDKs/MacOSX10.6.sdk" CACHE STRING
+	set(CMAKE_FRAMEWORK_PATH "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk" CACHE STRING
 		"Directory containing all the osx 10.6 headers")
 	
 	if(NOT EXISTS ${CMAKE_FRAMEWORK_PATH})

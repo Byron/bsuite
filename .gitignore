@@ -2,5 +2,7 @@ doc/
 lib/
 bin/
 build/
+*.autosave
 *.pyc
 *.pdf
+*.sublime-workspace
