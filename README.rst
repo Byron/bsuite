@@ -71,7 +71,7 @@ Lidar Tools Features
  * Display any amount of points without the fear of *out-of-memory* issues.
  * Speedup reading performance using *memory mapping* (currently POSIX only)
  * Speedup display performance using *system* or *GPU* caches.
-
+   
 ########
 PTexVis
 ########
@@ -97,6 +97,28 @@ PTexVis Features
  
   * Can currently only sample *triangle* meshes when *not* only displaying pure texel samples. 
   
+
+###################
+Curvature HW Shader
+###################
+
+.. image:: http://old.byronimo.de/download/crvshader.png
+    :width: 900 px
+
+Implements a (by now) legacy viewport hardware shader to display the curvature of triangle-vertices relative to the interpolated direction of their respective triangle.
+
+It can help to estimate overall smoothness of a surface.
+
+================
+Features
+================
+
+* Display curvature on meshes in real-time
+* supports display-based mesh-smoothing (as when pressing 1,2, 3 on the keyboard)
+* flat-shaded mode and one that incorporates scene lights
+* customize mapping of angles to colors using a ramp
+* adapt the shader to your scene's scale using a simple scale slider (required on windows only)
+
 
 #################
 Byrons Poly Tools
