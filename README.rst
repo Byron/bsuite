@@ -10,19 +10,9 @@ All plugins and tools work on Linux, OSX and Windows.
 Download
 ########
 
-The plugins have been compiled on *Linux*, *OSX* and *Windows*, for maya *2013*, *2012* and *2011*, and on some platforms for even older maya versions.
+The plugins have been compiled on *Linux*, *OSX* and *Windows* for various maya versions. Please download the respective zip file to see if the particular maya version you seek has compiled binaries.
 
-* *Linux*
-
- * https://dl.dropbox.com/u/17820808/bsuite/linux/bsuite_linux_x64.zip
- 
-* *OSX*
-
- * https://dl.dropbox.com/u/17820808/bsuite/osx/bsuite_osx_x64.zip
- 
-* *Windows*
-
- * https://dl.dropbox.com/u/17820808/bsuite/windows/bsuite_windows_x64.zip
+* https://github.com/Byron/bsuite/releases
 
 ============
 Installation
