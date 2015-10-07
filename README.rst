@@ -133,7 +133,7 @@ BPT Features
 
 * Tweak your Meshes in realtime and split trough it almost instantly.
 * You can procedurally slide or push your split, or align it to it's boundary.
-* Soft Selection functionality is directly integrated into the node and can be used in conjuctions with every action which changes the mesh's topology.
+* Soft Selection functionality is directly integrated into the node and can be used in conjunctions with every action which changes the mesh's topology.
 * The Tools will not be limited to a specific component type, and you decide whether you want to work with vertices, edges or faces. Additionally, Smart Split is actually 3 in 1: Split through geometry, poke faces or connect vertices.
 * Byrons Poly Tools bring to you a chamfer and solid chamfer. Due to new algorithms it will give higher quality bevels compared to other packages.
  
